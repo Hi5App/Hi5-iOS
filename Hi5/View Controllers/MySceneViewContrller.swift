@@ -120,11 +120,11 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
   //MARK: - MetalViewControllerDelegate
     func renderObjects(drawable:CAMetalDrawable) {
     // draw the view
-      objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil)
+        objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil)
     }
 
     func updateLogic(timeSinceLastUpdate: CFTimeInterval) {
-    objectToDraw.updateWithDelta(delta: timeSinceLastUpdate)
+        objectToDraw.updateWithDelta(delta: timeSinceLastUpdate)
     }
     
     //MARK: - setup interaction with images

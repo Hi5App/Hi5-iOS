@@ -89,10 +89,24 @@
                     <view key="view" contentMode="scaleToFill" id="31f-VG-8yk">
                         <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <mtkView contentMode="scaleToFill" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="yN6-MA-zow">
+                                <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
+                            </mtkView>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="dlB-IJ-0oo"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="yN6-MA-zow" secondAttribute="trailing" id="1Bk-Ur-IrX"/>
+                            <constraint firstItem="yN6-MA-zow" firstAttribute="leading" secondItem="31f-VG-8yk" secondAttribute="leading" id="96b-gY-XKg"/>
+                            <constraint firstAttribute="bottom" secondItem="yN6-MA-zow" secondAttribute="bottom" id="PBh-vk-NaR"/>
+                            <constraint firstItem="yN6-MA-zow" firstAttribute="top" secondItem="31f-VG-8yk" secondAttribute="top" id="b11-68-gs8"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="d4S-v9-xrB"/>
+                    <connections>
+                        <outlet property="mtkView" destination="yN6-MA-zow" id="JJI-JQ-MHc"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="M3B-LP-wSo" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
