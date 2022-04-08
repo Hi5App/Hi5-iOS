@@ -7,6 +7,7 @@
 
 import UIKit
 import MetalKit
+import simd
 
 protocol MetalViewControllerDelegate : AnyObject{
   func updateLogic(timeSinceLastUpdate: CFTimeInterval)
@@ -18,7 +19,7 @@ class MetalViewController: UIViewController {
     var device: MTLDevice!
     var pipelineState: MTLRenderPipelineState!
     var commandQueue: MTLCommandQueue!
-    var projectionMatrix: Matrix4!
+    var projectionMatrix: float4x4!
     @IBOutlet weak var mtkView:MTKView!{
         didSet{
             mtkView.delegate = self
@@ -37,7 +38,7 @@ class MetalViewController: UIViewController {
     
       mtkView.device = device
       
-      projectionMatrix = Matrix4.makePerspectiveView(angle:85, aspectRatio: Float(self.view.bounds.size.width / self.view.bounds.size.height), nearZ: 0.01, farZ: 100.0)
+      projectionMatrix = float4x4.makePerspectiveViewAngle(Float(85).radians, aspectRatio: Float(self.view.bounds.size.width / self.view.bounds.size.height), nearZ: 0.01, farZ: 10.0)
 
       // 1
       let defaultLibrary = device.makeDefaultLibrary()!
@@ -64,7 +65,7 @@ class MetalViewController: UIViewController {
 
 extension MetalViewController:MTKViewDelegate{
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-        projectionMatrix = Matrix4.makePerspectiveView(angle: 85, aspectRatio: Float(self.view.bounds.size.width/self.view.bounds.size.height), nearZ: 0.01, farZ: 100.0)
+        projectionMatrix = float4x4.makePerspectiveViewAngle(Float(85).radians, aspectRatio: Float(self.view.bounds.size.width/self.view.bounds.size.height), nearZ: 0.01, farZ: 10.0)
     }
     
     func draw(in view: MTKView) {

@@ -8,6 +8,7 @@
 import Foundation
 import Metal
 import QuartzCore
+import simd
 
 class Node{
     let device:MTLDevice
@@ -43,11 +44,11 @@ class Node{
         time += delta
     }
 
-    func modelMatrix() -> Matrix4 {
-        let matrix = Matrix4()
-        matrix.translate(x: positionX, y: positionY, z: positionZ)
-        matrix.rotateAround(x: rotationX, y: rotationY, z: rotationZ)
-        matrix.scale(x: scale, y: scale, z: scale)
+    func modelMatrix() -> float4x4 {
+        var matrix = float4x4()
+        matrix.translate(positionX, y: positionY, z: positionZ)
+        matrix.rotateAroundX(rotationX, y: rotationY, z: rotationZ)
+        matrix.scale(scale, y: scale, z: scale)
         return matrix
     }
 
@@ -66,7 +67,7 @@ class Node{
         vertexCount = vertices.count
         self.texture = texture
         
-        self.bufferProvider = BufferProvider(device: device, inflightBuffersCount: 3, sizeOfUniformsBuffer: MemoryLayout<Float>.size*Matrix4.numberOfElements()*2)
+        self.bufferProvider = BufferProvider(device: device, inflightBuffersCount: 3, sizeOfUniformsBuffer: MemoryLayout<Float>.size*float4x4.numberOfElements()*2)
         
         //set up for rendering the front face to frontFaceTextureDescriptor
         
@@ -125,7 +126,7 @@ class Node{
     }
     
     // call 60 times a second
-    func render(commandQueue:MTLCommandQueue,pipelineState:MTLRenderPipelineState,drawable:CAMetalDrawable,parentModelViewMatrix:Matrix4, projectionMatrix:Matrix4,clearColor:MTLClearColor?){
+    func render(commandQueue:MTLCommandQueue,pipelineState:MTLRenderPipelineState,drawable:CAMetalDrawable,parentModelViewMatrix:float4x4, projectionMatrix:float4x4,clearColor:MTLClearColor?){
         _ = bufferProvider.availableResourcesSemaphore.wait(timeout: DispatchTime.distantFuture)
         
         // set up for cube texture
@@ -156,8 +157,9 @@ class Node{
         
         // start render
         
-        let nodeModelMatrix = self.modelMatrix()
-        nodeModelMatrix.multiply(left: parentModelViewMatrix)
+        var nodeModelMatrix = self.modelMatrix()
+//        nodeModelMatrix.multiply(left: parentModelViewMatrix)
+        nodeModelMatrix.multiplyLeft(parentModelViewMatrix)
         let uniformBuffer = bufferProvider.nextUniformsBuffer(projectionMatrix: projectionMatrix, modelViewMatrix: nodeModelMatrix)
         
         let commanBuffer = commandQueue.makeCommandBuffer()!

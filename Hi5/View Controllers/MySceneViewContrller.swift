@@ -6,12 +6,13 @@
 
 import UIKit
 import UniformTypeIdentifiers
+import simd
 
 class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UIDocumentPickerDelegate {
   
-    var worldModelMatrix:Matrix4!
+    var worldModelMatrix:float4x4!
     var objectToDraw:Quad!
-    var panSensivity:Float = 120.0
+    var panSensivity:Float = 5.0
     var lastPanLocation:CGPoint!
     var imageToDisplay:image4DSimple!
     var scaleLabel:UIButton!
@@ -21,9 +22,9 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
         configureNavBar()
         addLabelView()
         self.view.backgroundColor = UIColor(red: 123.0/255.0, green: 133.0/255.0, blue: 199.0/255.0, alpha: 1.0)
-        worldModelMatrix = Matrix4()
-        worldModelMatrix.translate(x:0.0, y: 0.0, z: -4)
-        worldModelMatrix.rotateAround(x:20.0, y: -25.0, z: 0.0)
+        worldModelMatrix = float4x4()
+        worldModelMatrix.translate(0.0, y: 0.0, z: -4)
+        worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
     }
     
     func configureNavBar(){
