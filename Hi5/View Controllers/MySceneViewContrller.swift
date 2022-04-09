@@ -142,57 +142,62 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
         if tapGesture.state == .ended{
             // calculate position in metal NDC
             let tapPosition = tapGesture.location(in: self.view)
-            let viewWidth = self.view.bounds.width
-            let viewHeight = self.view.bounds.height
-            let centerX = viewWidth/2
-            let centerY = viewHeight/2
-            let clipX = Float((tapPosition.x-centerX)/centerX)
-            let clipY = Float((-tapPosition.y+centerY)/centerY)
-            let clipZstart = Float(0)
-            let clipZend = Float(1)
-            let clipW = Float(1)
-            print(clipX,clipY,clipZstart,clipW)
-            print(clipX,clipY,clipZend,clipW)
-            let tapCastStart = simd_float4(clipX, clipY, clipZstart, clipW)
-            let tapCastEnd = simd_float4(clipX, clipY, clipZend, clipW)
-            var finalMatrix = objectToDraw.modelMatrix()
-            finalMatrix.multiplyLeft(worldModelMatrix)
-            finalMatrix.multiplyLeft(projectionMatrix)
-//            var pointA = matrix_multiply(finalMatrix, simd_float4(-1, 1, 0, 1))
-//            pointA = pointA/pointA.w
-//            print(pointA)
-            
-            let inverseFinalMatrix = finalMatrix.inverse
-            // test
-//            var point = simd_float4(-0.78723454, 0.36376953, 0.9976643, 1.0)
-//            var point2 = matrix_multiply(inverseFinalMatrix, point)
-//            print("point \(point) * inverseFM = \(point2)")
-//            point2 = point2/point2.w
-//            print("after divide w: \(point2)")
-//            print("---")
-            // ms stands for model space
-            var msTapCastStart = matrix_multiply(inverseFinalMatrix, tapCastStart)
-            var msTapCastEnd = matrix_multiply(inverseFinalMatrix, tapCastEnd)
-//            print("point \(tapCastEnd) * inverseFM = \(msTapCastEnd)")
-            msTapCastStart = msTapCastStart/msTapCastStart.w
-            msTapCastEnd = msTapCastEnd/msTapCastEnd.w
-            print("Start:\(msTapCastStart)")
-            print("End:\(msTapCastEnd)")
-            let TapCast = msTapCastEnd - msTapCastStart
-            let Step = TapCast/256
-            print(Step)
-            var currentPosi = msTapCastStart
-            var flag = false
-            for _ in 1...256{
-                if currentPosi[0]<1.0 && currentPosi[0]>(-1.0) && currentPosi[1]<1.0 && currentPosi[1]>(-1.0) && currentPosi[2]<1.0 && currentPosi[2]>(-1.0){
-                    flag = true
-                }else{
-                    currentPosi += Step
+            if let somaPosition = checkForIntersection(tapPosition){
+                print("find soma at \(somaPosition)")
+            }
+        }
+    }
+    
+    func checkForIntersection(_ tapPosition:CGPoint)->simd_float3?{ //use to sample in the same time
+        // calculate coordinate in NDC
+        let viewWidth = self.view.bounds.width
+        let viewHeight = self.view.bounds.height
+        let centerX = viewWidth/2
+        let centerY = viewHeight/2
+        let clipX = Float((tapPosition.x-centerX)/centerX)
+        let clipY = Float((-tapPosition.y+centerY)/centerY)
+        let clipZstart = Float(0)
+        let clipZend = Float(1)
+        let clipW = Float(1)
+        let tapCastStart = simd_float4(clipX, clipY, clipZstart, clipW)
+        let tapCastEnd = simd_float4(clipX, clipY, clipZend, clipW)
+        // calculate inverse of finalMatrix
+        var finalMatrix = objectToDraw.modelMatrix()
+        finalMatrix.multiplyLeft(worldModelMatrix)
+        finalMatrix.multiplyLeft(projectionMatrix)
+        let inverseFinalMatrix = finalMatrix.inverse
+        // calculate tapCast in model space, ms stands for model space
+        var msTapCastStart = matrix_multiply(inverseFinalMatrix, tapCastStart)
+        var msTapCastEnd = matrix_multiply(inverseFinalMatrix, tapCastEnd)
+        msTapCastStart = msTapCastStart/msTapCastStart.w
+        msTapCastEnd = msTapCastEnd/msTapCastEnd.w
+        // decide whether intersects, same as raycasting method
+        let TapCast = msTapCastEnd - msTapCastStart
+        let Step = TapCast/256
+        var currentPosi = msTapCastStart
+        var currentIntensity:Float = 0
+        var maxIntensity:Float = 0
+        var maxPosition = currentPosi
+        var flag = false
+        for _ in 1...256{
+            if currentPosi[0]<1.0 && currentPosi[0]>(-1.0) && currentPosi[1]<1.0 && currentPosi[1]>(-1.0) && currentPosi[2]<1.0 && currentPosi[2]>(-1.0){
+                //when intersect
+                flag = true
+                currentIntensity = imageToDisplay.sample3Ddata(x: currentPosi.x, y: currentPosi.y, z: currentPosi.z)
+                if currentIntensity > maxIntensity{
+                    maxIntensity = currentIntensity
+                    print("maxIntensity changed to \(currentIntensity)")
+                    maxPosition = currentPosi
                 }
+                currentPosi += Step
+            }else{
+                currentPosi += Step
             }
-            if flag {
-                print("meet!")
-            }
+        }
+        if flag{
+            return simd_float3(maxPosition.x,maxPosition.y,maxPosition.z)
+        }else{
+            return nil
         }
     }
     
@@ -228,6 +233,4 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
             print("objectScale \(objectToDraw.scale)")
         }
     }
-  
-  
 }
