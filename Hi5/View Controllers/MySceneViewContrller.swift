@@ -16,6 +16,7 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
     var lastPanLocation:CGPoint!
     var imageToDisplay:image4DSimple!
     var scaleLabel:UIButton!
+    var somaArray:[simd_float3] = []
   
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,7 +33,7 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
         // bar colors
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor.systemOrange
+        appearance.backgroundColor = UIColor(named: "mainOrange")
         navigationItem.standardAppearance = appearance
         navigationItem.scrollEdgeAppearance = appearance
         navigationItem.compactAppearance = appearance
@@ -45,7 +46,7 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
         scaleLabel = UIButton(type: .system)
         scaleLabel.setTitle("Scale:1.0", for: .normal)
         scaleLabel.setTitleColor(UIColor.systemBlue, for: .normal)
-        scaleLabel.backgroundColor = UIColor.systemOrange
+        scaleLabel.backgroundColor = UIColor(named: "mainOrange")
         scaleLabel.translatesAutoresizingMaskIntoConstraints = false
         scaleLabel.layer.cornerRadius = 4.0
         scaleLabel.addTarget(self, action: #selector(resetScale), for: .touchUpInside)
@@ -107,6 +108,7 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
             // display image
             if let image = imageToDisplay{
                 objectToDraw = Quad(device: device,commandQ: commandQueue,viewWidth: Int(view.bounds.width),viewHeight: Int(view.bounds.height),image4DSimple: image)
+                somaArray.removeAll()
             }else{
                 print("No 4d image")
             }
@@ -121,7 +123,7 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
   //MARK: - MetalViewControllerDelegate
     func renderObjects(drawable:CAMetalDrawable) {
     // draw the view
-        objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil)
+        objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil,somaArray:somaArray)
     }
 
     func updateLogic(timeSinceLastUpdate: CFTimeInterval) {
@@ -144,6 +146,7 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
             let tapPosition = tapGesture.location(in: self.view)
             if let somaPosition = checkForIntersection(tapPosition){
                 print("find soma at \(somaPosition)")
+                somaArray.append(somaPosition)
             }
         }
     }

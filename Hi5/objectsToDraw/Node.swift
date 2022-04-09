@@ -126,7 +126,7 @@ class Node{
     }
     
     // call 60 times a second
-    func render(commandQueue:MTLCommandQueue,pipelineState:MTLRenderPipelineState,drawable:CAMetalDrawable,parentModelViewMatrix:float4x4, projectionMatrix:float4x4,clearColor:MTLClearColor?){
+    func render(commandQueue:MTLCommandQueue,pipelineState:MTLRenderPipelineState,drawable:CAMetalDrawable,parentModelViewMatrix:float4x4, projectionMatrix:float4x4,clearColor:MTLClearColor?,somaArray:[simd_float3]){
         _ = bufferProvider.availableResourcesSemaphore.wait(timeout: DispatchTime.distantFuture)
         
         // set up for cube texture
@@ -158,7 +158,6 @@ class Node{
         // start render
         
         var nodeModelMatrix = self.modelMatrix()
-//        nodeModelMatrix.multiply(left: parentModelViewMatrix)
         nodeModelMatrix.multiplyLeft(parentModelViewMatrix)
         let uniformBuffer = bufferProvider.nextUniformsBuffer(projectionMatrix: projectionMatrix, modelViewMatrix: nodeModelMatrix)
         
@@ -194,15 +193,18 @@ class Node{
             print("renderEncoder for back face rendering failed")
         }
         
-        // draw the final quad
+        
+        
+        // share the renderEncoder
         let renderPassDescriptor = MTLRenderPassDescriptor()
         renderPassDescriptor.colorAttachments[0].texture = drawable.texture
         renderPassDescriptor.colorAttachments[0].loadAction = .clear
         renderPassDescriptor.colorAttachments[0].storeAction = .store
         renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: 123.0/255.0, green: 133.0/255.0, blue: 199.0/255.0, alpha: 1.0)
-        
         let renderEncoder = commanBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
-        renderEncoder.setCullMode(MTLCullMode.front) //切面
+        
+        // draw the final Quad
+//        renderEncoder.setCullMode(MTLCullMode.front) //切面
         renderEncoder.setRenderPipelineState(pipelineState)
         renderEncoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
         renderEncoder.setFragmentTexture(frontFaceTexture, index: 0)
@@ -212,9 +214,42 @@ class Node{
             renderEncoder.setFragmentSamplerState(samplerState, index: 0)
         }
         
-//        renderEncoder.setVertexBuffer(uniformBuffer, offset: 0, index: 1)
+        // draw extra triangle
         
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: vertexCount,instanceCount: 1)
+        
+        // draw soma if exits
+        if !somaArray.isEmpty {
+            //generate vertices
+            for center in somaArray{
+                let A = Vertex(x: -0.05+center.x, y: -0.05+center.y, z:   0.0+center.z, r:  0.0, g:  1.0, b:  0.0, a:  1.0,s: 0.0,t: 0.0)
+                let B = Vertex(x:   0.0+center.x, y:  0.05+center.y, z:   0.0+center.z, r:  0.0, g:  0.0, b:  1.0, a:  1.0,s: 0.0,t: 1.0)
+                let C = Vertex(x:  0.05+center.x, y: -0.05+center.y, z:   0.0+center.z, r:  1.0, g:  0.0, b:  1.0, a:  1.0,s: 1.0,t: 1.0)
+                
+                let triangleVerticesArray:Array<Vertex> = [C,B,A]
+                let dataSize = triangleVerticesArray.count * MemoryLayout.size(ofValue: triangleVerticesArray[0])
+                let triangleVertexBuffer = device.makeBuffer(bytes: triangleVerticesArray, length: dataSize, options: [])
+                //draw triangles
+                let defaultLibrary = device.makeDefaultLibrary()!
+                let fragmentProgram = defaultLibrary.makeFunction(name: "texture_fragment")
+                let vertexProgram = defaultLibrary.makeFunction(name: "texture_vertex")
+                
+                let trianglePipelineStateDescriptor = MTLRenderPipelineDescriptor()
+                trianglePipelineStateDescriptor.label = "draw triangle mark"
+                trianglePipelineStateDescriptor.vertexFunction = vertexProgram
+                trianglePipelineStateDescriptor.fragmentFunction = fragmentProgram
+                trianglePipelineStateDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+                
+                let trianglePipelineState = try! device.makeRenderPipelineState(descriptor: trianglePipelineStateDescriptor)
+                
+    //            let renderEncoder = commanBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
+                renderEncoder.setRenderPipelineState(trianglePipelineState)
+                renderEncoder.setVertexBuffer(triangleVertexBuffer, offset: 0, index: 0)
+                renderEncoder.setVertexBuffer(uniformBuffer, offset: 0, index: 1)
+                renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3,instanceCount: 1)
+            }
+        }
+        
         renderEncoder.endEncoding()
        
         commanBuffer.present(drawable)

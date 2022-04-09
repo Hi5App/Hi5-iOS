@@ -18,6 +18,7 @@ class ViewController: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        self.view.backgroundColor = UIColor(named: "homeBackground")
         configureNavBar()
         functionCollectionView.dataSource = functionDataSource
         functionCollectionView.delegate = self
@@ -42,7 +43,7 @@ class ViewController: UIViewController{
         // bar colors
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor.systemOrange
+        appearance.backgroundColor = UIColor(named: "mainOrange")
         navigationItem.standardAppearance = appearance
         navigationItem.scrollEdgeAppearance = appearance
         navigationItem.compactAppearance = appearance
