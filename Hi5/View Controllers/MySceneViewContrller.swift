@@ -176,20 +176,20 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
         msTapCastEnd = msTapCastEnd/msTapCastEnd.w
         // decide whether intersects, same as raycasting method
         let TapCast = msTapCastEnd - msTapCastStart
-        let Step = TapCast/256
+        let Step = TapCast/512
         var currentPosi = msTapCastStart
         var currentIntensity:Float = 0
         var maxIntensity:Float = 0
         var maxPosition = currentPosi
         var flag = false
-        for _ in 1...256{
+        for _ in 1...512{
             if currentPosi[0]<1.0 && currentPosi[0]>(-1.0) && currentPosi[1]<1.0 && currentPosi[1]>(-1.0) && currentPosi[2]<1.0 && currentPosi[2]>(-1.0){
                 //when intersect
                 flag = true
                 currentIntensity = imageToDisplay.sample3Ddata(x: currentPosi.x, y: currentPosi.y, z: currentPosi.z)
                 if currentIntensity > maxIntensity{
                     maxIntensity = currentIntensity
-                    print("maxIntensity changed to \(currentIntensity)")
+//                    print("maxIntensity changed to \(currentIntensity)")
                     maxPosition = currentPosi
                 }
                 currentPosi += Step
@@ -198,6 +198,7 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
             }
         }
         if flag{
+            print(maxIntensity)
             return simd_float3(maxPosition.x,maxPosition.y,maxPosition.z)
         }else{
             return nil

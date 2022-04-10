@@ -37,7 +37,6 @@ class MetalViewController: UIViewController {
       device = MTLCreateSystemDefaultDevice()
     
       mtkView.device = device
-      
       projectionMatrix = float4x4.makePerspectiveViewAngle(Float(85).radians, aspectRatio: Float(self.view.bounds.size.width / self.view.bounds.size.height), nearZ:0.01, farZ:8.0)
 
       // 1

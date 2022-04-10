@@ -29,8 +29,10 @@ class image4DSimple{
     }
     
     func sample3Ddata(x:Float,y:Float,z:Float)->Float{
-        let positionIn3dArray = access3DfromCenter(x: x, y: y, z: z )
-//        let position = (Int(positionIn3dArray.0),Int(positionIn3dArray.1),Int(positionIn3dArray.2))
+        var positionIn3dArray = access3DfromCenter(x: x, y: y, z: z )
+//        positionIn3dArray = (positionIn3dArray.0,positionIn3dArray.1,positionIn3dArray.2)
+//        let position = (positionIn3dArray.0,positionIn3dArray.1,positionIn3dArray.2)
+//        print(position)
         let lowX = Int(positionIn3dArray.0)
         let lowY = Int(positionIn3dArray.1)
         let lowZ = Int(positionIn3dArray.2)
@@ -81,6 +83,12 @@ class image4DSimple{
     func access3DfromCenter(x:Float,y:Float,z:Float)->(Float,Float,Float){
         // input model space coordinates, output 3d array index
         // 62.5 = 127/2,center index of the array
+        // rotate 90 degree and invert y axis
+        let temp = x
+        let x = z
+        let y = -y
+        let z = -temp
+        // position in 3dArray
         let arrayX = x*62.5+62.5
         let arrayY = -y*62.5+62.5
         let arrayZ = -(z*62.5-62.5)
