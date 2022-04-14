@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		43027F642805385F0067E792 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43027F632805385F0067E792 /* LoginViewController.swift */; };
+		43027F66280538940067E792 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43027F65280538940067E792 /* RegisterViewController.swift */; };
 		43108E4327C7314400F3287D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43108E4227C7314400F3287D /* AppDelegate.swift */; };
 		43108E4527C7314400F3287D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43108E4427C7314400F3287D /* SceneDelegate.swift */; };
 		43108E4727C7314500F3287D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43108E4627C7314400F3287D /* ViewController.swift */; };
@@ -29,6 +31,10 @@
 		433B1F4027DD81AF00F44604 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 433B1F3F27DD81AF00F44604 /* Shaders.metal */; };
 		437DA8C227DEF7790080A74C /* Quad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437DA8C127DEF7790080A74C /* Quad.swift */; };
 		438684B527E48C1700F095BB /* hex2UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 438684B427E48C1700F095BB /* hex2UIColor.swift */; };
+		43B12F542806E19F0049BE9C /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F532806E19F0049BE9C /* User.swift */; };
+		43B12F572806E9CB0049BE9C /* Hi5API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F562806E9CB0049BE9C /* Hi5API.swift */; };
+		43B12F592806EE290049BE9C /* UserJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F582806EE290049BE9C /* UserJSON.swift */; };
+		43B12F5B2806F9EE0049BE9C /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F5A2806F9EE0049BE9C /* Request.swift */; };
 		43C54BD127EA04990067F559 /* FunctionCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C54BD027EA04990067F559 /* FunctionCollectionViewCell.swift */; };
 		43EEA48C27FFDF8D00B0E8B7 /* float4x4+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EEA48B27FFDF8D00B0E8B7 /* float4x4+Extensions.swift */; };
 		43FA187127E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FA187027E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift */; };
@@ -52,6 +58,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		43027F632805385F0067E792 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		43027F65280538940067E792 /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 		43108E3F27C7314400F3287D /* Hi5.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hi5.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		43108E4227C7314400F3287D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		43108E4427C7314400F3287D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -78,6 +86,10 @@
 		433B1F3F27DD81AF00F44604 /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
 		437DA8C127DEF7790080A74C /* Quad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Quad.swift; sourceTree = "<group>"; };
 		438684B427E48C1700F095BB /* hex2UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = hex2UIColor.swift; sourceTree = "<group>"; };
+		43B12F532806E19F0049BE9C /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		43B12F562806E9CB0049BE9C /* Hi5API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hi5API.swift; sourceTree = "<group>"; };
+		43B12F582806EE290049BE9C /* UserJSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserJSON.swift; sourceTree = "<group>"; };
+		43B12F5A2806F9EE0049BE9C /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		43C54BD027EA04990067F559 /* FunctionCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionCollectionViewCell.swift; sourceTree = "<group>"; };
 		43EEA48B27FFDF8D00B0E8B7 /* float4x4+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "float4x4+Extensions.swift"; sourceTree = "<group>"; };
 		43FA187027E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionCollectionViewDataSource.swift; sourceTree = "<group>"; };
@@ -108,6 +120,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		43027F62280538370067E792 /* Login Screen */ = {
+			isa = PBXGroup;
+			children = (
+				43027F632805385F0067E792 /* LoginViewController.swift */,
+				43027F65280538940067E792 /* RegisterViewController.swift */,
+			);
+			path = "Login Screen";
+			sourceTree = "<group>";
+		};
 		43108E3627C7314400F3287D = {
 			isa = PBXGroup;
 			children = (
@@ -138,8 +159,10 @@
 				43108E4D27C7314500F3287D /* LaunchScreen.storyboard */,
 				43108E5027C7314500F3287D /* Info.plist */,
 				4320388427D8EEC700DB2DBC /* cube.png */,
+				43B12F552806E9B40049BE9C /* Network */,
+				43B12F522806E18A0049BE9C /* User */,
 				431CDBEF27D8E807000F1F10 /* View Controllers */,
-				4320387027D8ED1D00DB2DBC /* objectsToDraw */,
+				4320387027D8ED1D00DB2DBC /* ObjectsToDraw */,
 				431CDBEE27D8E7E4000F1F10 /* Data Parser */,
 				4320388127D8EDA400DB2DBC /* Utilities */,
 				433B1F3F27DD81AF00F44604 /* Shaders.metal */,
@@ -176,15 +199,15 @@
 		431CDBEF27D8E807000F1F10 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				43027F62280538370067E792 /* Login Screen */,
 				43A35EFB27EC58010078E25B /* Home Screen */,
-				438684B427E48C1700F095BB /* hex2UIColor.swift */,
 				4320386827D8EC8000DB2DBC /* MetalViewController.swift */,
 				4320386C27D8ECB100DB2DBC /* MySceneViewContrller.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
 		};
-		4320387027D8ED1D00DB2DBC /* objectsToDraw */ = {
+		4320387027D8ED1D00DB2DBC /* ObjectsToDraw */ = {
 			isa = PBXGroup;
 			children = (
 				433B1F3A27DD815B00F44604 /* Cube.swift */,
@@ -192,12 +215,13 @@
 				433B1F3B27DD815B00F44604 /* Vertex.swift */,
 				437DA8C127DEF7790080A74C /* Quad.swift */,
 			);
-			path = objectsToDraw;
+			path = ObjectsToDraw;
 			sourceTree = "<group>";
 		};
 		4320388127D8EDA400DB2DBC /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				438684B427E48C1700F095BB /* hex2UIColor.swift */,
 				4320387D27D8ED8F00DB2DBC /* MetalTexture.swift */,
 				4320387F27D8ED9200DB2DBC /* BufferProvider.swift */,
 				43EEA48B27FFDF8D00B0E8B7 /* float4x4+Extensions.swift */,
@@ -213,6 +237,24 @@
 				43108E4627C7314400F3287D /* ViewController.swift */,
 			);
 			path = "Home Screen";
+			sourceTree = "<group>";
+		};
+		43B12F522806E18A0049BE9C /* User */ = {
+			isa = PBXGroup;
+			children = (
+				43B12F532806E19F0049BE9C /* User.swift */,
+				43B12F582806EE290049BE9C /* UserJSON.swift */,
+			);
+			path = User;
+			sourceTree = "<group>";
+		};
+		43B12F552806E9B40049BE9C /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				43B12F562806E9CB0049BE9C /* Hi5API.swift */,
+				43B12F5A2806F9EE0049BE9C /* Request.swift */,
+			);
+			path = Network;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -348,23 +390,29 @@
 			buildActionMask = 2147483647;
 			files = (
 				43C54BD127EA04990067F559 /* FunctionCollectionViewCell.swift in Sources */,
+				43B12F5B2806F9EE0049BE9C /* Request.swift in Sources */,
 				43EEA48C27FFDF8D00B0E8B7 /* float4x4+Extensions.swift in Sources */,
 				438684B527E48C1700F095BB /* hex2UIColor.swift in Sources */,
 				43108E4727C7314500F3287D /* ViewController.swift in Sources */,
+				43027F642805385F0067E792 /* LoginViewController.swift in Sources */,
 				4320387E27D8ED8F00DB2DBC /* MetalTexture.swift in Sources */,
+				43B12F592806EE290049BE9C /* UserJSON.swift in Sources */,
 				4320386D27D8ECB100DB2DBC /* MySceneViewContrller.swift in Sources */,
 				433B1F3C27DD815B00F44604 /* Node.swift in Sources */,
 				43108E7527C776CA00F3287D /* v3drawReader.swift in Sources */,
 				433B1F3E27DD815B00F44604 /* Vertex.swift in Sources */,
 				4320386927D8EC8000DB2DBC /* MetalViewController.swift in Sources */,
+				43027F66280538940067E792 /* RegisterViewController.swift in Sources */,
 				433B1F4027DD81AF00F44604 /* Shaders.metal in Sources */,
 				433B1F3D27DD815B00F44604 /* Cube.swift in Sources */,
 				4320388027D8ED9200DB2DBC /* BufferProvider.swift in Sources */,
 				43108E4327C7314400F3287D /* AppDelegate.swift in Sources */,
 				43FA187127E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift in Sources */,
+				43B12F572806E9CB0049BE9C /* Hi5API.swift in Sources */,
 				437DA8C227DEF7790080A74C /* Quad.swift in Sources */,
 				43108E4527C7314400F3287D /* SceneDelegate.swift in Sources */,
 				43108E7327C7316B00F3287D /* image4DSimple.swift in Sources */,
+				43B12F542806E19F0049BE9C /* User.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

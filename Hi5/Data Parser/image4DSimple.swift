@@ -29,10 +29,7 @@ class image4DSimple{
     }
     
     func sample3Ddata(x:Float,y:Float,z:Float)->Float{
-        var positionIn3dArray = access3DfromCenter(x: x, y: y, z: z )
-//        positionIn3dArray = (positionIn3dArray.0,positionIn3dArray.1,positionIn3dArray.2)
-//        let position = (positionIn3dArray.0,positionIn3dArray.1,positionIn3dArray.2)
-//        print(position)
+        let positionIn3dArray = access3DfromCenter(x: x, y: y, z: z )
         let lowX = Int(positionIn3dArray.0)
         let lowY = Int(positionIn3dArray.1)
         let lowZ = Int(positionIn3dArray.2)
@@ -55,8 +52,6 @@ class image4DSimple{
         let xf = positionIn3dArray.0 - Float(lowX)
         let yf = positionIn3dArray.1 - Float(lowY)
         let zf = positionIn3dArray.2 - Float(lowZ)
-//        print(x,y,z)
-//        print(xf,yf,zf)
         var fractions = Array(repeating: Array(repeating: Array(repeating: Float(0), count: 2), count: 2), count: 2)
         fractions[0][0][0] = (1.0-xf)*(1.0-yf)*(1.0-zf)
         fractions[0][0][1] = (1.0-xf)*(1.0-yf)*(    zf)
