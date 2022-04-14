@@ -22,24 +22,20 @@ class LoginViewController: UIViewController {
         stackView.setCustomSpacing(0, after: passwordTextField)
         stackView.setCustomSpacing(0, after: errorTextField)
         
-        //test
-        let httpRequest = HTTPRequest() //self-made class,wrap up the native swift network method
-//        httpRequest.authLogin(url: Hi5API.loginURL, data: "test")
-        httpRequest.verifyLogin(url: Hi5API.loginURL, uploadData: nil)
     }
 
     @IBAction func LoginButtonTapped(_ sender: Any) {
         // check inputs
         
         // send HTTP request
-        // create json
-        let loginUser = loginUser(name: emailTextField.text!, passwd: passwordTextField.text!) //after check inputs, so force unwarp
-        let jsonString = Hi5API.generateLoginJSON(loginUser: loginUser)
-        guard jsonString != nil else {return}
-        print(jsonString ?? "no json")
+        let loginUser = loginUser(user:user(name: emailTextField.text!, passwd: passwordTextField.text!))
+        let jsonData = Hi5API.generateLoginJSON(loginUser: loginUser)
+        guard jsonData != nil else {return}
+        print("json data is:\n" + String(data: jsonData!, encoding: .utf8)!)
         let httpRequest = HTTPRequest() //self-made class,wrap up the native swift network method
-        httpRequest.authLogin(url: Hi5API.loginURL, data: jsonString!)
+        httpRequest.verifyLogin(url: Hi5API.loginURL, uploadData: jsonData!)
         
-        // check auth results
+        // handle results
+        
     }
 }

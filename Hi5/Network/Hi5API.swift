@@ -16,9 +16,23 @@ enum Hi5Urls:String {
     case findPasswordURL = "/dynamic/user/findpassword"
 }
 
-struct loginUser:Codable{
-    var name:String
-    var passwd:String
+// MARK: - login Data Structure
+struct loginUser:Codable{ //wrap user class for specific json format
+    let user:user
+}
+struct user:Codable{
+    let name:String
+    let passwd:String
+}
+
+struct loginFeedback{
+    let id:Int
+    let name:String
+    let email:String
+    let nickname:String
+    let score:Int
+    let appkey:String
+    let passwd:String
 }
 
 struct Hi5API{
@@ -27,19 +41,19 @@ struct Hi5API{
     static let updatePassURL = serverIP + Hi5Urls.updatePasswordURL.rawValue
     static let findPasswordURL = serverIP + Hi5Urls.findPasswordURL.rawValue
     
-    static func generateLoginJSON(loginUser:loginUser)->String?{
+    static func generateLoginJSON(loginUser:loginUser)->Data?{
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
         do {
             let result = try encoder.encode(loginUser)
-            if let jsonString = String(data: result, encoding: .utf8){
-                return jsonString
-            }else{
-                return nil
-            }
+            return result
         } catch {
-            print("loginJSON creation failed\n name is \(loginUser.name) and password is \(loginUser.passwd)")
+            print("loginJSON creation failed\n name is \(loginUser.user.name) and password is \(loginUser.user.passwd)")
             return nil
         }
+    }
+    
+    static func parseLoginFeedback(){
+        
     }
 }

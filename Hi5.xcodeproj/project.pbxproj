@@ -33,8 +33,7 @@
 		438684B527E48C1700F095BB /* hex2UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 438684B427E48C1700F095BB /* hex2UIColor.swift */; };
 		43B12F542806E19F0049BE9C /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F532806E19F0049BE9C /* User.swift */; };
 		43B12F572806E9CB0049BE9C /* Hi5API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F562806E9CB0049BE9C /* Hi5API.swift */; };
-		43B12F592806EE290049BE9C /* UserJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F582806EE290049BE9C /* UserJSON.swift */; };
-		43B12F5B2806F9EE0049BE9C /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F5A2806F9EE0049BE9C /* Request.swift */; };
+		43B12F5B2806F9EE0049BE9C /* HTTPRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F5A2806F9EE0049BE9C /* HTTPRequest.swift */; };
 		43C54BD127EA04990067F559 /* FunctionCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C54BD027EA04990067F559 /* FunctionCollectionViewCell.swift */; };
 		43EEA48C27FFDF8D00B0E8B7 /* float4x4+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EEA48B27FFDF8D00B0E8B7 /* float4x4+Extensions.swift */; };
 		43FA187127E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FA187027E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift */; };
@@ -88,8 +87,7 @@
 		438684B427E48C1700F095BB /* hex2UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = hex2UIColor.swift; sourceTree = "<group>"; };
 		43B12F532806E19F0049BE9C /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		43B12F562806E9CB0049BE9C /* Hi5API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hi5API.swift; sourceTree = "<group>"; };
-		43B12F582806EE290049BE9C /* UserJSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserJSON.swift; sourceTree = "<group>"; };
-		43B12F5A2806F9EE0049BE9C /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
+		43B12F5A2806F9EE0049BE9C /* HTTPRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPRequest.swift; sourceTree = "<group>"; };
 		43C54BD027EA04990067F559 /* FunctionCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionCollectionViewCell.swift; sourceTree = "<group>"; };
 		43EEA48B27FFDF8D00B0E8B7 /* float4x4+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "float4x4+Extensions.swift"; sourceTree = "<group>"; };
 		43FA187027E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionCollectionViewDataSource.swift; sourceTree = "<group>"; };
@@ -243,7 +241,6 @@
 			isa = PBXGroup;
 			children = (
 				43B12F532806E19F0049BE9C /* User.swift */,
-				43B12F582806EE290049BE9C /* UserJSON.swift */,
 			);
 			path = User;
 			sourceTree = "<group>";
@@ -252,7 +249,7 @@
 			isa = PBXGroup;
 			children = (
 				43B12F562806E9CB0049BE9C /* Hi5API.swift */,
-				43B12F5A2806F9EE0049BE9C /* Request.swift */,
+				43B12F5A2806F9EE0049BE9C /* HTTPRequest.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -390,13 +387,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				43C54BD127EA04990067F559 /* FunctionCollectionViewCell.swift in Sources */,
-				43B12F5B2806F9EE0049BE9C /* Request.swift in Sources */,
+				43B12F5B2806F9EE0049BE9C /* HTTPRequest.swift in Sources */,
 				43EEA48C27FFDF8D00B0E8B7 /* float4x4+Extensions.swift in Sources */,
 				438684B527E48C1700F095BB /* hex2UIColor.swift in Sources */,
 				43108E4727C7314500F3287D /* ViewController.swift in Sources */,
 				43027F642805385F0067E792 /* LoginViewController.swift in Sources */,
 				4320387E27D8ED8F00DB2DBC /* MetalTexture.swift in Sources */,
-				43B12F592806EE290049BE9C /* UserJSON.swift in Sources */,
 				4320386D27D8ECB100DB2DBC /* MySceneViewContrller.swift in Sources */,
 				433B1F3C27DD815B00F44604 /* Node.swift in Sources */,
 				43108E7527C776CA00F3287D /* v3drawReader.swift in Sources */,
