@@ -9,11 +9,11 @@ import UIKit
 import MobileCoreServices
 import UniformTypeIdentifiers
 
-class ViewController: UIViewController{
+class HomeViewController: UIViewController{
     
     @IBOutlet var functionCollectionView: UICollectionView!
     let functionDataSource = functionCollectionViewDataSource()
-    
+    var loginUser:User!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,7 +62,7 @@ class ViewController: UIViewController{
     }
 }
 
-extension ViewController:UICollectionViewDelegate{
+extension HomeViewController:UICollectionViewDelegate{
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         switch functionDataSource.softwareFunctions[indexPath.row].name{
         case "Marker Factory":

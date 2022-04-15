@@ -12,17 +12,16 @@ class User:NSObject{
     let nickName:String
     let email:String
     let password:String
-    let inviterCode:String
+    let inviterCode:String?
+    let score:Int?
     
-    init(userName:String,nickName:String,email:String,password:String,inviterCode:String){
+    init(userName:String,nickName:String,email:String,password:String,inviterCode:String,score:Int){
         self.userName = userName
         self.nickName = nickName
         self.email = email
         self.password = password
         self.inviterCode = inviterCode
+        self.score = score
     }
     
-    class func GuestUser() -> User{
-        return User(userName: "Guest", nickName: "Guest", email: "Guest@mode.com", password: "123456", inviterCode: "0")
-    }
 }

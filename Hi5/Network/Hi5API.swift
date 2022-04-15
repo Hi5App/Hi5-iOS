@@ -25,7 +25,7 @@ struct user:Codable{
     let passwd:String
 }
 
-struct loginFeedback{
+struct loginFeedback:Codable{
     let id:Int
     let name:String
     let email:String
@@ -53,7 +53,26 @@ struct Hi5API{
         }
     }
     
-    static func parseLoginFeedback(){
+    static func parseLoginJSON(jsonData:Data)->loginFeedback?{
+        do {
+            let decoder = JSONDecoder()
+            let response = try decoder.decode(loginFeedback.self, from: jsonData)
+            return response
+        }catch{
+            print("decode login json error")
+            return nil
+        }
+    }
+    
+    static func generateRegisterJSON(){
+        
+    }
+    
+    static func generateUpdatePassJSON(){
+        
+    }
+    
+    static func generateFindPassJSON(){
         
     }
 }
