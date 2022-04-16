@@ -9,54 +9,20 @@ import Foundation
 
 let serverIP = "http://139.155.28.154:26000"
 
-enum Hi5Urls:String {
-    case loginURL = "/dynamic/user/login"
-    case registerURL = "/dynamic/user/register"
-    case updatePasswordURL = "/dynamic/user/updatepassword"
-    case findPasswordURL = "/dynamic/user/findpassword"
-}
-
-// MARK: - login Data Structure
-struct loginUser:Codable{ //wrap user class for specific json format
-    let user:user
-}
-struct user:Codable{
-    let name:String
-    let passwd:String
-}
-
-struct loginFeedback:Codable{
-    let id:Int
-    let name:String
-    let email:String
-    let nickname:String
-    let score:Int
-    let appkey:String
-    let passwd:String
-}
-
 struct Hi5API{
-    static let loginURL = serverIP + Hi5Urls.loginURL.rawValue
-    static let registerURL = serverIP + Hi5Urls.registerURL.rawValue
-    static let updatePassURL = serverIP + Hi5Urls.updatePasswordURL.rawValue
-    static let findPasswordURL = serverIP + Hi5Urls.findPasswordURL.rawValue
+    static let loginURL = serverIP + "/dynamic/user/login"
+    static let registerURL = serverIP + "/dynamic/user/register"
+    static let updatePassURL = serverIP + "/dynamic/user/updatepassword"
+    static let findPasswordURL = serverIP + "/dynamic/user/findpassword"
     
-    static func generateLoginJSON(loginUser:loginUser)->Data?{
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
-        do {
-            let result = try encoder.encode(loginUser)
-            return result
-        } catch {
-            print("loginJSON creation failed\n name is \(loginUser.user.name) and password is \(loginUser.user.passwd)")
-            return nil
-        }
-    }
+    static let getBrainListURL = serverIP + "/dynamic/image/getimagelist"
+    static let downloadImageURL = serverIP + "/dynamic/image/cropimage"
+    static let getBBSwcURL = serverIP + "/dynamic/coll/getswcbb"
     
-    static func parseLoginJSON(jsonData:Data)->loginFeedback?{
+    static func parseLoginJSON(jsonData:Data)->LoginFeedback?{
         do {
             let decoder = JSONDecoder()
-            let response = try decoder.decode(loginFeedback.self, from: jsonData)
+            let response = try decoder.decode(LoginFeedback.self, from: jsonData)
             return response
         }catch{
             print("decode login json error")
@@ -64,15 +30,45 @@ struct Hi5API{
         }
     }
     
-    static func generateRegisterJSON(){
-        
+    static func parseRegisterJSON(jsonData:Data)->RegisterFeedback?{
+//        do {
+            let response = RegisterFeedback(code: "200")
+            return response
+//        }catch{
+//            print("decode register json error")
+//            return nil
+//        }
     }
     
-    static func generateUpdatePassJSON(){
-        
+    static func parseBrainListJSON(jsonData:Data)->BrainListFeedBack?{
+        do {
+            print(String(decoding: jsonData, as: UTF8.self))
+            let result = try JSONSerialization.jsonObject(with: jsonData, options: .allowFragments) as? [[String:String]]
+            guard result != nil else {return nil}
+            
+            var brainList = [BrainInfo]()
+            for item in result! {
+                let data = try! JSONSerialization.data(withJSONObject: item, options: [])
+                let brainItem = try! JSONDecoder().decode(BrainInfo.self, from: data)
+                brainList.append(brainItem)
+            }
+            
+            return BrainListFeedBack(barinList: brainList)
+        }catch {
+            print("decode brain list json error")
+            return nil
+        }
     }
     
-    static func generateFindPassJSON(){
-        
+    static func generateJSON<T>(_ value:T)->Data? where T : Encodable {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        do {
+            let result = try encoder.encode(value)
+            return result
+        } catch {
+            print("JSON creation failed")
+            return nil
+        }
     }
 }
