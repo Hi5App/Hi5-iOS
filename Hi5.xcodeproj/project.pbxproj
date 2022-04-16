@@ -37,6 +37,7 @@
 		43C54BD127EA04990067F559 /* FunctionCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C54BD027EA04990067F559 /* FunctionCollectionViewCell.swift */; };
 		43EEA48C27FFDF8D00B0E8B7 /* float4x4+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EEA48B27FFDF8D00B0E8B7 /* float4x4+Extensions.swift */; };
 		43FA187127E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FA187027E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift */; };
+		489ED89D280ACACE000781C6 /* HTTPModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489ED89C280ACACE000781C6 /* HTTPModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,6 +92,7 @@
 		43C54BD027EA04990067F559 /* FunctionCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionCollectionViewCell.swift; sourceTree = "<group>"; };
 		43EEA48B27FFDF8D00B0E8B7 /* float4x4+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "float4x4+Extensions.swift"; sourceTree = "<group>"; };
 		43FA187027E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionCollectionViewDataSource.swift; sourceTree = "<group>"; };
+		489ED89C280ACACE000781C6 /* HTTPModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -250,6 +252,7 @@
 			children = (
 				43B12F562806E9CB0049BE9C /* Hi5API.swift */,
 				43B12F5A2806F9EE0049BE9C /* HTTPRequest.swift */,
+				489ED89C280ACACE000781C6 /* HTTPModel.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -389,6 +392,7 @@
 				43C54BD127EA04990067F559 /* FunctionCollectionViewCell.swift in Sources */,
 				43B12F5B2806F9EE0049BE9C /* HTTPRequest.swift in Sources */,
 				43EEA48C27FFDF8D00B0E8B7 /* float4x4+Extensions.swift in Sources */,
+				489ED89D280ACACE000781C6 /* HTTPModel.swift in Sources */,
 				438684B527E48C1700F095BB /* hex2UIColor.swift in Sources */,
 				43108E4727C7314500F3287D /* HomeViewController.swift in Sources */,
 				43027F642805385F0067E792 /* LoginViewController.swift in Sources */,
