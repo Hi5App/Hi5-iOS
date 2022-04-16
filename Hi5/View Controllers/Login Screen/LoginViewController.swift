@@ -29,17 +29,11 @@ class LoginViewController: UIViewController {
         // check inputs
         
         // send HTTP request
-        let loginUser = loginUser(user:user(name: emailTextField.text!, passwd: passwordTextField.text!))
-        let passwd = passwordTextField.text!
-        let jsonData = Hi5API.generateLoginJSON(loginUser: loginUser)
-        guard jsonData != nil else {return}
-//        print("json data is:\n" + String(data: jsonData!, encoding: .utf8)!)
-        let httpRequest = HTTPRequest() //self-made class,wrap up the native swift network method
-        httpRequest.verifyLogin(url: Hi5API.loginURL, uploadData: jsonData!) { data, error in
-            if let data = data {
-                let loginResult = Hi5API.parseLoginJSON(jsonData: data)!
+        HTTPRequest.UserPart.login(name: emailTextField.text!, passwd: passwordTextField.text!) {
+            loginFeedBack in
+            if let loginResult = loginFeedBack {
                 print("user \(loginResult.id) login successfully")
-                self.loginNewUser = User(userName: loginResult.name, nickName: loginResult.nickname, email: loginResult.email, password: passwd, inviterCode: loginResult.appkey, score: loginResult.score)
+                self.loginNewUser = User(userName: loginResult.name, nickName: loginResult.nickname, email: loginResult.email, password: self.passwordTextField.text!, inviterCode: loginResult.appkey, score: loginResult.score)
                 // jump to home screen
                 let storyBoard:UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
                 let nextViewController = storyBoard.instantiateViewController(withIdentifier: "homeVC") as! HomeViewController
