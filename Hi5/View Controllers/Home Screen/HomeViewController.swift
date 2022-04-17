@@ -9,7 +9,19 @@ import UIKit
 import MobileCoreServices
 import UniformTypeIdentifiers
 
-class HomeViewController: UIViewController{
+protocol checkLoginStatus{
+    var loginStatus:Bool{get set}
+}
+
+class HomeViewController: UIViewController,checkLoginStatus{
+    
+    var loginStatus: Bool = true{
+        didSet{
+            if loginStatus == false{
+                backToLogin()
+            }
+        }
+    }
     
     @IBOutlet var functionCollectionView: UICollectionView!
     let functionDataSource = functionCollectionViewDataSource()
@@ -62,9 +74,28 @@ class HomeViewController: UIViewController{
     }
     
     @objc func tapUser(){
-        let UserInfoVC = UserInfoViewController(style: .insetGrouped)
-        UserInfoVC.loginUser = self.loginUser
-        self.present(UserInfoVC, animated: true)
+        if loginUser.email == "Guest@Guest.com"{
+            let alert = UIAlertController(title: "Attention", message: "You are currently in Guest Mode\nSign in to see account infomation", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            alert.addAction(UIAlertAction(title: "Sign in", style: .default,handler: { (action) in
+                //present loginViewController
+                self.backToLogin()
+            }))
+            self.present(alert, animated: true)
+            return
+        }else{
+            let UserInfoVC = UserInfoViewController(style: .insetGrouped)
+            UserInfoVC.loginUser = self.loginUser
+            UserInfoVC.delagate = self
+            self.present(UserInfoVC, animated: true)
+        }
+    }
+    
+    func backToLogin(){
+        loginUser = User.guestUser()
+        let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
+        let nextViewController = storyBoard.instantiateViewController(withIdentifier: "loginVC") as! LoginViewController
+        self.navigationController?.pushViewController(nextViewController, animated: true)
     }
 }
 

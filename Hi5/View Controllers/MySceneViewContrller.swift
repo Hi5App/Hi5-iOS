@@ -11,7 +11,12 @@ import simd
 class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UIDocumentPickerDelegate {
   
     var worldModelMatrix:float4x4!
-    var objectToDraw:Quad!
+    var objectToDraw:Quad!{
+        didSet{
+            setupGestures()
+            self.metalViewControllerDelegate = self
+        }
+    }
     var panSensivity:Float = 5.0
     var lastPanLocation:CGPoint!
     var imageToDisplay:image4DSimple!
@@ -27,7 +32,7 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
         worldModelMatrix.translate(0.0, y: 0.0, z: -4)
         worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
     }
-    
+    // MARK: - Congfigue UI
     func configureNavBar(){
         navigationController?.navigationBar.tintColor = .label
         // bar colors
@@ -40,12 +45,13 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
         
         // buttons
         let readLocalFile = UIAction(title:"Local Image",image: UIImage(systemName: "folder.fill")){ (action) in
-            self.chooseAndReadImage()
+            self.readLocalImage()
         }
         let readCloudFile = UIAction(title:"Cloud Image",image: UIImage(systemName: "icloud.fill")){ (action) in
-            print("read cloud image")
+            self.readCloudImage()
         }
         let menu = UIMenu(title: "Image Source", options: .displayInline, children: [readLocalFile,readCloudFile])
+        
         navigationItem.rightBarButtonItem = .init(systemItem: .add)
         navigationItem.rightBarButtonItem!.menu = menu
     }
@@ -73,11 +79,38 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
     }
     
    // MARK: - Image Reader
-    @objc func chooseAndReadImage(){
+    func readLocalImage(){
         let v3drawUTType = UTType("com.penglab.Hi5-imageType.v3draw.v3draw")!
         let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [v3drawUTType])
         documentPicker.delegate = self
         present(documentPicker, animated: true, completion: nil)
+    }
+    
+    func readCloudImage(){
+        // send Request for Image
+        
+        // decompress PBDImage
+        
+        // save .v3draw to documents folder
+        
+        
+    }
+    
+    func readImageFromDocumentsFolder(filename:String){
+        let fileManager = FileManager.default
+        let reader = v3drawReader()
+        let rawImage1Url = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(filename)
+        imageToDisplay = reader.read(from: rawImage1Url)
+        self.title = imageToDisplay.name
+        
+        // display image
+        if let image = imageToDisplay{
+            objectToDraw = Quad(device: device,commandQ: commandQueue,viewWidth: Int(view.bounds.width),viewHeight: Int(view.bounds.height),image4DSimple: image)
+            somaArray.removeAll()
+        }else{
+            print("No 4d image")
+        }
+        
     }
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentAt url: URL) {
@@ -101,27 +134,14 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
             let appFolderDocumentURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("\(url.lastPathComponent)")
             do{
                 if !fileManager.fileExists(atPath: appFolderDocumentURL.path){
-                    try fileManager.copyItem(at: url, to: appFolderDocumentURL)
+                    try fileManager.copyItem(at: url, to: appFolderDocumentURL) // copy image if it doesn't exist
                 }
             }catch{
                 print(error)
             }
             
             // read the selected image from document folder
-            let reader = v3drawReader()
-            let rawImage1Url = appFolderDocumentURL
-            imageToDisplay = reader.read(from: rawImage1Url)
-            self.title = imageToDisplay.name
-            
-            // display image
-            if let image = imageToDisplay{
-                objectToDraw = Quad(device: device,commandQ: commandQueue,viewWidth: Int(view.bounds.width),viewHeight: Int(view.bounds.height),image4DSimple: image)
-                somaArray.removeAll()
-            }else{
-                print("No 4d image")
-            }
-            self.metalViewControllerDelegate = self
-            setupGestures()
+            readImageFromDocumentsFolder(filename: url.lastPathComponent)
             
             url.stopAccessingSecurityScopedResource()
         }

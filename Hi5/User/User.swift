@@ -28,4 +28,8 @@ class User:NSObject{
         self.score = score
     }
     
+    static func guestUser()->User{
+        return User(userName: "Guest", nickName: "Guest", email: "Guest@Guest.com", password: "Guest", inviterCode: "none", score: 0)
+    }
+    
 }

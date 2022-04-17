@@ -37,7 +37,7 @@ class MetalViewController: UIViewController {
       device = MTLCreateSystemDefaultDevice()
     
       mtkView.device = device
-      projectionMatrix = float4x4.makePerspectiveViewAngle(Float(85).radians, aspectRatio: Float(self.view.bounds.size.width / self.view.bounds.size.height), nearZ:0.01, farZ:8.0)
+      projectionMatrix = float4x4.makePerspectiveViewAngle(Float(85).radians, aspectRatio: Float(self.view.bounds.size.width / self.view.bounds.size.height), nearZ:0.01, farZ:100.0)
 
       // 1
       let defaultLibrary = device.makeDefaultLibrary()!
@@ -64,7 +64,7 @@ class MetalViewController: UIViewController {
 
 extension MetalViewController:MTKViewDelegate{
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-        projectionMatrix = float4x4.makePerspectiveViewAngle(Float(85).radians, aspectRatio: Float(self.view.bounds.size.width/self.view.bounds.size.height), nearZ: 1, farZ: 6.0)
+        projectionMatrix = float4x4.makePerspectiveViewAngle(Float(85).radians, aspectRatio: Float(self.view.bounds.size.width/self.view.bounds.size.height), nearZ: 0.01, farZ: 100.0)
     }
     
     func draw(in view: MTKView) {

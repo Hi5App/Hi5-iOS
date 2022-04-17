@@ -11,26 +11,22 @@ class UserInfoViewController: UITableViewController{
     
     var loginUser:User!{
         didSet{
-            details = [[loginUser.userName,loginUser.email],[loginUser.nickName,loginUser.inviterCode!,String(loginUser.score ?? 0)]]
+            details = [[loginUser.userName,loginUser.email],[loginUser.nickName,loginUser.inviterCode!,String(loginUser.score ?? 0)],["Sign out"]]
         }
     }
-    let sectionNames = ["Basic Info","Detail"]
-    let titles = [["Username","Email"],["Nickname","InviterCode","Score"]]
-    let imageNames = [["person.fill","mail.fill"],["heart.fill","globe.europe.africa.fill","graduationcap.fill"]]
+    let sectionNames = ["Basic Info","Detail",""]
+    let titles = [["Username","Email"],["Nickname","Inviter Code","Score"],[""]]
+    let imageNames = [["person.fill","mail.fill"],["heart.fill","globe.europe.africa.fill","graduationcap.fill"],["rectangle.portrait.and.arrow.right.fill"]]
     var details:[[String]]!
    
-    
+    var delagate:checkLoginStatus?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.tintColor = UIColor.systemOrange
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
+    
 
     // MARK: - Table view data source
 
@@ -56,6 +52,14 @@ class UserInfoViewController: UITableViewController{
         content.secondaryText = titles[indexPath.section][indexPath.row]
         cell.contentConfiguration = content
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let signOutIndex = IndexPath(row: 0, section: 2)
+        if indexPath == signOutIndex{
+            self.dismiss(animated: true)
+            delagate?.loginStatus = false
+        }
     }
 
 }
