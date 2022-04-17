@@ -20,7 +20,11 @@ class User:NSObject{
         self.nickName = nickName
         self.email = email
         self.password = password
-        self.inviterCode = inviterCode
+        if inviterCode == ""{
+            self.inviterCode = "none"
+        }else{
+            self.inviterCode = inviterCode
+        }
         self.score = score
     }
     

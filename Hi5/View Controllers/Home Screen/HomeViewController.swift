@@ -53,12 +53,18 @@ class HomeViewController: UIViewController{
             image: UIImage(systemName: "person.circle"),
             style: .done,
             target: self,
-            action: nil)
+            action: #selector(tapUser))
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             image: UIImage(systemName: "gear"),
             style: .done,
             target: self,
             action: nil)
+    }
+    
+    @objc func tapUser(){
+        let UserInfoVC = UserInfoViewController(style: .insetGrouped)
+        UserInfoVC.loginUser = self.loginUser
+        self.present(UserInfoVC, animated: true)
     }
 }
 

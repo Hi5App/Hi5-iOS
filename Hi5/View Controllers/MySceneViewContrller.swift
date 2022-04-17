@@ -39,7 +39,15 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
         navigationItem.compactAppearance = appearance
         
         // buttons
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(chooseAndReadImage))
+        let readLocalFile = UIAction(title:"Local Image",image: UIImage(systemName: "folder.fill")){ (action) in
+            self.chooseAndReadImage()
+        }
+        let readCloudFile = UIAction(title:"Cloud Image",image: UIImage(systemName: "icloud.fill")){ (action) in
+            print("read cloud image")
+        }
+        let menu = UIMenu(title: "Image Source", options: .displayInline, children: [readLocalFile,readCloudFile])
+        navigationItem.rightBarButtonItem = .init(systemItem: .add)
+        navigationItem.rightBarButtonItem!.menu = menu
     }
     
     func addLabelView(){
