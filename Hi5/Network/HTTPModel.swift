@@ -44,7 +44,7 @@ struct QueryCondition:Codable{
     let limit:Int
 }
 
-struct QueryBrainList:Codable{
+struct QueryBrainListStruct:Codable{
     let user:UserInfo
     let condition:QueryCondition
 }
@@ -60,21 +60,21 @@ struct getBBSwcStruct:Codable{
     let res:Int
 }
 
-struct parameter:Codable{
+struct Parameter:Codable{
     let x:Int
     let y:Int
     let z:Int
 }
 
-struct boundingBox:Codable{
-    let pa1:parameter
-    let pa2:parameter
+struct BoundingBox:Codable{
+    let pa1:Parameter
+    let pa2:Parameter
     let res:String
-    let brainId:String
+    let obj:String
 }
 
-struct downloadImage:Codable{
-    let bBox:boundingBox
+struct DownloadImageStruct:Codable{
+    let bb:BoundingBox
     let user:UserInfo
 }
 
@@ -87,32 +87,52 @@ struct BrainListFeedBack:Codable{
     let barinList:[BrainInfo]
 }
 
-// MARK: - Image Data Structure
-struct getPotentialLoactionStruct:Codable{
+// MARK: - Soma Data Structure
+struct QueryPotentialLoactionStruct:Codable{
     let user:UserInfo
 }
 
-struct getSomaListStruct:Codable{
-    let bBox:boundingBox
-    let user:UserInfo
-}
-
-struct markerInfo:Codable{
-    let x:Double
-    let y:Double
-    let z:Double // 保留三位小数
-}
-
-struct updateSomaInfo:Codable {
-    let locationId:Int
-    let locationType:Int
-    let username:String
+struct PotentialLocationFeedBack:Codable{
+    let id:Int
     let image:String
-    let insertsomaList:[markerInfo]
+    let loc:PositionInt
+    let owner:String
+}
+
+struct QuerySomaListStruct:Codable{
+    let bBox:BoundingBox
+    let user:UserInfo
+}
+
+struct PositionInt:Codable{
+    let x:Int
+    let y:Int
+    let z:Int 
+}
+
+struct UpdateSomaInfo:Codable {
+    let locationId:Int
+    let locationtype:Int
+    let owner:String
+    let image:String
+    let insertsomalist:[PositionInt]
     let deletesomalist:[String]
 }
 
-struct updateSomaListStruct:Codable{
-    let pa:updateSomaInfo
+struct UpdateSomaListStruct:Codable{
+    let pa:UpdateSomaInfo
     let user:UserInfo
+}
+
+struct SomaInfo:Codable{
+    let name:String
+    let loc:PositionInt
+}
+
+struct SomaListFeedBack:Codable{
+    let somaList:[SomaInfo]
+}
+
+struct UpdateSomaListFeedback:Codable{
+    let code:String
 }
