@@ -19,6 +19,10 @@ struct Hi5API{
     static let downloadImageURL = serverIP + "/dynamic/image/cropimage"
     static let getBBSwcURL = serverIP + "/dynamic/coll/getswcbb"
     
+    static let getPotentialLocationURL = serverIP + "/dynamic/soma/getpotentiallocation"
+    static let getSomaListURL = serverIP + "/dynamic/soma/getsomalist"
+    static let updateSomaListURL = serverIP + "/dynamic/soma/updatesomalist"
+    
     static func parseLoginJSON(jsonData:Data)->LoginFeedback?{
         do {
             let decoder = JSONDecoder()
@@ -42,7 +46,6 @@ struct Hi5API{
     
     static func parseBrainListJSON(jsonData:Data)->BrainListFeedBack?{
         do {
-            print(String(decoding: jsonData, as: UTF8.self))
             let result = try JSONSerialization.jsonObject(with: jsonData, options: .allowFragments) as? [[String:String]]
             guard result != nil else {return nil}
             
@@ -56,6 +59,49 @@ struct Hi5API{
             return BrainListFeedBack(barinList: brainList)
         }catch {
             print("decode brain list json error")
+            return nil
+        }
+    }
+    
+    static func parsePotentialLocationJSON(jsonData:Data)->PotentialLocationFeedBack?{
+        do {
+            let decoder = JSONDecoder()
+            let response = try decoder.decode(PotentialLocationFeedBack.self, from: jsonData)
+            return response
+        }catch{
+            print("decode potential location json error")
+            return nil
+        }
+    }
+    
+    static func parseSomaListJSON(jsonData:Data)->SomaListFeedBack?{
+        do {
+            let result = try JSONSerialization.jsonObject(with: jsonData, options: .allowFragments) as? [[String:String]]
+            guard result != nil else {return nil}
+            
+            var somaList = [SomaInfo]()
+            for item in result! {
+                let data = try! JSONSerialization.data(withJSONObject: item, options: [])
+                let somaItem = try! JSONDecoder().decode(SomaInfo.self, from: data)
+                somaList.append(somaItem)
+            }
+            
+            return SomaListFeedBack(somaList: somaList)
+        } catch {
+            print("decode soma list json error")
+            return nil
+        }
+    }
+    
+    static func saveImage(jsonData:Data, brainId:String, res:String, centerX:Int, centerY:Int, centerZ:Int)->URL?{
+        do {
+            let fileName = brainId + "_" + res + "_" + "\(centerX)" + "_" + "\(centerY)" + "_" + "\(centerZ)" + ".v3dpbd"
+            let url = FileManager.default.urls(for: .documentDirectory,
+                                                    in: .userDomainMask)[0].appendingPathComponent(fileName)
+            try jsonData.write(to: url)
+            try print(String(contentsOf: url))
+            return url
+        } catch {
             return nil
         }
     }

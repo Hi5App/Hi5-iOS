@@ -27,7 +27,7 @@ class LoginViewController: UIViewController {
 
     @IBAction func LoginButtonTapped(_ sender: Any) {
         // check inputs
-        
+
         // send HTTP request
         HTTPRequest.UserPart.login(name: emailTextField.text!, passwd: passwordTextField.text!) {
             loginFeedBack in
@@ -40,6 +40,10 @@ class LoginViewController: UIViewController {
                 nextViewController.loginUser = self.loginNewUser // pass user info to home screen
                 self.navigationController?.pushViewController(nextViewController, animated: true)
             }
+        } errorHandler: {
+            error in
+            print(error)
         }
+    
     }
 }
