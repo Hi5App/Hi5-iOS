@@ -22,6 +22,11 @@ class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         errorTextField.alpha = 0
+        // for debug
+        emailTextField.text = "kx1126"
+        passwordTextField.text = "123456"
+        LoginButtonTapped(signInButton!)
+        
         stackView.setCustomSpacing(0, after: passwordTextField)
         stackView.setCustomSpacing(0, after: errorTextField)
         setupGestures()

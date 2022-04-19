@@ -99,7 +99,6 @@ struct Hi5API{
             let url = FileManager.default.urls(for: .documentDirectory,
                                                     in: .userDomainMask)[0].appendingPathComponent(fileName)
             try jsonData.write(to: url)
-            try print(String(contentsOf: url))
             return url
         } catch {
             return nil

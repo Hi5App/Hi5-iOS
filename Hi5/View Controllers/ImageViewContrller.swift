@@ -8,7 +8,7 @@ import UIKit
 import UniformTypeIdentifiers
 import simd
 
-class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UIDocumentPickerDelegate {
+class ImageViewController: MetalViewController,MetalViewControllerDelegate,UIDocumentPickerDelegate {
   
     var worldModelMatrix:float4x4!
     var objectToDraw:Quad!{
@@ -22,6 +22,11 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
     var imageToDisplay:image4DSimple!
     var scaleLabel:UIButton!
     var somaArray:[simd_float3] = []
+    
+    var user:User!
+    var brainListfeed:BrainListFeedBack!
+    var resUsed:String!
+    var currentImageName:String = ""
   
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,8 +55,7 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
         let readCloudFile = UIAction(title:"Cloud Image",image: UIImage(systemName: "icloud.fill")){ (action) in
             self.readCloudImage()
         }
-        let menu = UIMenu(title: "Image Source", options: .displayInline, children: [readLocalFile,readCloudFile])
-        
+        let menu = UIMenu(title: "", options: .displayInline, children: [readLocalFile,readCloudFile])
         navigationItem.rightBarButtonItem = .init(systemItem: .add)
         navigationItem.rightBarButtonItem!.menu = menu
     }
@@ -87,12 +91,54 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
     }
     
     func readCloudImage(){
+        // check Guest Mode
+        if user.email == "Guest@Guest.com"{
+            
+        }
         // send Request for Image
+        HTTPRequest.ImagePart.getBrainList(name: user.userName, passwd: user.password) { brainListFeedback in
+            guard brainListFeedback != nil else{return}
+//            print(brainListFeedback!)
+            self.brainListfeed = brainListFeedback!
+            for brainInfo in self.brainListfeed.barinList{
+                if brainInfo.name == "191813"{
+                    print(brainInfo.detail)
+                    let resArray = brainInfo.detail.components(separatedBy: ",")
+                    //trim string
+                    let RIndex = resArray[1].firstIndex(of: "R")
+                    let endIndex = resArray[1].firstIndex(of: ")")
+                    self.resUsed = String(resArray[1][RIndex!...endIndex!])
+                    print(self.resUsed!)
+                    
+                    // download image
+                    // test data 4433 / 2,13377 / 2,6692 / 2,191813，128
+                    HTTPRequest.ImagePart.downloadImage(centerX: 4433/2, centerY: 13377/2, centerZ: 6692/2, size: 128, res: self.resUsed, brainId: "191813", name: self.user.userName, passwd: self.user.password) { url in
+                        guard url != nil else {return}
+                        print(url!)
+                        var PBDImage = PBDImage(imageLocation: url!)
+                        self.imageToDisplay = PBDImage.decompressToV3draw()
+                        
+                        //display image
+                        if let image = self.imageToDisplay{
+                            self.objectToDraw = Quad(device: self.device,commandQ: self.commandQueue,viewWidth: Int(self.view.bounds.width),viewHeight: Int(self.view.bounds.height),image4DSimple: image)
+                            self.somaArray.removeAll()
+                        }else{
+                            print("No 4d image")
+                        }
+//                        self.currentImageName = url!.lastPathComponent
+                    } errorHandler: { error in
+                        print(error)
+                    }
+                }
+            }
+        } errorHandler: { error in
+            // alert get barin list failed
+            print(error)
+            return
+        }
+        // decompress PBDImage and save .v3draw to documents folder
         
-        // decompress PBDImage
-        
-        // save .v3draw to documents folder
-        
+        // read Image from Documents Folder
         
     }
     
@@ -160,9 +206,9 @@ class MySceneViewController: MetalViewController,MetalViewControllerDelegate,UID
     
     //MARK: - setup interaction with images
     func setupGestures(){
-        let pan = UIPanGestureRecognizer(target: self, action: #selector(MySceneViewController.pan))
-        let pinch = UIPinchGestureRecognizer(target: self, action: #selector(MySceneViewController.pinch))
-        let tap = UITapGestureRecognizer(target: self, action: #selector(MySceneViewController.tap))
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(ImageViewController.pan))
+        let pinch = UIPinchGestureRecognizer(target: self, action: #selector(ImageViewController.pinch))
+        let tap = UITapGestureRecognizer(target: self, action: #selector(ImageViewController.tap))
         self.view.addGestureRecognizer(pan)
         self.view.addGestureRecognizer(pinch)
         self.view.addGestureRecognizer(tap)

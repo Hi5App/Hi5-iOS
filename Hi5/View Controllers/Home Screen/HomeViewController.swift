@@ -35,6 +35,9 @@ class HomeViewController: UIViewController,checkLoginStatus{
         functionCollectionView.dataSource = functionDataSource
         functionCollectionView.delegate = self
         configureCollectionViewLayout()
+        
+        // for debug
+        showMarkerFactory()
     }
     
     func configureCollectionViewLayout(){
@@ -111,7 +114,8 @@ extension HomeViewController:UICollectionViewDelegate{
     
     func showMarkerFactory(){
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
-        let nextViewController = storyBoard.instantiateViewController(withIdentifier: "mysceneviewcontroller") as! MySceneViewController
+        let nextViewController = storyBoard.instantiateViewController(withIdentifier: "imageviewcontroller") as! ImageViewController
+        nextViewController.user = self.loginUser
         self.navigationController?.pushViewController(nextViewController, animated: true)
     }
 }

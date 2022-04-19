@@ -17,6 +17,7 @@
 		43108E6627C7314600F3287D /* Hi5UITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43108E6527C7314600F3287D /* Hi5UITestsLaunchTests.swift */; };
 		43108E7327C7316B00F3287D /* image4DSimple.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43108E7227C7316B00F3287D /* image4DSimple.swift */; };
 		43108E7527C776CA00F3287D /* v3drawReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43108E7427C776CA00F3287D /* v3drawReader.swift */; };
+		4317EDE5280D9AEA00B2A17B /* PBDImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4317EDE4280D9AEA00B2A17B /* PBDImage.swift */; };
 		4320386927D8EC8000DB2DBC /* MetalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4320386827D8EC8000DB2DBC /* MetalViewController.swift */; };
 		4320387E27D8ED8F00DB2DBC /* MetalTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4320387D27D8ED8F00DB2DBC /* MetalTexture.swift */; };
 		4320388027D8ED9200DB2DBC /* BufferProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4320387F27D8ED9200DB2DBC /* BufferProvider.swift */; };
@@ -29,7 +30,7 @@
 		439215A0280C623400E53631 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4392159F280C623400E53631 /* HomeViewController.swift */; };
 		439215A2280C62A800E53631 /* UserInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439215A1280C62A800E53631 /* UserInfoViewController.swift */; };
 		439215A4280C62CB00E53631 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439215A3280C62CB00E53631 /* LoginViewController.swift */; };
-		439215A6280C630700E53631 /* MySceneViewContrller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439215A5280C630700E53631 /* MySceneViewContrller.swift */; };
+		439215A6280C630700E53631 /* ImageViewContrller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439215A5280C630700E53631 /* ImageViewContrller.swift */; };
 		439215A8280C650D00E53631 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 439215A7280C650D00E53631 /* Main.storyboard */; };
 		43B12F542806E19F0049BE9C /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F532806E19F0049BE9C /* User.swift */; };
 		43B12F572806E9CB0049BE9C /* Hi5API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F562806E9CB0049BE9C /* Hi5API.swift */; };
@@ -72,6 +73,7 @@
 		43108E6527C7314600F3287D /* Hi5UITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hi5UITestsLaunchTests.swift; sourceTree = "<group>"; };
 		43108E7227C7316B00F3287D /* image4DSimple.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = image4DSimple.swift; sourceTree = "<group>"; };
 		43108E7427C776CA00F3287D /* v3drawReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = v3drawReader.swift; sourceTree = "<group>"; };
+		4317EDE4280D9AEA00B2A17B /* PBDImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PBDImage.swift; sourceTree = "<group>"; };
 		4320386827D8EC8000DB2DBC /* MetalViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalViewController.swift; sourceTree = "<group>"; };
 		4320387D27D8ED8F00DB2DBC /* MetalTexture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalTexture.swift; sourceTree = "<group>"; };
 		4320387F27D8ED9200DB2DBC /* BufferProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BufferProvider.swift; sourceTree = "<group>"; };
@@ -84,7 +86,7 @@
 		4392159F280C623400E53631 /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		439215A1280C62A800E53631 /* UserInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserInfoViewController.swift; sourceTree = "<group>"; };
 		439215A3280C62CB00E53631 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
-		439215A5280C630700E53631 /* MySceneViewContrller.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySceneViewContrller.swift; sourceTree = "<group>"; };
+		439215A5280C630700E53631 /* ImageViewContrller.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageViewContrller.swift; sourceTree = "<group>"; };
 		439215A7280C650D00E53631 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		43B12F532806E19F0049BE9C /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		43B12F562806E9CB0049BE9C /* Hi5API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hi5API.swift; sourceTree = "<group>"; };
@@ -191,6 +193,7 @@
 			children = (
 				43108E7227C7316B00F3287D /* image4DSimple.swift */,
 				43108E7427C776CA00F3287D /* v3drawReader.swift */,
+				4317EDE4280D9AEA00B2A17B /* PBDImage.swift */,
 			);
 			path = "Data Parser";
 			sourceTree = "<group>";
@@ -201,7 +204,7 @@
 				43027F62280538370067E792 /* Login Screen */,
 				43A35EFB27EC58010078E25B /* Home Screen */,
 				4320386827D8EC8000DB2DBC /* MetalViewController.swift */,
-				439215A5280C630700E53631 /* MySceneViewContrller.swift */,
+				439215A5280C630700E53631 /* ImageViewContrller.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -394,13 +397,14 @@
 				43EEA48C27FFDF8D00B0E8B7 /* float4x4+Extensions.swift in Sources */,
 				489ED89D280ACACE000781C6 /* HTTPModel.swift in Sources */,
 				438684B527E48C1700F095BB /* hex2UIColor.swift in Sources */,
+				4317EDE5280D9AEA00B2A17B /* PBDImage.swift in Sources */,
 				439215A2280C62A800E53631 /* UserInfoViewController.swift in Sources */,
 				4320387E27D8ED8F00DB2DBC /* MetalTexture.swift in Sources */,
 				433B1F3C27DD815B00F44604 /* Node.swift in Sources */,
 				43108E7527C776CA00F3287D /* v3drawReader.swift in Sources */,
 				433B1F3E27DD815B00F44604 /* Vertex.swift in Sources */,
 				4320386927D8EC8000DB2DBC /* MetalViewController.swift in Sources */,
-				439215A6280C630700E53631 /* MySceneViewContrller.swift in Sources */,
+				439215A6280C630700E53631 /* ImageViewContrller.swift in Sources */,
 				439215A4280C62CB00E53631 /* LoginViewController.swift in Sources */,
 				43027F66280538940067E792 /* RegisterViewController.swift in Sources */,
 				433B1F4027DD81AF00F44604 /* Shaders.metal in Sources */,

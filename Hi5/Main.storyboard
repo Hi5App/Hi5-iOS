@@ -83,10 +83,10 @@
             </objects>
             <point key="canvasLocation" x="1370.7692307692307" y="99.526066350710892"/>
         </scene>
-        <!--My Scene View Controller-->
+        <!--Image View Controller-->
         <scene sceneID="WBT-na-QWf">
             <objects>
-                <viewController storyboardIdentifier="mysceneviewcontroller" id="PZu-Np-LZ9" customClass="MySceneViewController" customModule="Hi5" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="imageviewcontroller" id="PZu-Np-LZ9" customClass="ImageViewController" customModule="Hi5" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="31f-VG-8yk">
                         <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
