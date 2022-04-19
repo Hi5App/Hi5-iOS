@@ -47,6 +47,7 @@ struct PBDImage{
             print("Unsupported endianness")
             return nil
         }
+        let isBig = endianness == "B"
         if endianness == "B"{
             print("it's big endian")
         }else if endianness == "L"{
@@ -54,9 +55,11 @@ struct PBDImage{
         }
         
         // check datatype
-        let datatype = compressionByteBuffer[25]
+        let datatype = UInt8(bytes2Int(bytes: [UInt8](compressionByteBuffer[25...26]), isBig: isBig))
         //skip bytes[26]
         switch datatype{
+        case 33:
+            print("datatype is 33")
         case 1:
             print("datatype is UInt8")
         case 2:
@@ -103,7 +106,7 @@ struct PBDImage{
         return image4DSimple
     }
     
-    func handleDifference(difference:UInt8,value:UInt8)->UInt8{
+    func handleDifference(difference:UInt8, value:UInt8)->UInt8{
         if difference == 3{
             if value == 0{
                 return UInt8(255)
@@ -114,7 +117,7 @@ struct PBDImage{
             if Int(difference)+Int(value) > 255{
                 return 0
             }else{
-                return difference+value
+                return difference + value
             }
         }
     }
@@ -131,7 +134,7 @@ struct PBDImage{
         
         var decompressionPointerValue:UInt8 = 0
         
-        while(cp < 817318){
+        while(cp < compressionByteBuffer.count - 43){
             
             value = compressionByteBuffer[compressionBufferPointer + cp]
             
@@ -140,9 +143,9 @@ struct PBDImage{
                 for j in cp+1...cp+count{
                     decompressionByteBuffer[decompressionBufferPointer+dp] = compressionByteBuffer[j + compressionBufferPointer]
                     dp += 1
-                    cp += count+1
-                    decompressionPointerValue = decompressionByteBuffer[dp-1 + decompressionBufferPointer]
                 }
+                cp += count+1
+                decompressionPointerValue = decompressionByteBuffer[dp-1 + decompressionBufferPointer]
             }else if(value<128){ // difference mode
                 var leftToFill = value-32
                 while(leftToFill > 0){
@@ -179,6 +182,7 @@ struct PBDImage{
                     dp += Int(fillNumber)
                     leftToFill -= fillNumber
                 }
+                cp += 1
             }else{ // repeat mode
                 let repearCount = value-127
                 cp += 1
@@ -194,5 +198,19 @@ struct PBDImage{
         }
         
         print(dp)
+    }
+    
+    func bytes2Int(bytes:[UInt8], isBig:Bool)->UInt{
+        var value = UInt(0)
+        if !isBig {
+            for byte in bytes.reversed() {
+                value = (value << 8) + (UInt)(byte & 0xff)
+            }
+        } else {
+            for byte in bytes {
+                value = (value << 8) + (UInt)(byte & 0xff)
+            }
+        }
+        return (UInt)(value & 0xff)
     }
 }
