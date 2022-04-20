@@ -30,7 +30,7 @@
 		439215A0280C623400E53631 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4392159F280C623400E53631 /* HomeViewController.swift */; };
 		439215A2280C62A800E53631 /* UserInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439215A1280C62A800E53631 /* UserInfoViewController.swift */; };
 		439215A4280C62CB00E53631 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439215A3280C62CB00E53631 /* LoginViewController.swift */; };
-		439215A6280C630700E53631 /* ImageViewContrller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439215A5280C630700E53631 /* ImageViewContrller.swift */; };
+		439215A6280C630700E53631 /* MarkerFactoryViewContrller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439215A5280C630700E53631 /* MarkerFactoryViewContrller.swift */; };
 		439215A8280C650D00E53631 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 439215A7280C650D00E53631 /* Main.storyboard */; };
 		43B12F542806E19F0049BE9C /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F532806E19F0049BE9C /* User.swift */; };
 		43B12F572806E9CB0049BE9C /* Hi5API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F562806E9CB0049BE9C /* Hi5API.swift */; };
@@ -86,7 +86,7 @@
 		4392159F280C623400E53631 /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		439215A1280C62A800E53631 /* UserInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserInfoViewController.swift; sourceTree = "<group>"; };
 		439215A3280C62CB00E53631 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
-		439215A5280C630700E53631 /* ImageViewContrller.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageViewContrller.swift; sourceTree = "<group>"; };
+		439215A5280C630700E53631 /* MarkerFactoryViewContrller.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarkerFactoryViewContrller.swift; sourceTree = "<group>"; };
 		439215A7280C650D00E53631 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		43B12F532806E19F0049BE9C /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		43B12F562806E9CB0049BE9C /* Hi5API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hi5API.swift; sourceTree = "<group>"; };
@@ -204,7 +204,7 @@
 				43027F62280538370067E792 /* Login Screen */,
 				43A35EFB27EC58010078E25B /* Home Screen */,
 				4320386827D8EC8000DB2DBC /* MetalViewController.swift */,
-				439215A5280C630700E53631 /* ImageViewContrller.swift */,
+				439215A5280C630700E53631 /* MarkerFactoryViewContrller.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -404,7 +404,7 @@
 				43108E7527C776CA00F3287D /* v3drawReader.swift in Sources */,
 				433B1F3E27DD815B00F44604 /* Vertex.swift in Sources */,
 				4320386927D8EC8000DB2DBC /* MetalViewController.swift in Sources */,
-				439215A6280C630700E53631 /* ImageViewContrller.swift in Sources */,
+				439215A6280C630700E53631 /* MarkerFactoryViewContrller.swift in Sources */,
 				439215A4280C62CB00E53631 /* LoginViewController.swift in Sources */,
 				43027F66280538940067E792 /* RegisterViewController.swift in Sources */,
 				433B1F4027DD81AF00F44604 /* Shaders.metal in Sources */,

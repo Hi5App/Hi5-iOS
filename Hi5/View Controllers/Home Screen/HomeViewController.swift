@@ -114,7 +114,7 @@ extension HomeViewController:UICollectionViewDelegate{
     
     func showMarkerFactory(){
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
-        let nextViewController = storyBoard.instantiateViewController(withIdentifier: "imageviewcontroller") as! ImageViewController
+        let nextViewController = storyBoard.instantiateViewController(withIdentifier: "imageviewcontroller") as! MarkerFactoryViewController
         nextViewController.user = self.loginUser
         self.navigationController?.pushViewController(nextViewController, animated: true)
     }

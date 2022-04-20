@@ -197,7 +197,7 @@ struct PBDImage{
             }
         }
         
-        print(dp)
+//        print(dp)
     }
     
     func bytes2Int(bytes:[UInt8], isBig:Bool)->UInt{

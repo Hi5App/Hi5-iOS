@@ -8,8 +8,8 @@ import UIKit
 import UniformTypeIdentifiers
 import simd
 
-class ImageViewController: MetalViewController,MetalViewControllerDelegate,UIDocumentPickerDelegate {
-  
+class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelegate,UIDocumentPickerDelegate {
+ 
     var worldModelMatrix:float4x4!
     var objectToDraw:Quad!{
         didSet{
@@ -21,23 +21,91 @@ class ImageViewController: MetalViewController,MetalViewControllerDelegate,UIDoc
     var lastPanLocation:CGPoint!
     var imageToDisplay:image4DSimple!
     var scaleLabel:UIButton!
-    var somaArray:[simd_float3] = []
+    var somaArray:[simd_float3] = [] // soma needs to be displayed
+    var somaList:SomaListFeedBack!
     
     var user:User!
-    var brainListfeed:BrainListFeedBack!
     var resUsed:String!
     var currentImageName:String = ""
+    
+    var somaPotentialLocation:PotentialLocationFeedBack!
+    var brainListfeed:BrainListFeedBack!
+    let perferredSize = 128
   
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureButtons()
         configureNavBar()
-        addLabelView()
         self.view.backgroundColor = UIColor(red: 123.0/255.0, green: 133.0/255.0, blue: 199.0/255.0, alpha: 1.0)
         worldModelMatrix = float4x4()
         worldModelMatrix.translate(0.0, y: 0.0, z: -4)
         worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
+        
+        //request potential location and brainList for later use
+        HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { feedback in
+            if let feedback = feedback{
+                self.somaPotentialLocation = feedback
+//                print("first see potential location: \(self.somaPotentialLocation!)")
+            }
+        } errorHandler: { error in
+            print("soma potential fetch failed")
+        }
+        HTTPRequest.ImagePart.getBrainList(name: user.userName, passwd: user.password) { feedback in
+            if let feedback = feedback{
+                self.brainListfeed = feedback
+//                print("first see brainListFeedback: \(self.brainListfeed!)")
+            }
+        } errorHandler: { error in
+            print("brain list fetch failed")
+        }
     }
     // MARK: - Congfigue UI
+    func configureButtons(){
+        var backwardConfiguration = UIButton.Configuration.filled()
+        backwardConfiguration.cornerStyle = .medium
+        backwardConfiguration.baseBackgroundColor = UIColor(named: "mainOrange")
+        backwardConfiguration.baseForegroundColor = UIColor(red: 123.0/255.0, green: 133.0/255.0, blue: 199.0/255.0, alpha: 1.0)
+        backwardConfiguration.buttonSize = .medium
+        backwardConfiguration.title = "prev"
+        backwardConfiguration.image = UIImage(systemName: "chevron.backward.square")
+        backwardConfiguration.imagePlacement = .top
+        
+        var forwardConfiguration = backwardConfiguration
+        forwardConfiguration.title = "next"
+        forwardConfiguration.image = UIImage(systemName: "chevron.forward.square")
+        
+        let backwardButton = UIButton(configuration: backwardConfiguration)
+        backwardButton.addTarget(self, action: #selector(backButtonTapped), for: .touchDown)
+        backwardButton.translatesAutoresizingMaskIntoConstraints = false
+        let forwardButton = UIButton(configuration: forwardConfiguration)
+        backwardButton.addTarget(self, action: #selector(forwardButtonTapped), for: .touchDown)
+        forwardButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(backwardButton)
+        view.addSubview(forwardButton)
+        
+        // add scaleLabel
+        var scaleLabelConfiguration = backwardConfiguration
+        scaleLabelConfiguration.image = UIImage(systemName: "1.magnifyingglass")
+        scaleLabelConfiguration.title = "  1.0x"
+        scaleLabelConfiguration.imagePlacement = .leading
+        scaleLabel = UIButton(configuration: scaleLabelConfiguration)
+        scaleLabel.translatesAutoresizingMaskIntoConstraints = false
+        scaleLabel.addTarget(self, action: #selector(resetScale), for: .touchUpInside)
+        view.addSubview(scaleLabel)
+
+        
+        let constraints = [
+            backwardButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            backwardButton.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 5),
+            forwardButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            forwardButton.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -5),
+            
+            scaleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            scaleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10)
+        ]
+        NSLayoutConstraint.activate(constraints)
+    }
+    
     func configureNavBar(){
         navigationController?.navigationBar.tintColor = .label
         // bar colors
@@ -60,26 +128,20 @@ class ImageViewController: MetalViewController,MetalViewControllerDelegate,UIDoc
         navigationItem.rightBarButtonItem!.menu = menu
     }
     
-    func addLabelView(){
-        scaleLabel = UIButton(type: .system)
-        scaleLabel.setTitle("Scale:1.0", for: .normal)
-        scaleLabel.setTitleColor(UIColor.systemBlue, for: .normal)
-        scaleLabel.backgroundColor = UIColor(named: "mainOrange")
-        scaleLabel.translatesAutoresizingMaskIntoConstraints = false
-        scaleLabel.layer.cornerRadius = 4.0
-        scaleLabel.addTarget(self, action: #selector(resetScale), for: .touchUpInside)
-        view.addSubview(scaleLabel)
-
-        let constraints = [
-            scaleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            scaleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10)
-        ]
-        NSLayoutConstraint.activate(constraints)
+    @objc func resetScale(){
+        if let object = objectToDraw{
+            object.scale = 1.0
+            scaleLabel.configuration?.image = UIImage(systemName:"1.magnifyingglass")
+            scaleLabel.setTitle("  1.0x", for: .normal)
+        }
     }
     
-    @objc func resetScale(){
-        objectToDraw.scale = 1.0
-        scaleLabel.setTitle("Scale:1.0", for: .normal)
+    @objc func backButtonTapped(){
+        
+    }
+    
+    @objc func forwardButtonTapped(){
+        
     }
     
    // MARK: - Image Reader
@@ -96,49 +158,96 @@ class ImageViewController: MetalViewController,MetalViewControllerDelegate,UIDoc
             
         }
         // send Request for Image
-        HTTPRequest.ImagePart.getBrainList(name: user.userName, passwd: user.password) { brainListFeedback in
-            guard brainListFeedback != nil else{return}
-//            print(brainListFeedback!)
-            self.brainListfeed = brainListFeedback!
-            for brainInfo in self.brainListfeed.barinList{
-                if brainInfo.name == "191813"{
-                    print(brainInfo.detail)
-                    let resArray = brainInfo.detail.components(separatedBy: ",")
-                    //trim string
-                    let RIndex = resArray[1].firstIndex(of: "R")
-                    let endIndex = resArray[1].firstIndex(of: ")")
-                    self.resUsed = String(resArray[1][RIndex!...endIndex!])
-                    print(self.resUsed!)
-                    
-                    // download image
-                    // test data 4433 / 2,13377 / 2,6692 / 2,191813，128
-                    HTTPRequest.ImagePart.downloadImage(centerX: 4433/2, centerY: 13377/2, centerZ: 6692/2, size: 128, res: self.resUsed, brainId: "191813", name: self.user.userName, passwd: self.user.password) { url in
-                        guard url != nil else {return}
-                        print(url!)
-                        var PBDImage = PBDImage(imageLocation: url!)
-                        self.imageToDisplay = PBDImage.decompressToV3draw()
-                        
-                        //display image
-                        if let image = self.imageToDisplay{
-                            self.objectToDraw = Quad(device: self.device,commandQ: self.commandQueue,viewWidth: Int(self.view.bounds.width),viewHeight: Int(self.view.bounds.height),image4DSimple: image)
-                            self.somaArray.removeAll()
-                        }else{
-                            print("No 4d image")
-                        }
-//                        self.currentImageName = url!.lastPathComponent
-                    } errorHandler: { error in
-                        print(error)
-                    }
-                }
-            }
-        } errorHandler: { error in
-            // alert get barin list failed
-            print(error)
+        guard somaPotentialLocation != nil && brainListfeed != nil else {
+            // alert user for network issue
             return
         }
-        // decompress PBDImage and save .v3draw to documents folder
         
-        // read Image from Documents Folder
+        for brainInfo in self.brainListfeed.barinList{
+            if brainInfo.name == somaPotentialLocation!.image{
+                let resArray = brainInfo.detail.components(separatedBy: ",")
+                //trim res string
+                let RIndex = resArray[1].firstIndex(of: "R") // use secondary resolution
+                let endIndex = resArray[1].firstIndex(of: ")")
+                self.resUsed = String(resArray[1][RIndex!...endIndex!])
+                print(self.resUsed!)
+            }
+        }
+        
+        // download image and fetch somaList
+        // test data 4433 / 2,13377 / 2,6692 / 2,191813，128
+        HTTPRequest.ImagePart.downloadImage(centerX: somaPotentialLocation.loc.x, centerY: somaPotentialLocation.loc.y, centerZ: somaPotentialLocation.loc.z, size: perferredSize, res: self.resUsed, brainId: somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { url in
+            guard url != nil else {return}
+            var PBDImage = PBDImage(imageLocation: url!) // decompress image
+            self.imageToDisplay = PBDImage.decompressToV3draw()
+            
+            // request somaList
+            HTTPRequest.SomaPart.getSomaList(centerX: self.somaPotentialLocation.loc.x, centerY: self.somaPotentialLocation.loc.y, centerZ: self.somaPotentialLocation.loc.z, size: self.perferredSize, res: self.resUsed, brainId: self.somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { feedback in
+                if let feedback = feedback{
+                    self.somaList = feedback
+                }
+            } errorHandler: { error in
+                print("soma List fetch failed")
+            }
+
+            
+            //display image
+            if let image = self.imageToDisplay{
+                self.objectToDraw = Quad(device: self.device,commandQ: self.commandQueue,viewWidth: Int(self.view.bounds.width),viewHeight: Int(self.view.bounds.height),image4DSimple: image)
+                // convert somaList data structure to somaArray model-space data structure
+                
+                // refresh existing soma
+                self.somaArray.removeAll()
+                //add soma
+                
+            }else{
+                print("No 4d image")
+            }
+        } errorHandler: { error in
+            print(error)
+        }
+            
+        
+//        HTTPRequest.ImagePart.getBrainList(name: user.userName, passwd: user.password) { brainListFeedback in
+//            guard brainListFeedback != nil else{return}
+//            self.brainListfeed = brainListFeedback!
+//            for brainInfo in self.brainListfeed.barinList{
+//                if brainInfo.name == "191813"{
+//                    print(brainInfo.detail)
+//                    let resArray = brainInfo.detail.components(separatedBy: ",")
+//                    //trim string
+//                    let RIndex = resArray[1].firstIndex(of: "R")
+//                    let endIndex = resArray[1].firstIndex(of: ")")
+//                    self.resUsed = String(resArray[1][RIndex!...endIndex!])
+//                    print(self.resUsed!)
+//
+//                    // download image
+//                    // test data 4433 / 2,13377 / 2,6692 / 2,191813，128
+//                    HTTPRequest.ImagePart.downloadImage(centerX: 4433/2, centerY: 13377/2, centerZ: 6692/2, size: 128, res: self.resUsed, brainId: "191813", name: self.user.userName, passwd: self.user.password) { url in
+//                        guard url != nil else {return}
+//                        var PBDImage = PBDImage(imageLocation: url!)
+//                        self.imageToDisplay = PBDImage.decompressToV3draw()
+//
+//                        //display image
+//                        if let image = self.imageToDisplay{
+//                            self.objectToDraw = Quad(device: self.device,commandQ: self.commandQueue,viewWidth: Int(self.view.bounds.width),viewHeight: Int(self.view.bounds.height),image4DSimple: image)
+//                            self.somaArray.removeAll()
+//                        }else{
+//                            print("No 4d image")
+//                        }
+//
+//                        // request somaList
+//
+//                    } errorHandler: { error in
+//                        print(error)
+//                    }
+//                }
+//            }
+//        } errorHandler: { error in
+//            // alert get barin list failed
+//            print(error)
+//            return
+//        }
         
     }
     
@@ -206,9 +315,9 @@ class ImageViewController: MetalViewController,MetalViewControllerDelegate,UIDoc
     
     //MARK: - setup interaction with images
     func setupGestures(){
-        let pan = UIPanGestureRecognizer(target: self, action: #selector(ImageViewController.pan))
-        let pinch = UIPinchGestureRecognizer(target: self, action: #selector(ImageViewController.pinch))
-        let tap = UITapGestureRecognizer(target: self, action: #selector(ImageViewController.tap))
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(MarkerFactoryViewController.pan))
+        let pinch = UIPinchGestureRecognizer(target: self, action: #selector(MarkerFactoryViewController.pinch))
+        let tap = UITapGestureRecognizer(target: self, action: #selector(MarkerFactoryViewController.tap))
         self.view.addGestureRecognizer(pan)
         self.view.addGestureRecognizer(pinch)
         self.view.addGestureRecognizer(tap)
@@ -272,7 +381,7 @@ class ImageViewController: MetalViewController,MetalViewControllerDelegate,UIDoc
             }
         }
         if flag{
-            print(maxIntensity)
+            print("soma intensity is \(maxIntensity)")
             return simd_float3(maxPosition.x,maxPosition.y,maxPosition.z)
         }else{
             return nil
@@ -306,9 +415,12 @@ class ImageViewController: MetalViewController,MetalViewControllerDelegate,UIDoc
             pinchGesture.scale = 1.0
         }
         if pinchGesture.state == .ended{
-            scaleLabel.setTitle(String(format: "Scale:%.1f", objectToDraw.scale), for: .normal)
-            print("pinchScale \(pinchGesture.scale)")
-            print("objectScale \(objectToDraw.scale)")
+            scaleLabel.setTitle(String(format: "  %.1fx", objectToDraw.scale), for: .normal)
+            if objectToDraw.scale >= 1.0{
+                scaleLabel.configuration?.image = UIImage(systemName: "plus.magnifyingglass")
+            }else if objectToDraw.scale < 1.0{
+                scaleLabel.configuration?.image = UIImage(systemName: "minus.magnifyingglass")
+            }
         }
     }
 }
