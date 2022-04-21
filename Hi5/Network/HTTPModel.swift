@@ -100,7 +100,7 @@ struct PotentialLocationFeedBack:Codable{
 }
 
 struct QuerySomaListStruct:Codable{
-    let bBox:BoundingBox
+    let bb:BoundingBox
     let user:UserInfo
 }
 

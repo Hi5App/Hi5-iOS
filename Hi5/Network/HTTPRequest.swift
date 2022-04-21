@@ -149,7 +149,7 @@ struct HTTPRequest{
             let pa2 = Parameter(x: centerX + size / 2, y: centerY + size / 2, z: centerZ + size / 2)
             let bBox = BoundingBox(pa1: pa1, pa2: pa2, res: res, obj: brainId)
             let user = UserInfo(name: name, passwd: passwd)
-            let querySomaListStruct = QuerySomaListStruct(bBox: bBox, user: user)
+            let querySomaListStruct = QuerySomaListStruct(bb: bBox, user: user)
             
             let jsonData = Hi5API.generateJSON(querySomaListStruct)
             guard jsonData != nil else {return}
