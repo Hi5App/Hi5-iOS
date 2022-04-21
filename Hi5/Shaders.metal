@@ -83,12 +83,12 @@ fragment float4 basic_fragment(VertexOut interpolated [[stage_in]],
 
     while(ray_length > 0){
         float greyScale = image3d.sample(simpleSimpler,currentPosi).x;
-//        greyScale = greyScale/255.0;
-        if (greyScale <= 90){
-            greyScale = greyScale/255.0*2;
-        }else{
-            greyScale = greyScale/255.0*6;
-        }
+        greyScale = greyScale/255.0;
+//        if (greyScale <= 90){
+//            greyScale = greyScale/255.0*2;
+//        }else{
+//            greyScale = greyScale/255.0*6;
+//        }
         if(greyScale > maxIntensity){
             maxIntensity = greyScale;
         }

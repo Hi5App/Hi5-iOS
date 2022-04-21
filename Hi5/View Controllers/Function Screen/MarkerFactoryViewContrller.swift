@@ -10,17 +10,22 @@ import simd
 
 class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelegate,UIDocumentPickerDelegate {
  
+    //Buttons
+    var scaleLabel:UIButton!
+    var backwardButton:UIButton!
+    var forwardButton:UIButton!
+    
     var worldModelMatrix:float4x4!
     var objectToDraw:Quad!{
         didSet{
             setupGestures()
             self.metalViewControllerDelegate = self
+            self.enableButtons()
         }
     }
     var panSensivity:Float = 5.0
     var lastPanLocation:CGPoint!
     var imageToDisplay:image4DSimple!
-    var scaleLabel:UIButton!
     var somaArray:[simd_float3] = [] // soma needs to be displayed
     var somaList:SomaListFeedBack!
     
@@ -29,8 +34,10 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     var currentImageName:String = ""
     
     var somaPotentialLocation:PotentialLocationFeedBack!
+    var imageCache:image4DSimpleCache!
     var brainListfeed:BrainListFeedBack!
     let perferredSize = 128
+    let somaperferredSize = 256
   
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,7 +52,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { feedback in
             if let feedback = feedback{
                 self.somaPotentialLocation = feedback
-//                print("first see potential location: \(self.somaPotentialLocation!)")
+                print("first see potential location: \(self.somaPotentialLocation!)")
             }
         } errorHandler: { error in
             print("soma potential fetch failed")
@@ -64,7 +71,8 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         var backwardConfiguration = UIButton.Configuration.filled()
         backwardConfiguration.cornerStyle = .medium
         backwardConfiguration.baseBackgroundColor = UIColor(named: "mainOrange")
-        backwardConfiguration.baseForegroundColor = UIColor(red: 123.0/255.0, green: 133.0/255.0, blue: 199.0/255.0, alpha: 1.0)
+//        backwardConfiguration.baseForegroundColor = UIColor(red: 123.0/255.0, green: 133.0/255.0, blue: 199.0/255.0, alpha: 1.0)
+        backwardConfiguration.baseForegroundColor = UIColor.label
         backwardConfiguration.buttonSize = .medium
         backwardConfiguration.title = "prev"
         backwardConfiguration.image = UIImage(systemName: "chevron.backward.square")
@@ -74,10 +82,10 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         forwardConfiguration.title = "next"
         forwardConfiguration.image = UIImage(systemName: "chevron.forward.square")
         
-        let backwardButton = UIButton(configuration: backwardConfiguration)
+        backwardButton = UIButton(configuration: backwardConfiguration)
         backwardButton.addTarget(self, action: #selector(backButtonTapped), for: .touchDown)
         backwardButton.translatesAutoresizingMaskIntoConstraints = false
-        let forwardButton = UIButton(configuration: forwardConfiguration)
+        forwardButton = UIButton(configuration: forwardConfiguration)
         backwardButton.addTarget(self, action: #selector(forwardButtonTapped), for: .touchDown)
         forwardButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(backwardButton)
@@ -104,6 +112,26 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
             scaleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10)
         ]
         NSLayoutConstraint.activate(constraints)
+        
+        disableButtons()
+    }
+    
+    func disableButtons(){
+        scaleLabel.isEnabled = false
+        forwardButton.isEnabled = false
+        backwardButton.isEnabled = false
+        scaleLabel.alpha = 0
+        forwardButton.alpha = 0
+        backwardButton.alpha = 0
+    }
+    
+    func enableButtons(){
+        scaleLabel.isEnabled = true
+        forwardButton.isEnabled = true
+        backwardButton.isEnabled = true
+        scaleLabel.alpha = 1
+        forwardButton.alpha = 1
+        backwardButton.alpha = 1
     }
     
     func configureNavBar(){
@@ -137,10 +165,18 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     }
     
     @objc func backButtonTapped(){
+        // update soma list
+        
+        // retrive images from cache
+    
         
     }
     
     @objc func forwardButtonTapped(){
+        // update soma list
+        
+        
+        // try retrive images from cache
         
     }
     
@@ -163,6 +199,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
             return
         }
         
+        // get secondary resolution
         for brainInfo in self.brainListfeed.barinList{
             if brainInfo.name == somaPotentialLocation!.image{
                 let resArray = brainInfo.detail.components(separatedBy: ",")
@@ -175,15 +212,15 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         }
         
         // download image and fetch somaList
-        // test data 4433 / 2,13377 / 2,6692 / 2,191813，128
-        HTTPRequest.ImagePart.downloadImage(centerX: somaPotentialLocation.loc.x, centerY: somaPotentialLocation.loc.y, centerZ: somaPotentialLocation.loc.z, size: perferredSize, res: self.resUsed, brainId: somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { url in
+        HTTPRequest.ImagePart.downloadImage(centerX: somaPotentialLocation.loc.x/2, centerY: somaPotentialLocation.loc.y/2, centerZ: somaPotentialLocation.loc.z/2, size: perferredSize, res: self.resUsed, brainId: somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { url in
             guard url != nil else {return}
             var PBDImage = PBDImage(imageLocation: url!) // decompress image
             self.imageToDisplay = PBDImage.decompressToV3draw()
             
             // request somaList
-            HTTPRequest.SomaPart.getSomaList(centerX: self.somaPotentialLocation.loc.x, centerY: self.somaPotentialLocation.loc.y, centerZ: self.somaPotentialLocation.loc.z, size: self.perferredSize, res: self.resUsed, brainId: self.somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { feedback in
+            HTTPRequest.SomaPart.getSomaList(centerX: self.somaPotentialLocation.loc.x, centerY: self.somaPotentialLocation.loc.y, centerZ: self.somaPotentialLocation.loc.z, size: self.somaperferredSize, res:"", brainId: self.somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { feedback in
                 if let feedback = feedback{
+                    print(feedback)
                     self.somaList = feedback
                 }
             } errorHandler: { error in
