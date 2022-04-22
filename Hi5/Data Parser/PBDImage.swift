@@ -109,7 +109,8 @@ struct PBDImage{
     func handleDifference(difference:UInt8, value:UInt8)->UInt8{
         if difference == 3{
             if value == 0{
-                return UInt8(255)
+//                return UInt8(255)
+                return UInt8(0)
             }else{
                 return value-1
             }
@@ -184,11 +185,11 @@ struct PBDImage{
                 }
                 cp += 1
             }else{ // repeat mode
-                let repearCount = value-127
+                let repeatCount = value-127
                 cp += 1
                 let repeatValue = compressionByteBuffer[cp+compressionBufferPointer]
                 
-                for _ in 0..<repearCount{
+                for _ in 0..<repeatCount{
                     decompressionByteBuffer[decompressionBufferPointer + dp] = repeatValue
                     dp += 1
                 }

@@ -20,7 +20,6 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         didSet{
             setupGestures()
             self.metalViewControllerDelegate = self
-            self.enableButtons()
         }
     }
     var panSensivity:Float = 5.0
@@ -83,10 +82,10 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         forwardConfiguration.image = UIImage(systemName: "chevron.forward.square")
         
         backwardButton = UIButton(configuration: backwardConfiguration)
-        backwardButton.addTarget(self, action: #selector(backButtonTapped), for: .touchDown)
+        backwardButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
         backwardButton.translatesAutoresizingMaskIntoConstraints = false
         forwardButton = UIButton(configuration: forwardConfiguration)
-        backwardButton.addTarget(self, action: #selector(forwardButtonTapped), for: .touchDown)
+        forwardButton.addTarget(self, action: #selector(forwardButtonTapped), for: .touchUpInside)
         forwardButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(backwardButton)
         view.addSubview(forwardButton)
@@ -113,7 +112,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         ]
         NSLayoutConstraint.activate(constraints)
         
-        disableButtons()
+//        disableButtons()
     }
     
     func disableButtons(){
@@ -177,7 +176,17 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         
         
         // try retrive images from cache
+        print("tapped")
+        HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { feedback in
+            if let feedback = feedback{
+                self.somaPotentialLocation = feedback
+                print("forward see potential location: \(self.somaPotentialLocation!)")
+            }
+        } errorHandler: { error in
+            print("soma potential fetch failed")
+        }
         
+        readCloudImage()
     }
     
    // MARK: - Image Reader
@@ -243,48 +252,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         } errorHandler: { error in
             print(error)
         }
-            
         
-//        HTTPRequest.ImagePart.getBrainList(name: user.userName, passwd: user.password) { brainListFeedback in
-//            guard brainListFeedback != nil else{return}
-//            self.brainListfeed = brainListFeedback!
-//            for brainInfo in self.brainListfeed.barinList{
-//                if brainInfo.name == "191813"{
-//                    print(brainInfo.detail)
-//                    let resArray = brainInfo.detail.components(separatedBy: ",")
-//                    //trim string
-//                    let RIndex = resArray[1].firstIndex(of: "R")
-//                    let endIndex = resArray[1].firstIndex(of: ")")
-//                    self.resUsed = String(resArray[1][RIndex!...endIndex!])
-//                    print(self.resUsed!)
-//
-//                    // download image
-//                    // test data 4433 / 2,13377 / 2,6692 / 2,191813，128
-//                    HTTPRequest.ImagePart.downloadImage(centerX: 4433/2, centerY: 13377/2, centerZ: 6692/2, size: 128, res: self.resUsed, brainId: "191813", name: self.user.userName, passwd: self.user.password) { url in
-//                        guard url != nil else {return}
-//                        var PBDImage = PBDImage(imageLocation: url!)
-//                        self.imageToDisplay = PBDImage.decompressToV3draw()
-//
-//                        //display image
-//                        if let image = self.imageToDisplay{
-//                            self.objectToDraw = Quad(device: self.device,commandQ: self.commandQueue,viewWidth: Int(self.view.bounds.width),viewHeight: Int(self.view.bounds.height),image4DSimple: image)
-//                            self.somaArray.removeAll()
-//                        }else{
-//                            print("No 4d image")
-//                        }
-//
-//                        // request somaList
-//
-//                    } errorHandler: { error in
-//                        print(error)
-//                    }
-//                }
-//            }
-//        } errorHandler: { error in
-//            // alert get barin list failed
-//            print(error)
-//            return
-//        }
         
     }
     
