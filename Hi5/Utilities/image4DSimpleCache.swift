@@ -15,9 +15,13 @@ struct imageMarkerBundle{
 struct image4DSimpleCache{
    
     
-    var imageCache:[imageMarkerBundle]!
+    var imageCache:[imageMarkerBundle] = []
     let size = 5
-    var index = -1
+    var index = -1{
+        didSet{
+            print("index now is \(index)")
+        }
+    }
     
     mutating func addImage(image:image4DSimple,list:SomaListFeedBack){
         if imageCache.count == size{
@@ -30,24 +34,22 @@ struct image4DSimpleCache{
     }
     
     mutating func previousImage()->imageMarkerBundle?{
-        index -= 1
-        if index < 0{
-            index = 0
+        if index == 0{
             print("no previous image in cache")
             return nil
         }else{
+            index -= 1
             return imageCache[index]
         }
     }
     
     mutating func nextImage()->imageMarkerBundle?{
-        index += 1
-        if index < 5{
-            return imageCache[index]
-        }else{
-            index = 4
+        if index == imageCache.count-1{
             print("no next image in cache")
             return nil
+        }else{
+            index += 1
+            return imageCache[index]
         }
     }
 }

@@ -16,8 +16,9 @@ class image4DSimple{
     let sizeZ:Int
     let channelNumber:Int
     let imageData:[[[UInt8]]]
+    let imageArray:[UInt8]
     
-    init(name:String,endiannessType e:Character,dataType dt:UInt8,_ sX:Int,_ sY:Int,_ sZ:Int,_ channel:Int,_ data:[[[UInt8]]]){
+    init(name:String,endiannessType e:Character,dataType dt:UInt8,_ sX:Int,_ sY:Int,_ sZ:Int,_ channel:Int,_ data:[[[UInt8]]],array:[UInt8]){
         self.name = name
         endianness = e
         dataType = dt
@@ -26,6 +27,7 @@ class image4DSimple{
         sizeZ = sZ
         channelNumber = channel
         imageData = data
+        imageArray = array
     }
     
     func sample3Ddata(x:Float,y:Float,z:Float)->Float{

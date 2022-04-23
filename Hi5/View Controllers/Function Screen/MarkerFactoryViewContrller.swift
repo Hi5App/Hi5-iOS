@@ -46,6 +46,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         worldModelMatrix = float4x4()
         worldModelMatrix.translate(0.0, y: 0.0, z: -4)
         worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
+        imageCache = image4DSimpleCache()
         
         //request potential location and brainList for later use
         HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { feedback in
@@ -64,6 +65,15 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         } errorHandler: { error in
             print("brain list fetch failed")
         }
+    }
+    
+    func drawWithImageAndSoma(image:image4DSimple,soma:SomaListFeedBack){
+        self.objectToDraw = Quad(device: self.device,commandQ: self.commandQueue,viewWidth: Int(self.view.bounds.width),viewHeight: Int(self.view.bounds.height),image4DSimple: image)
+        // convert somaList data structure to somaArray model-space data structure
+        
+        // refresh existing soma
+        self.somaArray.removeAll()
+        //add soma
     }
     // MARK: - Congfigue UI
     func configureButtons(){
@@ -167,8 +177,11 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         // update soma list
         
         // retrive images from cache
-    
-        
+        if let imageBuddle = imageCache.previousImage(){
+            drawWithImageAndSoma(image: imageBuddle.image, soma: imageBuddle.somaList)
+        }else{
+            // alert user no previous image
+        }
     }
     
     @objc func forwardButtonTapped(){
@@ -176,17 +189,20 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         
         
         // try retrive images from cache
-        print("tapped")
-        HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { feedback in
-            if let feedback = feedback{
-                self.somaPotentialLocation = feedback
-                print("forward see potential location: \(self.somaPotentialLocation!)")
+        if let imageBuddle = imageCache.nextImage(){
+            drawWithImageAndSoma(image: imageBuddle.image, soma: imageBuddle.somaList)
+        }else{
+            // request image from server
+            HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { feedback in
+                if let feedback = feedback{
+                    self.somaPotentialLocation = feedback
+                    print("forward see potential location: \(self.somaPotentialLocation!)")
+                    self.readCloudImage()
+                }
+            } errorHandler: { error in
+                print("soma potential fetch failed")
             }
-        } errorHandler: { error in
-            print("soma potential fetch failed")
         }
-        
-        readCloudImage()
     }
     
    // MARK: - Image Reader
@@ -202,7 +218,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         if user.email == "Guest@Guest.com"{
             
         }
-        // send Request for Image
+        // check location and brainList
         guard somaPotentialLocation != nil && brainListfeed != nil else {
             // alert user for network issue
             return
@@ -231,23 +247,18 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
                 if let feedback = feedback{
                     print(feedback)
                     self.somaList = feedback
+                    // save to cache
+                    self.imageCache.addImage(image: self.imageToDisplay, list: self.somaList)
+                    
+                    //display image
+                    if let image = self.imageToDisplay{
+                        self.drawWithImageAndSoma(image: image, soma: self.somaList)
+                    }else{
+                        print("No 4d image")
+                    }
                 }
             } errorHandler: { error in
                 print("soma List fetch failed")
-            }
-
-            
-            //display image
-            if let image = self.imageToDisplay{
-                self.objectToDraw = Quad(device: self.device,commandQ: self.commandQueue,viewWidth: Int(self.view.bounds.width),viewHeight: Int(self.view.bounds.height),image4DSimple: image)
-                // convert somaList data structure to somaArray model-space data structure
-                
-                // refresh existing soma
-                self.somaArray.removeAll()
-                //add soma
-                
-            }else{
-                print("No 4d image")
             }
         } errorHandler: { error in
             print(error)
