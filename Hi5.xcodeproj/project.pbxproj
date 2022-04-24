@@ -25,6 +25,7 @@
 		433B1F3D27DD815B00F44604 /* Cube.swift in Sources */ = {isa = PBXBuildFile; fileRef = 433B1F3A27DD815B00F44604 /* Cube.swift */; };
 		433B1F3E27DD815B00F44604 /* Vertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 433B1F3B27DD815B00F44604 /* Vertex.swift */; };
 		433B1F4027DD81AF00F44604 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 433B1F3F27DD81AF00F44604 /* Shaders.metal */; };
+		433C55C32813F8D900BC223F /* CoordHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 433C55C22813F8D900BC223F /* CoordHelper.swift */; };
 		437DA8C227DEF7790080A74C /* Quad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437DA8C127DEF7790080A74C /* Quad.swift */; };
 		438684B527E48C1700F095BB /* hex2UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 438684B427E48C1700F095BB /* hex2UIColor.swift */; };
 		439215A0280C623400E53631 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4392159F280C623400E53631 /* HomeViewController.swift */; };
@@ -82,6 +83,7 @@
 		433B1F3A27DD815B00F44604 /* Cube.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cube.swift; sourceTree = "<group>"; };
 		433B1F3B27DD815B00F44604 /* Vertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vertex.swift; sourceTree = "<group>"; };
 		433B1F3F27DD81AF00F44604 /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
+		433C55C22813F8D900BC223F /* CoordHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordHelper.swift; sourceTree = "<group>"; };
 		437DA8C127DEF7790080A74C /* Quad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Quad.swift; sourceTree = "<group>"; };
 		438684B427E48C1700F095BB /* hex2UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = hex2UIColor.swift; sourceTree = "<group>"; };
 		4392159F280C623400E53631 /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
@@ -229,6 +231,7 @@
 				4320387F27D8ED9200DB2DBC /* BufferProvider.swift */,
 				43EEA48B27FFDF8D00B0E8B7 /* float4x4+Extensions.swift */,
 				43CFDB232810FDA000AF33FB /* image4DSimpleCache.swift */,
+				433C55C22813F8D900BC223F /* CoordHelper.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -405,6 +408,7 @@
 				439215A0280C623400E53631 /* HomeViewController.swift in Sources */,
 				43C54BD127EA04990067F559 /* FunctionCollectionViewCell.swift in Sources */,
 				43B12F5B2806F9EE0049BE9C /* HTTPRequest.swift in Sources */,
+				433C55C32813F8D900BC223F /* CoordHelper.swift in Sources */,
 				43EEA48C27FFDF8D00B0E8B7 /* float4x4+Extensions.swift in Sources */,
 				489ED89D280ACACE000781C6 /* HTTPModel.swift in Sources */,
 				438684B527E48C1700F095BB /* hex2UIColor.swift in Sources */,

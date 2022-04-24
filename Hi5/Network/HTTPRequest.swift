@@ -61,7 +61,7 @@ struct HTTPRequest{
             
             uploadTask(url:Hi5API.registerURL, uploadData: jsonData!) {
                 data, error, statusCode in
-                if let data = data, statusCode == 200 {
+                if statusCode == 200 {
                     completionHandler()
                 }
                 if error != nil || statusCode != 200{
@@ -166,7 +166,7 @@ struct HTTPRequest{
             }
         }
         
-        static func updateSomaLisr(imageId:String, locationId:Int, locationType:Int, username:String, passwd:String, insertSomaList:[PositionInt], deleteSomaList:[String], completionHandler:@escaping()->Void, errorHandler:@escaping(String)->Void) {
+        static func updateSomaList(imageId:String, locationId:Int, locationType:Int, username:String, passwd:String, insertSomaList:[PositionFloat], deleteSomaList:[String], completionHandler:@escaping()->Void, errorHandler:@escaping(String)->Void) {
             let user = UserInfo(name: username, passwd: passwd)
             let updateSomaInfo = UpdateSomaInfo(locationId: locationId, locationtype: locationType, owner: username, image: imageId, insertsomalist: insertSomaList, deletesomalist: deleteSomaList)
             let updateSomaListStruct = UpdateSomaListStruct(pa: updateSomaInfo, user: user)
@@ -176,7 +176,7 @@ struct HTTPRequest{
             
             uploadTask(url: Hi5API.updateSomaListURL, uploadData: jsonData!) {
                 data, error, statusCode in
-                if let data = data, statusCode == 200 {
+                if statusCode == 200 {
                     completionHandler()
                 }
                 if error != nil && statusCode != 200{

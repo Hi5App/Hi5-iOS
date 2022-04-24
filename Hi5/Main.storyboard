@@ -3,6 +3,7 @@
     <device id="retina6_0" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -94,18 +95,57 @@
                             <mtkView contentMode="scaleToFill" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="yN6-MA-zow">
                                 <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
                             </mtkView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="crf-LI-9nR">
+                                <rect key="frame" x="0.0" y="761" width="390" height="49"/>
+                                <items>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="LPq-px-gkH"/>
+                                    <barButtonItem title="Finshed" id="9J7-be-Jek">
+                                        <imageReference key="image" image="checkmark" catalog="system" symbolScale="large"/>
+                                        <color key="tintColor" name="mainOrange"/>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="qIc-4m-P4l"/>
+                                    <barButtonItem style="plain" id="HeP-4y-dDE">
+                                        <segmentedControl key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="52K-9T-FI3">
+                                            <rect key="frame" x="101" y="10.666666666666664" width="179" height="33"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <segments>
+                                                <segment title="Show"/>
+                                                <segment title="Mark"/>
+                                                <segment title="Delete"/>
+                                            </segments>
+                                            <color key="selectedSegmentTintColor" name="mainOrange"/>
+                                        </segmentedControl>
+                                    </barButtonItem>
+                                    <barButtonItem title="BoringImage" id="ck0-rS-4TG">
+                                        <imageReference key="image" image="heart" catalog="system" symbolScale="large"/>
+                                        <color key="tintColor" name="mainOrange"/>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="5FU-nE-SRS"/>
+                                    <barButtonItem title="GoodImage" style="done" id="TnY-7h-OFV">
+                                        <imageReference key="image" image="trash" catalog="system" symbolScale="large"/>
+                                        <color key="tintColor" name="mainOrange"/>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="dlB-IJ-0oo"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="yN6-MA-zow" secondAttribute="trailing" id="1Bk-Ur-IrX"/>
                             <constraint firstItem="yN6-MA-zow" firstAttribute="leading" secondItem="31f-VG-8yk" secondAttribute="leading" id="96b-gY-XKg"/>
+                            <constraint firstItem="crf-LI-9nR" firstAttribute="leading" secondItem="dlB-IJ-0oo" secondAttribute="leading" id="NTH-GI-ADP"/>
                             <constraint firstAttribute="bottom" secondItem="yN6-MA-zow" secondAttribute="bottom" id="PBh-vk-NaR"/>
+                            <constraint firstItem="crf-LI-9nR" firstAttribute="trailing" secondItem="dlB-IJ-0oo" secondAttribute="trailing" id="YmB-Ky-u3a"/>
                             <constraint firstItem="yN6-MA-zow" firstAttribute="top" secondItem="31f-VG-8yk" secondAttribute="top" id="b11-68-gs8"/>
+                            <constraint firstItem="dlB-IJ-0oo" firstAttribute="bottom" secondItem="crf-LI-9nR" secondAttribute="bottom" id="seG-LQ-XOc"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="d4S-v9-xrB"/>
                     <connections>
+                        <outlet property="DoneButton" destination="9J7-be-Jek" id="t2I-b6-jFe"/>
+                        <outlet property="boringImageButton" destination="ck0-rS-4TG" id="Hd7-ty-YGZ"/>
+                        <outlet property="goodImageButton" destination="TnY-7h-OFV" id="isQ-yI-uJv"/>
+                        <outlet property="modeSwitcher" destination="52K-9T-FI3" id="4IG-Gg-mnU"/>
                         <outlet property="mtkView" destination="yN6-MA-zow" id="JJI-JQ-MHc"/>
                     </connections>
                 </viewController>
@@ -347,6 +387,9 @@
                         <navigationBarAppearance key="standardAppearance"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="h7P-Wu-jJh">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="mOx-Be-L5p"/>
                     </connections>
@@ -375,7 +418,10 @@
         </scene>
     </scenes>
     <resources>
+        <image name="checkmark" catalog="system" width="128" height="114"/>
+        <image name="heart" catalog="system" width="128" height="109"/>
         <image name="pencil.circle" catalog="system" width="128" height="121"/>
+        <image name="trash" catalog="system" width="121" height="128"/>
         <namedColor name="AccentColor">
             <color red="0.0" green="0.46000000000000002" blue="0.89000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

@@ -110,12 +110,18 @@ struct PositionInt:Codable{
     let z:Int 
 }
 
+struct PositionFloat:Codable{
+    let x:Float
+    let y:Float
+    let z:Float
+}
+
 struct UpdateSomaInfo:Codable {
     let locationId:Int
     let locationtype:Int
     let owner:String
     let image:String
-    let insertsomalist:[PositionInt]
+    let insertsomalist:[PositionFloat]
     let deletesomalist:[String]
 }
 
@@ -126,7 +132,7 @@ struct UpdateSomaListStruct:Codable{
 
 struct SomaInfo:Codable{
     let name:String
-    let loc:PositionInt
+    let loc:PositionFloat
 }
 
 struct SomaListFeedBack:Codable{

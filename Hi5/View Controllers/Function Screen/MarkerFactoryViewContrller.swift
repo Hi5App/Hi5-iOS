@@ -8,6 +8,12 @@ import UIKit
 import UniformTypeIdentifiers
 import simd
 
+enum editMode:String{
+    case Show = "Show"
+    case Mark = "Mark"
+    case Delete = "Delete"
+}
+
 class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelegate,UIDocumentPickerDelegate {
  
     //Buttons
@@ -15,16 +21,31 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     var backwardButton:UIButton!
     var forwardButton:UIButton!
     
+    //Controls
+    @IBOutlet var DoneButton: UIBarButtonItem!
+    @IBOutlet var modeSwitcher: UISegmentedControl!
+    @IBOutlet var boringImageButton: UIBarButtonItem!
+    @IBOutlet var goodImageButton: UIBarButtonItem!
+    
+    
     var worldModelMatrix:float4x4!
     var objectToDraw:Quad!{
         didSet{
             setupGestures()
             self.metalViewControllerDelegate = self
+            enableButtons()
+            mode = .Show
         }
     }
+    
+    var mode:editMode = .Show
+    
     var panSensivity:Float = 5.0
     var lastPanLocation:CGPoint!
     var imageToDisplay:image4DSimple!
+    var userArray:[simd_float3] = [] // soma marked by user
+    var originalSomaArray:[simd_float3] = [] // soma list fetched from server
+    var removeSomaArray:[String] = [] // somaInfo name removed by user
     var somaArray:[simd_float3] = [] // soma needs to be displayed
     var somaList:SomaListFeedBack!
     
@@ -32,7 +53,14 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     var resUsed:String!
     var currentImageName:String = ""
     
-    var somaPotentialLocation:PotentialLocationFeedBack!
+    var somaPotentialLocation:PotentialLocationFeedBack!{
+        didSet{
+            somaPotentialSecondaryResLocation = PositionInt(x: somaPotentialLocation.loc.x/2,
+                                                            y: somaPotentialLocation.loc.y/2,
+                                                            z: somaPotentialLocation.loc.z/2)
+        }
+    }
+    var somaPotentialSecondaryResLocation:PositionInt!
     var imageCache:image4DSimpleCache!
     var brainListfeed:BrainListFeedBack!
     let perferredSize = 128
@@ -48,7 +76,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
         imageCache = image4DSimpleCache()
         
-        //request potential location and brainList for later use
+//        request potential location and brainList for later use
         HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { feedback in
             if let feedback = feedback{
                 self.somaPotentialLocation = feedback
@@ -57,6 +85,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         } errorHandler: { error in
             print("soma potential fetch failed")
         }
+        
         HTTPRequest.ImagePart.getBrainList(name: user.userName, passwd: user.password) { feedback in
             if let feedback = feedback{
                 self.brainListfeed = feedback
@@ -67,13 +96,12 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         }
     }
     
-    func drawWithImageAndSoma(image:image4DSimple,soma:SomaListFeedBack){
+    func drawWithImage(image:image4DSimple){
         self.objectToDraw = Quad(device: self.device,commandQ: self.commandQueue,viewWidth: Int(self.view.bounds.width),viewHeight: Int(self.view.bounds.height),image4DSimple: image)
-        // convert somaList data structure to somaArray model-space data structure
-        
         // refresh existing soma
         self.somaArray.removeAll()
-        //add soma
+        // convert somaList data structure to somaArray model-space data structure
+        self.somaArray =  self.originalSomaArray + self.userArray
     }
     // MARK: - Congfigue UI
     func configureButtons(){
@@ -122,7 +150,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         ]
         NSLayoutConstraint.activate(constraints)
         
-//        disableButtons()
+        disableButtons()
     }
     
     func disableButtons(){
@@ -178,7 +206,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         
         // retrive images from cache
         if let imageBuddle = imageCache.previousImage(){
-            drawWithImageAndSoma(image: imageBuddle.image, soma: imageBuddle.somaList)
+            drawWithImage(image: imageBuddle.image)
         }else{
             // alert user no previous image
         }
@@ -186,11 +214,19 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     
     @objc func forwardButtonTapped(){
         // update soma list
-        
+        let insertList = userArray.map { (somaLoc)->PositionFloat in
+            return CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaLoc, center: self.somaPotentialSecondaryResLocation).loc
+        }
+//        HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.image, locationType: 1, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: []) {
+//            print("soma List uploaded successfully")
+//        } errorHandler: { error in
+//            print(error)
+//        }
+
         
         // try retrive images from cache
         if let imageBuddle = imageCache.nextImage(){
-            drawWithImageAndSoma(image: imageBuddle.image, soma: imageBuddle.somaList)
+            drawWithImage(image: imageBuddle.image)
         }else{
             // request image from server
             HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { feedback in
@@ -237,7 +273,15 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         }
         
         // download image and fetch somaList
-        HTTPRequest.ImagePart.downloadImage(centerX: somaPotentialLocation.loc.x/2, centerY: somaPotentialLocation.loc.y/2, centerZ: somaPotentialLocation.loc.z/2, size: perferredSize, res: self.resUsed, brainId: somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { url in
+        HTTPRequest.ImagePart.downloadImage(
+            centerX: somaPotentialSecondaryResLocation.x,
+            centerY: somaPotentialSecondaryResLocation.y,
+            centerZ: somaPotentialSecondaryResLocation.z,
+            size: perferredSize,
+            res: self.resUsed,
+            brainId: somaPotentialLocation.image,
+            name: self.user.userName,
+            passwd: self.user.password) { url in
             guard url != nil else {return}
             var PBDImage = PBDImage(imageLocation: url!) // decompress image
             self.imageToDisplay = PBDImage.decompressToV3draw()
@@ -249,10 +293,12 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
                     self.somaList = feedback
                     // save to cache
                     self.imageCache.addImage(image: self.imageToDisplay, list: self.somaList)
-                    
+                    self.originalSomaArray = self.somaList.somaList.map({ (somaInfo)->simd_float3 in
+                        return CoordHelper.UploadSomaLocation2DisplaySomaLocation(uploadLoc: somaInfo, center: self.somaPotentialSecondaryResLocation)
+                    })
                     //display image
                     if let image = self.imageToDisplay{
-                        self.drawWithImageAndSoma(image: image, soma: self.somaList)
+                        self.drawWithImage(image: image)
                     }else{
                         print("No 4d image")
                     }
@@ -263,8 +309,6 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         } errorHandler: { error in
             print(error)
         }
-        
-        
     }
     
     func readImageFromDocumentsFolder(filename:String){
@@ -341,16 +385,51 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     
     @objc func tap(tapGesture:UITapGestureRecognizer){
         if tapGesture.state == .ended{
-            // calculate position in metal NDC
+            // check for mode
             let tapPosition = tapGesture.location(in: self.view)
-            if let somaPosition = checkForIntersection(tapPosition){
-                print("find soma at \(somaPosition)")
-                somaArray.append(somaPosition)
+            if modeSwitcher.selectedSegmentIndex <= 1{
+                // normal mark mode
+                modeSwitcher.selectedSegmentIndex = 1
+                modeSwitcher.sendActions(for: UIControl.Event.valueChanged)
+                
+                // calculate position in metal NDC
+                if let somaPosition = findSomaLocation(tapPosition,deleteMode: false){
+                    print("find soma at \(somaPosition)")
+                    let uploadLoc = CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaPosition, center: somaPotentialSecondaryResLocation)
+                    print("find soma globally at \(uploadLoc.loc)")
+                    userArray.append(somaPosition)
+                    self.somaArray =  self.originalSomaArray + self.userArray
+                    print(somaArray)
+                }
+                
+            }else if modeSwitcher.selectedSegmentIndex == 2{ // delete mode
+                // detect possible soma
+                if let somaPostion = findSomaLocation(tapPosition, deleteMode: true){
+                    print("find existing soma at \(somaPostion),removed it")
+                    // refresh from somaArray
+                    if let removeIndex = userArray.firstIndex(of: somaPostion){
+                        print(removeIndex)
+                        userArray.remove(at: removeIndex)
+                        somaArray = originalSomaArray + userArray
+                    }
+                    // add to remove list
+                    let soma = CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaPostion, center: self.somaPotentialSecondaryResLocation)
+                    guard self.somaList != nil else {return}
+                    for somaInfo in self.somaList.somaList{
+                        if (somaInfo.loc.x - soma.loc.x)<0.1 && (somaInfo.loc.y - soma.loc.y)<0.1 && (somaInfo.loc.z - soma.loc.z)<0.1{
+                            self.removeSomaArray.append(somaInfo.name) // add to removeList
+                            print("remove server soma with name \(somaInfo.name)")
+                        }
+                    }
+                }
             }
+            
+            
+            
         }
     }
     
-    func checkForIntersection(_ tapPosition:CGPoint)->simd_float3?{ //use to sample in the same time
+    func findSomaLocation(_ tapPosition:CGPoint,deleteMode:Bool)->simd_float3?{ //use to sample in the same time
         // calculate coordinate in NDC
         let viewWidth = self.view.bounds.width
         let viewHeight = self.view.bounds.height
@@ -385,18 +464,27 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
             if currentPosi[0]<1.0 && currentPosi[0]>(-1.0) && currentPosi[1]<1.0 && currentPosi[1]>(-1.0) && currentPosi[2]<1.0 && currentPosi[2]>(-1.0){
                 //when intersect
                 flag = true
-                currentIntensity = imageToDisplay.sample3Ddata(x: currentPosi.x, y: currentPosi.y, z: currentPosi.z)
-                if currentIntensity > maxIntensity{
-                    maxIntensity = currentIntensity
-//                    print("maxIntensity changed to \(currentIntensity)")
-                    maxPosition = currentPosi
+                if !deleteMode {
+                    currentIntensity = imageToDisplay.sample3Ddata(x: currentPosi.x, y: currentPosi.y, z: currentPosi.z)
+                    if currentIntensity > maxIntensity{
+                        maxIntensity = currentIntensity
+    //                    print("maxIntensity changed to \(currentIntensity)")
+                        maxPosition = currentPosi
+                    }
+                }else{
+                    for somaPosi in self.somaArray{
+                        let distance = simd_distance(somaPosi,simd_float3(currentPosi.x,currentPosi.y,currentPosi.z))
+                        if distance < 0.1{
+                            return somaPosi
+                        }
+                    }
                 }
                 currentPosi += Step
             }else{
                 currentPosi += Step
             }
         }
-        if flag{
+        if flag && !deleteMode{
             print("soma intensity is \(maxIntensity)")
             return simd_float3(maxPosition.x,maxPosition.y,maxPosition.z)
         }else{
@@ -414,6 +502,8 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
             objectToDraw.rotationX -= yDelta
             lastPanLocation = pointInView
         }else if panGesture.state == UIGestureRecognizer.State.began{
+            modeSwitcher.selectedSegmentIndex = 0
+            modeSwitcher.sendActions(for: UIControl.Event.valueChanged)
             lastPanLocation = panGesture.location(in: self.view)
         }
     }
@@ -422,6 +512,8 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     @objc func pinch(pinchGesture:UIPinchGestureRecognizer){
         guard pinchGesture.view != nil else {return}
         if pinchGesture.state == .began || pinchGesture.state == .changed{
+            modeSwitcher.selectedSegmentIndex = 0
+            modeSwitcher.sendActions(for: UIControl.Event.valueChanged)
             if objectToDraw.scale >= 2 {
                 objectToDraw.scale = 2
             }else if objectToDraw.scale <= 0.5 {
