@@ -189,8 +189,20 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
             self.readCloudImage()
         }
         let menu = UIMenu(title: "", options: .displayInline, children: [readLocalFile,readCloudFile])
-        navigationItem.rightBarButtonItem = .init(systemItem: .add)
-        navigationItem.rightBarButtonItem!.menu = menu
+        let openImageButton = UIBarButtonItem(systemItem: .add)
+        openImageButton.menu = menu
+        let UndoButton = UIBarButtonItem()
+        UndoButton.image = UIImage(systemName: "arrow.counterclockwise")
+        UndoButton.target = self
+        UndoButton.action = #selector(undoAMarker)
+        navigationItem.rightBarButtonItems = [openImageButton,UndoButton]
+    }
+    
+    @objc func undoAMarker(){
+        if !userArray.isEmpty{
+            userArray.remove(at: userArray.count-1)
+            somaArray = originalSomaArray + userArray
+        }
     }
     
     @objc func resetScale(){
@@ -203,6 +215,14 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     
     @objc func backButtonTapped(){
         // update soma list
+        let insertList = userArray.map { (somaLoc)->PositionFloat in
+            return CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaLoc, center: self.somaPotentialSecondaryResLocation).loc
+        }
+        HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 1, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
+            print("soma List uploaded successfully,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
+        } errorHandler: { error in
+            print(error)
+        }
         
         // retrive images from cache
         if let imageBuddle = imageCache.previousImage(){
@@ -217,13 +237,17 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         let insertList = userArray.map { (somaLoc)->PositionFloat in
             return CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaLoc, center: self.somaPotentialSecondaryResLocation).loc
         }
-//        HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.image, locationType: 1, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: []) {
-//            print("soma List uploaded successfully")
-//        } errorHandler: { error in
-//            print(error)
-//        }
+        HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 1, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
+            print("soma List uploaded successfully,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
+        } errorHandler: { error in
+            print(error)
+        }
 
-        
+        requestForNextImage()
+    }
+    
+    func requestForNextImage(){
+        somaArray.removeAll()
         // try retrive images from cache
         if let imageBuddle = imageCache.nextImage(){
             drawWithImage(image: imageBuddle.image)
@@ -238,6 +262,51 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
             } errorHandler: { error in
                 print("soma potential fetch failed")
             }
+        }
+    }
+    
+    @IBAction func DoneButtonTapped(_ sender: Any) {
+        let insertList = userArray.map { (somaLoc)->PositionFloat in
+            return CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaLoc, center: self.somaPotentialSecondaryResLocation).loc
+        }
+        HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 2, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
+            print("soma marked as Done,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
+            self.requestForNextImage()
+        } errorHandler: { error in
+            print(error)
+        }
+    }
+    
+    @IBAction func BoringImageButtonTapped(_ sender: Any) {
+        if userArray.isEmpty {
+            HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: -1, username: user.userName, passwd: user.password, insertSomaList: [], deleteSomaList: self.removeSomaArray) {
+                print("image marked as Trash")
+                self.requestForNextImage()
+            } errorHandler: { error in
+                print(error)
+            }
+        }else{
+            // alert user for new soma data
+            let alert = UIAlertController(title: "Attention", message: "Image marked as trash can't not have new soma marker,do you want to delete your soma marker?", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "No", style: .cancel))
+            alert.addAction(UIAlertAction(title: "Yes", style: .default,handler: { [self] (action) in
+                self.userArray.removeAll()
+                self.somaArray = originalSomaArray+userArray
+            }))
+            self.present(alert, animated: true)
+            // check for next move
+        }
+    }
+    
+    @IBAction func GoodImageButtonTapped(_ sender: Any) {
+        let insertList = userArray.map { (somaLoc)->PositionFloat in
+            return CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaLoc, center: self.somaPotentialSecondaryResLocation).loc
+        }
+        HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 3, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
+            print("Image marked as Good,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
+            self.requestForNextImage()
+        } errorHandler: { error in
+            print(error)
         }
     }
     
