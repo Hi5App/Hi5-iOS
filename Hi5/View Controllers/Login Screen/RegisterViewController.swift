@@ -40,6 +40,9 @@ class RegisterViewController: UIViewController {
         
         HTTPRequest.UserPart.register(email: emailTextField.text!, name: usernameTextField.text!, passwd: passwordTextField.text!, nickname: nicknameTextField.text!) { [self] in
             print("user:\(usernameTextField.text!) with nickname:\(nicknameTextField.text!) with email:\(emailTextField.text!) registered successfully")
+            errorTextField.alpha = 1
+            errorTextField.text = "Registered Successfully"
+            errorTextField.textColor = UIColor.systemGreen
         } errorHandler: { error in
             print(error)
         }

@@ -52,6 +52,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     var user:User!
     var resUsed:String!
     var currentImageName:String = ""
+    var currentImageURL:URL!
     
     var somaPotentialLocation:PotentialLocationFeedBack!{
         didSet{
@@ -66,6 +67,12 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     let perferredSize = 128
     let somaperferredSize = 256
   
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        deleteCurrentImageCache()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureButtons()
@@ -246,8 +253,19 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         requestForNextImage()
     }
     
+    func deleteCurrentImageCache(){
+        // delete current local image
+        let fileManager = FileManager.default
+        do{
+            try fileManager.removeItem(at: self.currentImageURL)
+        }catch{
+            print("delete cache image failed")
+        }
+    }
+    
     func requestForNextImage(){
         somaArray.removeAll()
+        
         // try retrive images from cache
         if let imageBuddle = imageCache.nextImage(){
             drawWithImage(image: imageBuddle.image)
@@ -340,7 +358,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
                 let RIndex = resArray[1].firstIndex(of: "R") // use secondary resolution
                 let endIndex = resArray[1].firstIndex(of: ")")
                 self.resUsed = String(resArray[1][RIndex!...endIndex!])
-                print(self.resUsed!)
+//                print(self.resUsed!)
             }
         }
         
@@ -356,6 +374,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
             passwd: self.user.password) { url in
             guard url != nil else {return}
             var PBDImage = PBDImage(imageLocation: url!) // decompress image
+            self.currentImageURL = url
             self.imageToDisplay = PBDImage.decompressToV3draw()
             
             // request somaList

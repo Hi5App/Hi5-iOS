@@ -48,27 +48,27 @@ struct PBDImage{
             return nil
         }
         let isBig = endianness == "B"
-        if endianness == "B"{
-            print("it's big endian")
-        }else if endianness == "L"{
-            print("it's little endian")
-        }
+//        if endianness == "B"{
+//            print("it's big endian")
+//        }else if endianness == "L"{
+//            print("it's little endian")
+//        }
         
         // check datatype
         let datatype = UInt8(bytes2Int(bytes: [UInt8](compressionByteBuffer[25...26]), isBig: isBig))
         //skip bytes[26]
-        switch datatype{
-        case 33:
-            print("datatype is 33")
-        case 1:
-            print("datatype is UInt8")
-        case 2:
-            print("datatype is UInt16")
-        case 4:
-            print("datatype is Float32")
-        default:
-            print("unsupported datatype")
-        }
+//        switch datatype{
+//        case 33:
+//            print("datatype is 33")
+//        case 1:
+//            print("datatype is UInt8")
+//        case 2:
+//            print("datatype is UInt16")
+//        case 4:
+//            print("datatype is Float32")
+//        default:
+//            print("unsupported datatype")
+//        }
         
         // check size. size is a array with 4 elements. each element is 4 bytes long
         var size:[UInt32] = []
@@ -82,7 +82,7 @@ struct PBDImage{
             }
             size.append(u32)
         }
-        print("its 3d size is \(size[0])*\(size[1])*\(size[2]) with \(size[3]) color channel(s)")
+//        print("its 3d size is \(size[0])*\(size[1])*\(size[2]) with \(size[3]) color channel(s)")
         decompressionByteBuffer = Array(repeating: UInt8(0), count: Int(size[0]*size[1]*size[2]))
         // decompress image data
         decompressPBDImageData(compressionBufferPointer: 43, decompressionBufferPointer: 0, decompressionSize: Int(size[0]*size[1]*size[2]))
@@ -97,7 +97,7 @@ struct PBDImage{
             }
         }
         if imageDataStart == decompressionByteBuffer.count {
-            print("Image \(PBDimageURL.lastPathComponent) read in")
+            print("Image \(PBDimageURL.lastPathComponent) read finished")
         }
         
         // init a image4DSimple
