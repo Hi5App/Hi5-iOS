@@ -21,7 +21,7 @@ class functionCollectionViewDataSource:NSObject,UICollectionViewDataSource{
         softwareFunction(name: "Marker Factory", decription: "produce soma data", image: UIImage(systemName: "pencil.circle")),
         softwareFunction(name: "Annotation", decription: "Annotate images",image: UIImage(systemName: "pencil.tip")),
         softwareFunction(name: "Check",decription: "Examine soma data", image: UIImage(systemName: "checkmark.square")),
-        softwareFunction(name: "Smart Imageing",decription: "no description", image: UIImage(systemName: "brain.head.profile")),
+        softwareFunction(name: "Smart Imaging",decription: "no description", image: UIImage(systemName: "brain.head.profile")),
         softwareFunction(name: "Chat",decription: "Chat with friends", image: UIImage(systemName: "message")),
         softwareFunction(name: "Help",decription: "read the mannal", image: UIImage(systemName: "questionmark.circle"))
     ]

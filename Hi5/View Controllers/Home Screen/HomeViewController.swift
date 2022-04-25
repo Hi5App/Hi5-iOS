@@ -37,7 +37,7 @@ class HomeViewController: UIViewController,checkLoginStatus{
         configureCollectionViewLayout()
         
         // for debug
-        showMarkerFactory()
+//        showMarkerFactory()
     }
     
     func configureCollectionViewLayout(){

@@ -27,16 +27,24 @@ class RegisterViewController: UIViewController {
 
         // Do any additional setup after loading the view.
     }
-    
+   
+    @IBAction func RegisterButtonTapped(_ sender: Any) {
+        // check for fields
+        guard usernameTextField.checkForEmpty() && emailTextField.checkForEmpty() && nicknameTextField.checkForEmpty()
+                && passwordTextField.checkForEmpty() && passwordCheckTextField.checkForEmpty() else {
+            let alert = UIAlertController(title: "Attention", message: "Please fill in all the field except Inviter Code", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel))
+            self.present(alert, animated: true)
+            return
+        }
+        
+        HTTPRequest.UserPart.register(email: emailTextField.text!, name: usernameTextField.text!, passwd: passwordTextField.text!, nickname: nicknameTextField.text!) { [self] in
+            print("user:\(usernameTextField.text!) with nickname:\(nicknameTextField.text!) with email:\(emailTextField.text!) registered successfully")
+        } errorHandler: { error in
+            print(error)
+        }
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
     }
-    */
+    
 
 }

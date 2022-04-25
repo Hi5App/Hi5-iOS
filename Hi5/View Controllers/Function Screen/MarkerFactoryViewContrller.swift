@@ -185,7 +185,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         let readLocalFile = UIAction(title:"Local Image",image: UIImage(systemName: "folder.fill")){ (action) in
             self.readLocalImage()
         }
-        let readCloudFile = UIAction(title:"Cloud Image",image: UIImage(systemName: "icloud.fill")){ (action) in
+        let readCloudFile = UIAction(title:"Server Image",image: UIImage(systemName: "icloud.fill")){ (action) in
             self.readCloudImage()
         }
         let menu = UIMenu(title: "", options: .displayInline, children: [readLocalFile,readCloudFile])
@@ -321,7 +321,10 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     func readCloudImage(){
         // check Guest Mode
         if user.email == "Guest@Guest.com"{
-            
+            let alert = UIAlertController(title: "Attention", message: "You are currently in Guest Mode\nGuest can not request for server image, please sign in to continue", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel))
+            self.present(alert, animated: true)
+            return
         }
         // check location and brainList
         guard somaPotentialLocation != nil && brainListfeed != nil else {
