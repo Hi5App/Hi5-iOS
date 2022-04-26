@@ -109,16 +109,17 @@
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="qIc-4m-P4l"/>
                                     <barButtonItem style="plain" id="HeP-4y-dDE">
                                         <segmentedControl key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="52K-9T-FI3">
-                                            <rect key="frame" x="101" y="10.666666666666664" width="179" height="33"/>
+                                            <rect key="frame" x="87" y="10.666666666666664" width="179" height="33"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <segments>
-                                                <segment title="Show"/>
+                                                <segment title="View"/>
                                                 <segment title="Mark"/>
                                                 <segment title="Delete"/>
                                             </segments>
                                             <color key="selectedSegmentTintColor" name="mainOrange"/>
                                         </segmentedControl>
                                     </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="EbX-AF-lqg"/>
                                     <barButtonItem title="BoringImage" id="ck0-rS-4TG">
                                         <imageReference key="image" image="trash" catalog="system" symbolScale="large"/>
                                         <color key="tintColor" name="mainOrange"/>

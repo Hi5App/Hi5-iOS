@@ -33,8 +33,10 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         didSet{
             setupGestures()
             self.metalViewControllerDelegate = self
-            enableButtons()
-            mode = .Show
+            deleteCurrentImageCache()
+            
+            modeSwitcher.selectedSegmentIndex = 0
+            modeSwitcher.sendActions(for: UIControl.Event.valueChanged)
         }
     }
     
@@ -66,12 +68,6 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     var brainListfeed:BrainListFeedBack!
     let perferredSize = 128
     let somaperferredSize = 256
-  
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        deleteCurrentImageCache()
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -161,19 +157,19 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     }
     
     func disableButtons(){
-        scaleLabel.isEnabled = false
+//        scaleLabel.isEnabled = false
         forwardButton.isEnabled = false
         backwardButton.isEnabled = false
-        scaleLabel.alpha = 0
+//        scaleLabel.alpha = 0
         forwardButton.alpha = 0
         backwardButton.alpha = 0
     }
     
     func enableButtons(){
-        scaleLabel.isEnabled = true
+//        scaleLabel.isEnabled = true
         forwardButton.isEnabled = true
         backwardButton.isEnabled = true
-        scaleLabel.alpha = 1
+//        scaleLabel.alpha = 1
         forwardButton.alpha = 1
         backwardButton.alpha = 1
     }
@@ -222,15 +218,16 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     
     @objc func backButtonTapped(){
         // update soma list
-        let insertList = userArray.map { (somaLoc)->PositionFloat in
-            return CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaLoc, center: self.somaPotentialSecondaryResLocation).loc
+        if !userArray.isEmpty || !removeSomaArray.isEmpty{
+            let insertList = userArray.map { (somaLoc)->PositionFloat in
+                return CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaLoc, center: self.somaPotentialSecondaryResLocation).loc
+            }
+            HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 1, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
+                print("soma List uploaded successfully,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
+            } errorHandler: { error in
+                print(error)
+            }
         }
-        HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 1, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
-            print("soma List uploaded successfully,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
-        } errorHandler: { error in
-            print(error)
-        }
-        
         // retrive images from cache
         if let imageBuddle = imageCache.previousImage(){
             drawWithImage(image: imageBuddle.image)
@@ -241,15 +238,16 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     
     @objc func forwardButtonTapped(){
         // update soma list
-        let insertList = userArray.map { (somaLoc)->PositionFloat in
-            return CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaLoc, center: self.somaPotentialSecondaryResLocation).loc
+        if !userArray.isEmpty || !removeSomaArray.isEmpty{
+            let insertList = userArray.map { (somaLoc)->PositionFloat in
+                return CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaLoc, center: self.somaPotentialSecondaryResLocation).loc
+            }
+            HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 1, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
+                print("soma List uploaded successfully,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
+            } errorHandler: { error in
+                print(error)
+            }
         }
-        HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 1, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
-            print("soma List uploaded successfully,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
-        } errorHandler: { error in
-            print(error)
-        }
-
         requestForNextImage()
     }
     
@@ -257,14 +255,17 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         // delete current local image
         let fileManager = FileManager.default
         do{
-            try fileManager.removeItem(at: self.currentImageURL)
+            if let url = self.currentImageURL{
+                try fileManager.removeItem(at: url)
+            }
         }catch{
             print("delete cache image failed")
         }
     }
     
     func requestForNextImage(){
-        somaArray.removeAll()
+        userArray.removeAll()
+        somaArray = userArray + originalSomaArray
         
         // try retrive images from cache
         if let imageBuddle = imageCache.nextImage(){
@@ -330,6 +331,10 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     
    // MARK: - Image Reader
     func readLocalImage(){
+        disableButtons()
+        DoneButton.isEnabled = false
+        goodImageButton.isEnabled = false
+        boringImageButton.isEnabled = false
         let v3drawUTType = UTType("com.penglab.Hi5-imageType.v3draw.v3draw")!
         let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [v3drawUTType])
         documentPicker.delegate = self
@@ -389,7 +394,12 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
                     })
                     //display image
                     if let image = self.imageToDisplay{
+                        self.DoneButton.isEnabled = true
+                        self.goodImageButton.isEnabled = true
+                        self.boringImageButton.isEnabled = true
+                        
                         self.drawWithImage(image: image)
+                        self.enableButtons()
                     }else{
                         print("No 4d image")
                     }

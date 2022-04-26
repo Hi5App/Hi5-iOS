@@ -69,7 +69,7 @@ fragment float4 basic_fragment(VertexOut interpolated [[stage_in]],
     
     float3 ray = In - Out;
     float ray_length = length(ray);
-    float step = 256;
+    float step = 200;
     float ray_step = ray_length/step;
 //    float3 ray_step_vec = ray/step;
     float3 ray_step_vec = float3(ray.x/step,ray.y/step,ray.z/(step));
