@@ -69,6 +69,10 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     let perferredSize = 128
     let somaperferredSize = 256
     
+    override func viewWillDisappear(_ animated: Bool) {
+        imageCache.imageCache.removeAll()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureButtons()
@@ -92,7 +96,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         HTTPRequest.ImagePart.getBrainList(name: user.userName, passwd: user.password) { feedback in
             if let feedback = feedback{
                 self.brainListfeed = feedback
-//                print("first see brainListFeedback: \(self.brainListfeed!)")
+                print("brainList")
             }
         } errorHandler: { error in
             print("brain list fetch failed")
@@ -100,7 +104,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     }
     
     func drawWithImage(image:image4DSimple){
-        self.objectToDraw = Quad(device: self.device,commandQ: self.commandQueue,viewWidth: Int(self.view.bounds.width),viewHeight: Int(self.view.bounds.height),image4DSimple: image)
+        self.objectToDraw = Quad(device: self.device,commandQ: self.commandQueue,viewWidth: Int(self.view.bounds.width)*Int(UIScreen.main.scale),viewHeight: Int(self.view.bounds.height)*Int(UIScreen.main.scale),image4DSimple: image)
         // refresh existing soma
         self.somaArray.removeAll()
         // convert somaList data structure to somaArray model-space data structure
@@ -421,8 +425,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         
         // display image
         if let image = imageToDisplay{
-            objectToDraw = Quad(device: device,commandQ: commandQueue,viewWidth: Int(view.bounds.width),viewHeight: Int(view.bounds.height),image4DSimple: image)
-            somaArray.removeAll()
+            drawWithImage(image: image)
         }else{
             print("No 4d image")
         }
