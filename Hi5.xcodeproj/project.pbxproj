@@ -26,16 +26,18 @@
 		433B1F3E27DD815B00F44604 /* Vertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 433B1F3B27DD815B00F44604 /* Vertex.swift */; };
 		433B1F4027DD81AF00F44604 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 433B1F3F27DD81AF00F44604 /* Shaders.metal */; };
 		433C55C32813F8D900BC223F /* CoordHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 433C55C22813F8D900BC223F /* CoordHelper.swift */; };
+		437BA779281C13E6001C0A44 /* AnnotationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437BA778281C13E6001C0A44 /* AnnotationViewController.swift */; };
 		437DA8C227DEF7790080A74C /* Quad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437DA8C127DEF7790080A74C /* Quad.swift */; };
 		438684B527E48C1700F095BB /* hex2UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 438684B427E48C1700F095BB /* hex2UIColor.swift */; };
 		439215A0280C623400E53631 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4392159F280C623400E53631 /* HomeViewController.swift */; };
 		439215A2280C62A800E53631 /* UserInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439215A1280C62A800E53631 /* UserInfoViewController.swift */; };
 		439215A4280C62CB00E53631 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439215A3280C62CB00E53631 /* LoginViewController.swift */; };
-		439215A6280C630700E53631 /* MarkerFactoryViewContrller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439215A5280C630700E53631 /* MarkerFactoryViewContrller.swift */; };
+		439215A6280C630700E53631 /* MarkerFactoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439215A5280C630700E53631 /* MarkerFactoryViewController.swift */; };
 		439215A8280C650D00E53631 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 439215A7280C650D00E53631 /* Main.storyboard */; };
 		43B12F542806E19F0049BE9C /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F532806E19F0049BE9C /* User.swift */; };
 		43B12F572806E9CB0049BE9C /* Hi5API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F562806E9CB0049BE9C /* Hi5API.swift */; };
 		43B12F5B2806F9EE0049BE9C /* HTTPRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F5A2806F9EE0049BE9C /* HTTPRequest.swift */; };
+		43B2255B281BD4DE00808B09 /* Image3dViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B2255A281BD4DE00808B09 /* Image3dViewController.swift */; };
 		43C54BD127EA04990067F559 /* FunctionCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C54BD027EA04990067F559 /* FunctionCollectionViewCell.swift */; };
 		43CFDB242810FDA000AF33FB /* image4DSimpleCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43CFDB232810FDA000AF33FB /* image4DSimpleCache.swift */; };
 		43EEA48C27FFDF8D00B0E8B7 /* float4x4+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EEA48B27FFDF8D00B0E8B7 /* float4x4+Extensions.swift */; };
@@ -84,16 +86,18 @@
 		433B1F3B27DD815B00F44604 /* Vertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vertex.swift; sourceTree = "<group>"; };
 		433B1F3F27DD81AF00F44604 /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
 		433C55C22813F8D900BC223F /* CoordHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordHelper.swift; sourceTree = "<group>"; };
+		437BA778281C13E6001C0A44 /* AnnotationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationViewController.swift; sourceTree = "<group>"; };
 		437DA8C127DEF7790080A74C /* Quad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Quad.swift; sourceTree = "<group>"; };
 		438684B427E48C1700F095BB /* hex2UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = hex2UIColor.swift; sourceTree = "<group>"; };
 		4392159F280C623400E53631 /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		439215A1280C62A800E53631 /* UserInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserInfoViewController.swift; sourceTree = "<group>"; };
 		439215A3280C62CB00E53631 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
-		439215A5280C630700E53631 /* MarkerFactoryViewContrller.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarkerFactoryViewContrller.swift; sourceTree = "<group>"; };
+		439215A5280C630700E53631 /* MarkerFactoryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarkerFactoryViewController.swift; sourceTree = "<group>"; };
 		439215A7280C650D00E53631 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		43B12F532806E19F0049BE9C /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		43B12F562806E9CB0049BE9C /* Hi5API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hi5API.swift; sourceTree = "<group>"; };
 		43B12F5A2806F9EE0049BE9C /* HTTPRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPRequest.swift; sourceTree = "<group>"; };
+		43B2255A281BD4DE00808B09 /* Image3dViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image3dViewController.swift; sourceTree = "<group>"; };
 		43C54BD027EA04990067F559 /* FunctionCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionCollectionViewCell.swift; sourceTree = "<group>"; };
 		43CFDB232810FDA000AF33FB /* image4DSimpleCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = image4DSimpleCache.swift; sourceTree = "<group>"; };
 		43EEA48B27FFDF8D00B0E8B7 /* float4x4+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "float4x4+Extensions.swift"; sourceTree = "<group>"; };
@@ -269,7 +273,9 @@
 			isa = PBXGroup;
 			children = (
 				4320386827D8EC8000DB2DBC /* MetalViewController.swift */,
-				439215A5280C630700E53631 /* MarkerFactoryViewContrller.swift */,
+				439215A5280C630700E53631 /* MarkerFactoryViewController.swift */,
+				437BA778281C13E6001C0A44 /* AnnotationViewController.swift */,
+				43B2255A281BD4DE00808B09 /* Image3dViewController.swift */,
 			);
 			path = "Function Screen";
 			sourceTree = "<group>";
@@ -413,13 +419,14 @@
 				489ED89D280ACACE000781C6 /* HTTPModel.swift in Sources */,
 				438684B527E48C1700F095BB /* hex2UIColor.swift in Sources */,
 				4317EDE5280D9AEA00B2A17B /* PBDImage.swift in Sources */,
+				43B2255B281BD4DE00808B09 /* Image3dViewController.swift in Sources */,
 				439215A2280C62A800E53631 /* UserInfoViewController.swift in Sources */,
 				4320387E27D8ED8F00DB2DBC /* MetalTexture.swift in Sources */,
 				433B1F3C27DD815B00F44604 /* Node.swift in Sources */,
 				43108E7527C776CA00F3287D /* v3drawReader.swift in Sources */,
 				433B1F3E27DD815B00F44604 /* Vertex.swift in Sources */,
 				4320386927D8EC8000DB2DBC /* MetalViewController.swift in Sources */,
-				439215A6280C630700E53631 /* MarkerFactoryViewContrller.swift in Sources */,
+				439215A6280C630700E53631 /* MarkerFactoryViewController.swift in Sources */,
 				439215A4280C62CB00E53631 /* LoginViewController.swift in Sources */,
 				43027F66280538940067E792 /* RegisterViewController.swift in Sources */,
 				433B1F4027DD81AF00F44604 /* Shaders.metal in Sources */,
@@ -431,6 +438,7 @@
 				437DA8C227DEF7790080A74C /* Quad.swift in Sources */,
 				43108E4527C7314400F3287D /* SceneDelegate.swift in Sources */,
 				43108E7327C7316B00F3287D /* image4DSimple.swift in Sources */,
+				437BA779281C13E6001C0A44 /* AnnotationViewController.swift in Sources */,
 				43B12F542806E19F0049BE9C /* User.swift in Sources */,
 				43CFDB242810FDA000AF33FB /* image4DSimpleCache.swift in Sources */,
 			);

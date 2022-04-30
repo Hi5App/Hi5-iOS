@@ -107,14 +107,25 @@ extension HomeViewController:UICollectionViewDelegate{
         switch functionDataSource.softwareFunctions[indexPath.row].name{
         case "Marker Factory":
             showMarkerFactory()
+        case "Annotation":
+            showAnnotation()
         default:
-            print("function not available")
+            let alert = UIAlertController(title: "Sorry", message: "This function is currently unavailable", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel))
+            self.present(alert, animated: true)
         }
     }
     
     func showMarkerFactory(){
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
-        let nextViewController = storyBoard.instantiateViewController(withIdentifier: "imageviewcontroller") as! MarkerFactoryViewController
+        let nextViewController = storyBoard.instantiateViewController(withIdentifier: "MarkFactoryVC") as! MarkerFactoryViewController
+        nextViewController.user = self.loginUser
+        self.navigationController?.pushViewController(nextViewController, animated: true)
+    }
+    
+    func showAnnotation(){
+        let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
+        let nextViewController = storyBoard.instantiateViewController(withIdentifier: "AnnoVC") as! AnnotationViewController
         nextViewController.user = self.loginUser
         self.navigationController?.pushViewController(nextViewController, animated: true)
     }

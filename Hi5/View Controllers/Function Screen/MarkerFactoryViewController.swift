@@ -8,7 +8,7 @@ import UIKit
 import UniformTypeIdentifiers
 import simd
 
-class MarkerFactoryViewController:Image3dViewController,UIDocumentPickerDelegate{
+class MarkerFactoryViewController:Image3dViewController{
  
     //Buttons
     var backwardButton:UIButton!
@@ -17,6 +17,18 @@ class MarkerFactoryViewController:Image3dViewController,UIDocumentPickerDelegate
     //Controls
     @IBOutlet var DoneButton: UIBarButtonItem!
     @IBOutlet var modeSwitcher: UISegmentedControl!
+    @IBAction func indexChanged(_ sender: UISegmentedControl) {
+        switch modeSwitcher.selectedSegmentIndex{
+        case 0:
+            editStatus = .View
+        case 1:
+            editStatus = .Mark
+        case 2:
+            editStatus = .Delete
+        default:
+            print("unrecognized index")
+        }
+    }
     @IBOutlet var boringImageButton: UIBarButtonItem!
     @IBOutlet var goodImageButton: UIBarButtonItem!
     
@@ -106,6 +118,9 @@ class MarkerFactoryViewController:Image3dViewController,UIDocumentPickerDelegate
         backwardButton.isEnabled = false
         forwardButton.alpha = 0
         backwardButton.alpha = 0
+        DoneButton.isEnabled = false
+        boringImageButton.isEnabled = false
+        goodImageButton.isEnabled = false
     }
     
     func enableButtons(){
@@ -113,20 +128,16 @@ class MarkerFactoryViewController:Image3dViewController,UIDocumentPickerDelegate
         backwardButton.isEnabled = true
         forwardButton.alpha = 1
         backwardButton.alpha = 1
+        DoneButton.isEnabled = true
+        boringImageButton.isEnabled = true
+        goodImageButton.isEnabled = true
     }
     
     override func configureNavBar(){
         super.configureNavBar()
         // buttons
-        let readLocalFile = UIAction(title:"Local Image",image: UIImage(systemName: "folder.fill")){ (action) in
-            self.readLocalImage()
-        }
-        let readCloudFile = UIAction(title:"Server Image",image: UIImage(systemName: "icloud.fill")){ (action) in
-            self.readCloudImage()
-        }
-        let menu = UIMenu(title: "", options: .displayInline, children: [readLocalFile,readCloudFile])
-        let openImageButton = UIBarButtonItem(systemItem: .add)
-        openImageButton.menu = menu
+        let openImageButton = UIBarButtonItem(image: UIImage(systemName: "icloud.and.arrow.down"), style: .plain, target: self, action: #selector(readCloudImage))
+        
         let UndoButton = UIBarButtonItem()
         UndoButton.image = UIImage(systemName: "arrow.counterclockwise")
         UndoButton.target = self
@@ -255,18 +266,8 @@ class MarkerFactoryViewController:Image3dViewController,UIDocumentPickerDelegate
     }
     
    // MARK: - Image Reader
-    func readLocalImage(){
-        disableButtons()
-        DoneButton.isEnabled = false
-        goodImageButton.isEnabled = false
-        boringImageButton.isEnabled = false
-        let v3drawUTType = UTType("com.penglab.Hi5-imageType.v3draw.v3draw")!
-        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [v3drawUTType])
-        documentPicker.delegate = self
-        present(documentPicker, animated: true, completion: nil)
-    }
     
-    func readCloudImage(){
+    @objc func readCloudImage(){
         // check Guest Mode
         if user.email == "Guest@Guest.com"{
             let alert = UIAlertController(title: "Attention", message: "You are currently in Guest Mode\nGuest can not request for server image, please sign in to continue", preferredStyle: .alert)
@@ -291,7 +292,7 @@ class MarkerFactoryViewController:Image3dViewController,UIDocumentPickerDelegate
 //                print(self.resUsed!)
             }
         }
-        
+        print("Downloading Image...")
         // download image and fetch somaList
         HTTPRequest.ImagePart.downloadImage(
             centerX: somaPotentialSecondaryResLocation.x,
@@ -303,9 +304,11 @@ class MarkerFactoryViewController:Image3dViewController,UIDocumentPickerDelegate
             name: self.user.userName,
             passwd: self.user.password) { url in
             guard url != nil else {return}
+            print("Image Downloaded successfully\nDecompress Image...")
             var PBDImage = PBDImage(imageLocation: url!) // decompress image
             self.currentImageURL = url
             self.imageToDisplay = PBDImage.decompressToV3draw()
+            print("Image Decompressed successfully")
             self.deleteCurrentImageCache() //clear PBDimage cache after decompress
             // request somaList
             HTTPRequest.SomaPart.getSomaList(centerX: self.somaPotentialLocation.loc.x, centerY: self.somaPotentialLocation.loc.y, centerZ: self.somaPotentialLocation.loc.z, size: self.somaperferredSize, res:"", brainId: self.somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { feedback in
@@ -337,83 +340,38 @@ class MarkerFactoryViewController:Image3dViewController,UIDocumentPickerDelegate
         }
     }
     
-    func readImageFromDocumentsFolder(filename:String){
-        let fileManager = FileManager.default
-        let reader = v3drawReader()
-        let rawImage1Url = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(filename)
-        imageToDisplay = reader.read(from: rawImage1Url)
-        self.title = imageToDisplay.name
-        
-        // display image
-        if let image = imageToDisplay{
-            drawWithImage(image: image)
-        }else{
-            print("No 4d image")
-        }
-        
-    }
-    
-    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentAt url: URL) {
-        // Start accessing a security-scoped resource.
-        Swift.debugPrint("url is \(url.path)\n")
-        guard url.startAccessingSecurityScopedResource() else {
-            // Handle the failure here.
-            return
-        }
-
-        // Make sure you release the security-scoped resource when you finish.
-        defer { url.stopAccessingSecurityScopedResource() }
-
-        // Use file coordination for reading and writing any of the URL’s content.
-        var error: NSError? = nil
-        NSFileCoordinator().coordinate(readingItemAt: url, error: &error) { (url) in
-            
-            let fileManager = FileManager.default
-            
-            // copy item to document directory
-            let appFolderDocumentURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("\(url.lastPathComponent)")
-            do{
-                if !fileManager.fileExists(atPath: appFolderDocumentURL.path){
-                    try fileManager.copyItem(at: url, to: appFolderDocumentURL) // copy image if it doesn't exist
-                }
-            }catch{
-                print(error)
-            }
-            
-            // read the selected image from document folder
-            readImageFromDocumentsFolder(filename: url.lastPathComponent)
-            
-            url.stopAccessingSecurityScopedResource()
-        }
-    }
-    
     //MARK: - setup interaction with images
-    override func setupGestures(){
-        super.setupGestures()
-        let tap = UITapGestureRecognizer(target: self, action: #selector(MarkerFactoryViewController.tap))
-        self.view.addGestureRecognizer(tap)
+    
+    override func respondEditStatusChange(){
+        if editStatus == .View{
+            modeSwitcher.selectedSegmentIndex = 0
+            modeSwitcher.sendActions(for: UIControl.Event.valueChanged)
+        }else if editStatus == .Mark{
+            modeSwitcher.selectedSegmentIndex = 1
+            modeSwitcher.sendActions(for: UIControl.Event.valueChanged)
+        }else{
+            modeSwitcher.selectedSegmentIndex = 2
+            modeSwitcher.sendActions(for: UIControl.Event.valueChanged)
+        }
     }
     
-    @objc func tap(tapGesture:UITapGestureRecognizer){
+    @objc override func tap(tapGesture:UITapGestureRecognizer){
         if tapGesture.state == .ended{
             // check for mode
             let tapPosition = tapGesture.location(in: self.view)
-            if modeSwitcher.selectedSegmentIndex <= 1{
+            if editStatus == .View || editStatus == .Mark{
                 // normal mark mode
-                modeSwitcher.selectedSegmentIndex = 1
-                modeSwitcher.sendActions(for: UIControl.Event.valueChanged)
-                
+                editStatus = .Mark
+                respondEditStatusChange()
                 // calculate position in metal NDC
                 if let somaPosition = findSomaLocation(tapPosition,deleteMode: false){
                     print("find soma at \(somaPosition)")
-                    let uploadLoc = CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaPosition, center: somaPotentialSecondaryResLocation)
-                    print("find soma globally at \(uploadLoc.loc)")
                     userArray.append(somaPosition)
                     self.somaArray =  self.originalSomaArray + self.userArray
                     print(somaArray)
                 }
                 
-            }else if modeSwitcher.selectedSegmentIndex == 2{ // delete mode
+            }else if editStatus == .Delete{ // delete mode
                 // detect possible soma
                 if let somaPostion = findSomaLocation(tapPosition, deleteMode: true){
                     print("find existing soma at \(somaPostion),removed it")
@@ -434,69 +392,6 @@ class MarkerFactoryViewController:Image3dViewController,UIDocumentPickerDelegate
                     }
                 }
             }
-        }
-    }
-    
-    func findSomaLocation(_ tapPosition:CGPoint,deleteMode:Bool)->simd_float3?{ //use to sample in the same time
-        // calculate coordinate in NDC
-        let viewWidth = self.view.bounds.width
-        let viewHeight = self.view.bounds.height
-        let centerX = viewWidth/2
-        let centerY = viewHeight/2
-        let clipX = Float((tapPosition.x-centerX)/centerX)
-        let clipY = Float((-tapPosition.y+centerY)/centerY)
-        let clipZstart = Float(0)
-        let clipZend = Float(1)
-        let clipW = Float(1)
-        let tapCastStart = simd_float4(clipX, clipY, clipZstart, clipW)
-        let tapCastEnd = simd_float4(clipX, clipY, clipZend, clipW)
-        // calculate inverse of finalMatrix
-        var finalMatrix = objectToDraw.modelMatrix()
-        finalMatrix.multiplyLeft(worldModelMatrix)
-        finalMatrix.multiplyLeft(projectionMatrix)
-        let inverseFinalMatrix = finalMatrix.inverse
-        // calculate tapCast in model space, ms stands for model space
-        var msTapCastStart = matrix_multiply(inverseFinalMatrix, tapCastStart)
-        var msTapCastEnd = matrix_multiply(inverseFinalMatrix, tapCastEnd)
-        msTapCastStart = msTapCastStart/msTapCastStart.w
-        msTapCastEnd = msTapCastEnd/msTapCastEnd.w
-        // decide whether intersects, same as raycasting method
-        let TapCast = msTapCastEnd - msTapCastStart
-        let Step = TapCast/512
-        var currentPosi = msTapCastStart
-        var currentIntensity:Float = 0
-        var maxIntensity:Float = 0
-        var maxPosition = currentPosi
-        var flag = false
-        for _ in 1...512{
-            if currentPosi[0]<1.0 && currentPosi[0]>(-1.0) && currentPosi[1]<1.0 && currentPosi[1]>(-1.0) && currentPosi[2]<1.0 && currentPosi[2]>(-1.0){
-                //when intersect
-                flag = true
-                if !deleteMode {
-                    currentIntensity = imageToDisplay.sample3Ddata(x: currentPosi.x, y: currentPosi.y, z: currentPosi.z)
-                    if currentIntensity > maxIntensity{
-                        maxIntensity = currentIntensity
-    //                    print("maxIntensity changed to \(currentIntensity)")
-                        maxPosition = currentPosi
-                    }
-                }else{
-                    for somaPosi in self.somaArray{
-                        let distance = simd_distance(somaPosi,simd_float3(currentPosi.x,currentPosi.y,currentPosi.z))
-                        if distance < 0.1{
-                            return somaPosi
-                        }
-                    }
-                }
-                currentPosi += Step
-            }else{
-                currentPosi += Step
-            }
-        }
-        if flag && !deleteMode{
-            print("soma intensity is \(maxIntensity)")
-            return simd_float3(maxPosition.x,maxPosition.y,maxPosition.z)
-        }else{
-            return nil
         }
     }
 }

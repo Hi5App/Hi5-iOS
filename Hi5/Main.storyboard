@@ -84,10 +84,63 @@
             </objects>
             <point key="canvasLocation" x="1370.7692307692307" y="99.526066350710892"/>
         </scene>
+        <!--Annotation View Controller-->
+        <scene sceneID="JMv-Vm-43f">
+            <objects>
+                <viewController storyboardIdentifier="AnnoVC" id="pRn-hD-zFs" customClass="AnnotationViewController" customModule="Hi5" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="WyX-Ps-CTC">
+                        <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <mtkView contentMode="scaleToFill" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="7nr-Q4-se1">
+                                <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
+                            </mtkView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="O5b-tt-Ofk">
+                                <rect key="frame" x="0.0" y="761" width="390" height="49"/>
+                                <items>
+                                    <barButtonItem style="plain" id="7am-NX-faw">
+                                        <segmentedControl key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="SaX-90-gG2">
+                                            <rect key="frame" x="16" y="10.666666666666664" width="358" height="33"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <segments>
+                                                <segment title="View"/>
+                                                <segment title="Mark"/>
+                                                <segment title="Delete"/>
+                                            </segments>
+                                            <color key="selectedSegmentTintColor" name="mainOrange"/>
+                                            <connections>
+                                                <action selector="indexChanged:" destination="pRn-hD-zFs" eventType="valueChanged" id="ghs-bL-C6L"/>
+                                            </connections>
+                                        </segmentedControl>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="eYh-9V-TWj"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="7nr-Q4-se1" firstAttribute="leading" secondItem="WyX-Ps-CTC" secondAttribute="leading" id="DtH-Ld-GRy"/>
+                            <constraint firstItem="O5b-tt-Ofk" firstAttribute="leading" secondItem="eYh-9V-TWj" secondAttribute="leading" id="Fpx-S1-YIJ"/>
+                            <constraint firstAttribute="bottom" secondItem="7nr-Q4-se1" secondAttribute="bottom" id="GM9-VL-nml"/>
+                            <constraint firstItem="eYh-9V-TWj" firstAttribute="trailing" secondItem="O5b-tt-Ofk" secondAttribute="trailing" id="XXe-cM-rhY"/>
+                            <constraint firstItem="eYh-9V-TWj" firstAttribute="bottom" secondItem="O5b-tt-Ofk" secondAttribute="bottom" id="jLU-gX-U0B"/>
+                            <constraint firstAttribute="trailing" secondItem="7nr-Q4-se1" secondAttribute="trailing" id="jnx-Ws-MTI"/>
+                            <constraint firstItem="7nr-Q4-se1" firstAttribute="top" secondItem="WyX-Ps-CTC" secondAttribute="top" id="pyf-YQ-21O"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="modeSwitcher" destination="SaX-90-gG2" id="4sC-4c-hwx"/>
+                        <outlet property="mtkView" destination="7nr-Q4-se1" id="r5m-DI-wTh"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Q5X-uY-DfB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2149" y="-548"/>
+        </scene>
         <!--Marker Factory View Controller-->
         <scene sceneID="WBT-na-QWf">
             <objects>
-                <viewController storyboardIdentifier="imageviewcontroller" id="PZu-Np-LZ9" customClass="MarkerFactoryViewController" customModule="Hi5" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MarkFactoryVC" id="PZu-Np-LZ9" customClass="MarkerFactoryViewController" customModule="Hi5" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="31f-VG-8yk">
                         <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -117,6 +170,9 @@
                                                 <segment title="Delete"/>
                                             </segments>
                                             <color key="selectedSegmentTintColor" name="mainOrange"/>
+                                            <connections>
+                                                <action selector="indexChanged:" destination="PZu-Np-LZ9" eventType="valueChanged" id="J1a-hO-ucD"/>
+                                            </connections>
                                         </segmentedControl>
                                     </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="EbX-AF-lqg"/>
@@ -156,7 +212,7 @@
                         <outlet property="boringImageButton" destination="ck0-rS-4TG" id="Hd7-ty-YGZ"/>
                         <outlet property="goodImageButton" destination="TnY-7h-OFV" id="isQ-yI-uJv"/>
                         <outlet property="modeSwitcher" destination="52K-9T-FI3" id="4IG-Gg-mnU"/>
-                        <outlet property="mtkView" destination="yN6-MA-zow" id="JJI-JQ-MHc"/>
+                        <outlet property="mtkView" destination="yN6-MA-zow" id="VDn-mO-bSA"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="M3B-LP-wSo" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -402,7 +458,7 @@
         <!--Navigation Controller-->
         <scene sceneID="JvZ-wv-l80">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="8Gf-Wp-DmQ" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="homeNavVC" automaticallyAdjustsScrollViewInsets="NO" id="8Gf-Wp-DmQ" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="KvX-KQ-FBh">
                         <rect key="frame" x="0.0" y="44" width="390" height="44"/>

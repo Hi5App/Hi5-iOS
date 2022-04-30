@@ -32,8 +32,6 @@ class MetalViewController: UIViewController {
   
   override func viewDidLoad() {
       super.viewDidLoad()
-    // Do any additional setup after loading the view, typically from a nib.
-    
       device = MTLCreateSystemDefaultDevice()
     
       mtkView.device = device
