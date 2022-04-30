@@ -8,16 +8,9 @@ import UIKit
 import UniformTypeIdentifiers
 import simd
 
-enum editMode:String{
-    case Show = "Show"
-    case Mark = "Mark"
-    case Delete = "Delete"
-}
-
-class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelegate,UIDocumentPickerDelegate {
+class MarkerFactoryViewController:Image3dViewController,UIDocumentPickerDelegate{
  
     //Buttons
-    var scaleLabel:UIButton!
     var backwardButton:UIButton!
     var forwardButton:UIButton!
     
@@ -27,35 +20,6 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     @IBOutlet var boringImageButton: UIBarButtonItem!
     @IBOutlet var goodImageButton: UIBarButtonItem!
     
-    
-    var worldModelMatrix:float4x4!
-    var objectToDraw:Quad!{
-        didSet{
-            setupGestures()
-            self.metalViewControllerDelegate = self
-            deleteCurrentImageCache()
-            
-            modeSwitcher.selectedSegmentIndex = 0
-            modeSwitcher.sendActions(for: UIControl.Event.valueChanged)
-        }
-    }
-    
-    var mode:editMode = .Show
-    
-    var panSensivity:Float = 5.0
-    var lastPanLocation:CGPoint!
-    var imageToDisplay:image4DSimple!
-    var userArray:[simd_float3] = [] // soma marked by user
-    var originalSomaArray:[simd_float3] = [] // soma list fetched from server
-    var removeSomaArray:[String] = [] // somaInfo name removed by user
-    var somaArray:[simd_float3] = [] // soma needs to be displayed
-    var somaList:SomaListFeedBack!
-    
-    var user:User!
-    var resUsed:String!
-    var currentImageName:String = ""
-    var currentImageURL:URL!
-    
     var somaPotentialLocation:PotentialLocationFeedBack!{
         didSet{
             somaPotentialSecondaryResLocation = PositionInt(x: somaPotentialLocation.loc.x/2,
@@ -63,11 +27,12 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
                                                             z: somaPotentialLocation.loc.z/2)
         }
     }
+    
     var somaPotentialSecondaryResLocation:PositionInt!
     var imageCache:image4DSimpleCache!
     var brainListfeed:BrainListFeedBack!
-    let perferredSize = 128
-    let somaperferredSize = 256
+    var somaList:SomaListFeedBack!
+    var resUsed:String!
     
     override func viewWillDisappear(_ animated: Bool) {
         imageCache.imageCache.removeAll()
@@ -76,8 +41,6 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     override func viewDidLoad() {
         super.viewDidLoad()
         configureButtons()
-        configureNavBar()
-        self.view.backgroundColor = UIColor(red: 123.0/255.0, green: 133.0/255.0, blue: 199.0/255.0, alpha: 1.0)
         worldModelMatrix = float4x4()
         worldModelMatrix.translate(0.0, y: 0.0, z: -4)
         worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
@@ -103,19 +66,11 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         }
     }
     
-    func drawWithImage(image:image4DSimple){
-        self.objectToDraw = Quad(device: self.device,commandQ: self.commandQueue,viewWidth: Int(self.view.bounds.width)*Int(UIScreen.main.scale),viewHeight: Int(self.view.bounds.height)*Int(UIScreen.main.scale),image4DSimple: image)
-        // refresh existing soma
-        self.somaArray.removeAll()
-        // convert somaList data structure to somaArray model-space data structure
-        self.somaArray =  self.originalSomaArray + self.userArray
-    }
     // MARK: - Congfigue UI
     func configureButtons(){
         var backwardConfiguration = UIButton.Configuration.filled()
         backwardConfiguration.cornerStyle = .medium
         backwardConfiguration.baseBackgroundColor = UIColor(named: "mainOrange")
-//        backwardConfiguration.baseForegroundColor = UIColor(red: 123.0/255.0, green: 133.0/255.0, blue: 199.0/255.0, alpha: 1.0)
         backwardConfiguration.baseForegroundColor = UIColor.label
         backwardConfiguration.buttonSize = .medium
         backwardConfiguration.title = "prev"
@@ -135,25 +90,11 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         view.addSubview(backwardButton)
         view.addSubview(forwardButton)
         
-        // add scaleLabel
-        var scaleLabelConfiguration = backwardConfiguration
-        scaleLabelConfiguration.image = UIImage(systemName: "1.magnifyingglass")
-        scaleLabelConfiguration.title = "  1.0x"
-        scaleLabelConfiguration.imagePlacement = .leading
-        scaleLabel = UIButton(configuration: scaleLabelConfiguration)
-        scaleLabel.translatesAutoresizingMaskIntoConstraints = false
-        scaleLabel.addTarget(self, action: #selector(resetScale), for: .touchUpInside)
-        view.addSubview(scaleLabel)
-
-        
         let constraints = [
             backwardButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             backwardButton.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 5),
             forwardButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            forwardButton.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -5),
-            
-            scaleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            scaleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10)
+            forwardButton.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -5)
         ]
         NSLayoutConstraint.activate(constraints)
         
@@ -161,33 +102,21 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
     }
     
     func disableButtons(){
-//        scaleLabel.isEnabled = false
         forwardButton.isEnabled = false
         backwardButton.isEnabled = false
-//        scaleLabel.alpha = 0
         forwardButton.alpha = 0
         backwardButton.alpha = 0
     }
     
     func enableButtons(){
-//        scaleLabel.isEnabled = true
         forwardButton.isEnabled = true
         backwardButton.isEnabled = true
-//        scaleLabel.alpha = 1
         forwardButton.alpha = 1
         backwardButton.alpha = 1
     }
     
-    func configureNavBar(){
-        navigationController?.navigationBar.tintColor = .label
-        // bar colors
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(named: "mainOrange")
-        navigationItem.standardAppearance = appearance
-        navigationItem.scrollEdgeAppearance = appearance
-        navigationItem.compactAppearance = appearance
-        
+    override func configureNavBar(){
+        super.configureNavBar()
         // buttons
         let readLocalFile = UIAction(title:"Local Image",image: UIImage(systemName: "folder.fill")){ (action) in
             self.readLocalImage()
@@ -209,14 +138,6 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
         if !userArray.isEmpty{
             userArray.remove(at: userArray.count-1)
             somaArray = originalSomaArray + userArray
-        }
-    }
-    
-    @objc func resetScale(){
-        if let object = objectToDraw{
-            object.scale = 1.0
-            scaleLabel.configuration?.image = UIImage(systemName:"1.magnifyingglass")
-            scaleLabel.setTitle("  1.0x", for: .normal)
         }
     }
     
@@ -385,7 +306,7 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
             var PBDImage = PBDImage(imageLocation: url!) // decompress image
             self.currentImageURL = url
             self.imageToDisplay = PBDImage.decompressToV3draw()
-            
+            self.deleteCurrentImageCache() //clear PBDimage cache after decompress
             // request somaList
             HTTPRequest.SomaPart.getSomaList(centerX: self.somaPotentialLocation.loc.x, centerY: self.somaPotentialLocation.loc.y, centerZ: self.somaPotentialLocation.loc.z, size: self.somaperferredSize, res:"", brainId: self.somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { feedback in
                 if let feedback = feedback{
@@ -465,25 +386,11 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
             url.stopAccessingSecurityScopedResource()
         }
     }
-
-  
-  //MARK: - MetalViewControllerDelegate
-    func renderObjects(drawable:CAMetalDrawable) {
-    // draw the view
-        objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil,somaArray:somaArray)
-    }
-
-    func updateLogic(timeSinceLastUpdate: CFTimeInterval) {
-        objectToDraw.updateWithDelta(delta: timeSinceLastUpdate)
-    }
     
     //MARK: - setup interaction with images
-    func setupGestures(){
-        let pan = UIPanGestureRecognizer(target: self, action: #selector(MarkerFactoryViewController.pan))
-        let pinch = UIPinchGestureRecognizer(target: self, action: #selector(MarkerFactoryViewController.pinch))
+    override func setupGestures(){
+        super.setupGestures()
         let tap = UITapGestureRecognizer(target: self, action: #selector(MarkerFactoryViewController.tap))
-        self.view.addGestureRecognizer(pan)
-        self.view.addGestureRecognizer(pinch)
         self.view.addGestureRecognizer(tap)
     }
     
@@ -527,9 +434,6 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
                     }
                 }
             }
-            
-            
-            
         }
     }
     
@@ -593,46 +497,6 @@ class MarkerFactoryViewController: MetalViewController,MetalViewControllerDelega
             return simd_float3(maxPosition.x,maxPosition.y,maxPosition.z)
         }else{
             return nil
-        }
-    }
-    
-    @objc func pan(panGesture:UIPanGestureRecognizer){
-        if panGesture.state == UIGestureRecognizer.State.changed{
-            let pointInView = panGesture.location(in: self.view)
-            
-            let xDelta = Float((lastPanLocation.x - pointInView.x)/self.view.bounds.width) * panSensivity
-            let yDelta = Float((lastPanLocation.y - pointInView.y)/self.view.bounds.height) * panSensivity
-            objectToDraw.rotationY -= xDelta
-            objectToDraw.rotationX -= yDelta
-            lastPanLocation = pointInView
-        }else if panGesture.state == UIGestureRecognizer.State.began{
-            modeSwitcher.selectedSegmentIndex = 0
-            modeSwitcher.sendActions(for: UIControl.Event.valueChanged)
-            lastPanLocation = panGesture.location(in: self.view)
-        }
-    }
-    
-    var pinchScale:Float = 2.0
-    @objc func pinch(pinchGesture:UIPinchGestureRecognizer){
-        guard pinchGesture.view != nil else {return}
-        if pinchGesture.state == .began || pinchGesture.state == .changed{
-            modeSwitcher.selectedSegmentIndex = 0
-            modeSwitcher.sendActions(for: UIControl.Event.valueChanged)
-            if objectToDraw.scale >= 2 {
-                objectToDraw.scale = 2
-            }else if objectToDraw.scale <= 0.5 {
-                objectToDraw.scale = 0.5
-            }
-            objectToDraw.scale = objectToDraw.scale * Float(pinchGesture.scale)
-            pinchGesture.scale = 1.0
-        }
-        if pinchGesture.state == .ended{
-            scaleLabel.setTitle(String(format: "  %.1fx", objectToDraw.scale), for: .normal)
-            if objectToDraw.scale >= 1.0{
-                scaleLabel.configuration?.image = UIImage(systemName: "plus.magnifyingglass")
-            }else if objectToDraw.scale < 1.0{
-                scaleLabel.configuration?.image = UIImage(systemName: "minus.magnifyingglass")
-            }
         }
     }
 }
