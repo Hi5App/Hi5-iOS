@@ -18,13 +18,13 @@ struct image4DSimpleCache{
     var somaPoLocations:[PotentialLocationFeedBack] = []
     var index = -1{
         didSet{
-            print("index now is \(index)")
+//            print("index now is \(index)")
         }
     }
     
     mutating func addLocation(location:PotentialLocationFeedBack){
         somaPoLocations.append(location)
-        print("add a location,total\(somaPoLocations.count)")
+//        print("add a location,total\(somaPoLocations.count)")
         index += 1
     }
     

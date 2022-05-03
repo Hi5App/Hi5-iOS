@@ -9,6 +9,7 @@ import Foundation
 import Metal
 import QuartzCore
 import simd
+import UIKit
 
 class Node{
     let device:MTLDevice
@@ -222,13 +223,34 @@ class Node{
         if !somaArray.isEmpty {
             //generate vertices
             for center in somaArray{
-                let A = Vertex(x: -0.05+center.x, y: -0.05+center.y, z:   0.0+center.z, r:  0.0, g:  1.0, b:  0.0, a:  1.0,s: 0.0,t: 0.0)
-                let B = Vertex(x:   0.0+center.x, y:  0.05+center.y, z:   0.0+center.z, r:  0.0, g:  0.0, b:  1.0, a:  1.0,s: 0.0,t: 1.0)
-                let C = Vertex(x:  0.05+center.x, y: -0.05+center.y, z:   0.0+center.z, r:  1.0, g:  0.0, b:  1.0, a:  1.0,s: 1.0,t: 1.0)
+                // cube vertices
+                let color = UIColor.systemOrange
+                let size = Float(0.03)
+                let A = Vertex(x: -size+center.x, y:  size+center.y, z:   size+center.z, r:  Float(color.redValue), g:  Float(color.greenValue), b:  Float(color.blueValue), a:  1.0,s: 0.0,t: 0.3)
+                let B = Vertex(x: -size+center.x, y:  -size+center.y, z:   size+center.z, r:  Float(color.redValue), g:  Float(color.greenValue), b:  Float(color.blueValue), a:  1.0,s: 0.0,t: 0.7)
+                let C = Vertex(x:  size+center.x, y:  -size+center.y, z:   size+center.z, r:  Float(color.redValue), g:  Float(color.greenValue), b:  Float(color.blueValue), a:  1.0,s: 1.0,t: 0.7)
+                let D = Vertex(x:  size+center.x, y:   size+center.y, z:   size+center.z, r:  Float(color.redValue), g:  Float(color.greenValue), b:  Float(color.blueValue), a:  1.0,s: 1.0,t: 0.3)
                 
-                let triangleVerticesArray:Array<Vertex> = [C,B,A]
-                let dataSize = triangleVerticesArray.count * MemoryLayout.size(ofValue: triangleVerticesArray[0])
-                let triangleVertexBuffer = device.makeBuffer(bytes: triangleVerticesArray, length: dataSize, options: [])
+                let Q = Vertex(x: -size+center.x, y:   size+center.y, z:  -size+center.z, r:  Float(color.redValue), g:  Float(color.greenValue), b:  Float(color.blueValue), a:  1.0,s: 0.0,t: 0.0)
+                let R = Vertex(x:  size+center.x, y:   size+center.y, z:  -size+center.z, r:  Float(color.redValue), g:  Float(color.greenValue), b:  Float(color.blueValue), a:  1.0,s: 0.0,t: 0.0)
+                let S = Vertex(x: -size+center.x, y:  -size+center.y, z:  -size+center.z, r:  Float(color.redValue), g:  Float(color.greenValue), b:  Float(color.blueValue), a:  1.0,s: 0.0,t: 0.0)
+                let T = Vertex(x:  size+center.x, y:  -size+center.y, z:  -size+center.z, r:  Float(color.redValue), g:  Float(color.greenValue), b:  Float(color.blueValue), a:  1.0,s: 0.0,t: 0.0)
+                
+                let cubeVerticesArray:Array<Vertex> = [
+                    
+                    A,B,C ,A,C,D,   //Front
+                    R,T,S ,Q,R,S,   //Back
+                    
+                    Q,S,B ,Q,B,A,   //Left
+                    D,C,T ,D,T,R,   //Right
+                    
+                    Q,A,D ,Q,D,R,   //Top
+                    B,S,T ,B,T,C    //Bot
+                ]
+                
+                let dataSize = cubeVerticesArray.count * MemoryLayout.size(ofValue: cubeVerticesArray[0])
+                let cubeVertexBuffer = device.makeBuffer(bytes: cubeVerticesArray, length: dataSize, options: [])
+                
                 //draw triangles
                 let defaultLibrary = device.makeDefaultLibrary()!
                 let fragmentProgram = defaultLibrary.makeFunction(name: "texture_fragment")
@@ -244,9 +266,9 @@ class Node{
                 
     //            let renderEncoder = commanBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
                 renderEncoder.setRenderPipelineState(trianglePipelineState)
-                renderEncoder.setVertexBuffer(triangleVertexBuffer, offset: 0, index: 0)
+                renderEncoder.setVertexBuffer(cubeVertexBuffer, offset: 0, index: 0)
                 renderEncoder.setVertexBuffer(uniformBuffer, offset: 0, index: 1)
-                renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3,instanceCount: 1)
+                renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: cubeVerticesArray.count)
             }
         }
         

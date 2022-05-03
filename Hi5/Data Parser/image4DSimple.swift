@@ -15,7 +15,7 @@ class image4DSimple{
     let sizeY:Int
     let sizeZ:Int
     let channelNumber:Int
-    let imageData:[[[UInt8]]]
+    var imageData:[[[UInt8]]]
     let imageArray:[UInt8]
     
     init(name:String,endiannessType e:Character,dataType dt:UInt8,_ sX:Int,_ sY:Int,_ sZ:Int,_ channel:Int,_ data:[[[UInt8]]],array:[UInt8]){
@@ -28,6 +28,20 @@ class image4DSimple{
         channelNumber = channel
         imageData = data
         imageArray = array
+    }
+    
+    func make3DArrayFrom1DArray(){
+        var start = 0
+        var array128x128x128 = Array(repeating: Array(repeating: Array(repeating: UInt8(0), count: 128), count: 128), count: 128)
+        for i in 0...127{
+            for j in 0...127{
+                for k in 0...127{
+                    array128x128x128[i][j][k] = imageArray[start]
+                    start += 1
+                }
+            }
+        }
+        imageData = array128x128x128
     }
     
     func sample3Ddata(x:Float,y:Float,z:Float)->Float{

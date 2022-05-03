@@ -28,7 +28,7 @@
 		433C55C32813F8D900BC223F /* CoordHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 433C55C22813F8D900BC223F /* CoordHelper.swift */; };
 		437BA779281C13E6001C0A44 /* AnnotationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437BA778281C13E6001C0A44 /* AnnotationViewController.swift */; };
 		437DA8C227DEF7790080A74C /* Quad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437DA8C127DEF7790080A74C /* Quad.swift */; };
-		438684B527E48C1700F095BB /* hex2UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 438684B427E48C1700F095BB /* hex2UIColor.swift */; };
+		438684B527E48C1700F095BB /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 438684B427E48C1700F095BB /* UIColor+Extension.swift */; };
 		439215A0280C623400E53631 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4392159F280C623400E53631 /* HomeViewController.swift */; };
 		439215A2280C62A800E53631 /* UserInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439215A1280C62A800E53631 /* UserInfoViewController.swift */; };
 		439215A4280C62CB00E53631 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439215A3280C62CB00E53631 /* LoginViewController.swift */; };
@@ -88,7 +88,7 @@
 		433C55C22813F8D900BC223F /* CoordHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordHelper.swift; sourceTree = "<group>"; };
 		437BA778281C13E6001C0A44 /* AnnotationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationViewController.swift; sourceTree = "<group>"; };
 		437DA8C127DEF7790080A74C /* Quad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Quad.swift; sourceTree = "<group>"; };
-		438684B427E48C1700F095BB /* hex2UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = hex2UIColor.swift; sourceTree = "<group>"; };
+		438684B427E48C1700F095BB /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		4392159F280C623400E53631 /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		439215A1280C62A800E53631 /* UserInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserInfoViewController.swift; sourceTree = "<group>"; };
 		439215A3280C62CB00E53631 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
@@ -230,7 +230,7 @@
 		4320388127D8EDA400DB2DBC /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				438684B427E48C1700F095BB /* hex2UIColor.swift */,
+				438684B427E48C1700F095BB /* UIColor+Extension.swift */,
 				4320387D27D8ED8F00DB2DBC /* MetalTexture.swift */,
 				4320387F27D8ED9200DB2DBC /* BufferProvider.swift */,
 				43EEA48B27FFDF8D00B0E8B7 /* float4x4+Extensions.swift */,
@@ -417,7 +417,7 @@
 				433C55C32813F8D900BC223F /* CoordHelper.swift in Sources */,
 				43EEA48C27FFDF8D00B0E8B7 /* float4x4+Extensions.swift in Sources */,
 				489ED89D280ACACE000781C6 /* HTTPModel.swift in Sources */,
-				438684B527E48C1700F095BB /* hex2UIColor.swift in Sources */,
+				438684B527E48C1700F095BB /* UIColor+Extension.swift in Sources */,
 				4317EDE5280D9AEA00B2A17B /* PBDImage.swift in Sources */,
 				43B2255B281BD4DE00808B09 /* Image3dViewController.swift in Sources */,
 				439215A2280C62A800E53631 /* UserInfoViewController.swift in Sources */,

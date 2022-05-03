@@ -314,7 +314,7 @@ class MarkerFactoryViewController:Image3dViewController{
             self.currentImageURL = url
             self.imageToDisplay = PBDImage.decompressToV3draw()
             print("Image Decompressed successfully")
-            self.deletePBDImageCache() //clear PBDimage cache after decompress
+            self.deletePBDImageCache() //delete PBDimage file after decompress
             // request somaList
             HTTPRequest.SomaPart.getSomaList(centerX: self.somaPotentialLocation.loc.x, centerY: self.somaPotentialLocation.loc.y, centerZ: self.somaPotentialLocation.loc.z, size: self.somaperferredSize, res:"", brainId: self.somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { feedback in
                 if let feedback = feedback{
