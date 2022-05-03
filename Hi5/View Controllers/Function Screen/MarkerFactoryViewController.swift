@@ -180,11 +180,13 @@ class MarkerFactoryViewController:Image3dViewController{
             }
             HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 1, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
                 print("soma List uploaded successfully,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
+                self.requestForNextImage()
             } errorHandler: { error in
                 print(error)
             }
+        }else{
+            self.requestForNextImage()
         }
-        requestForNextImage()
     }
     
     func deleteCurrentImageCache(){
@@ -200,8 +202,8 @@ class MarkerFactoryViewController:Image3dViewController{
     }
     
     func requestForNextImage(){
-        userArray.removeAll()
-        somaArray = userArray + originalSomaArray
+//        userArray.removeAll()
+//        somaArray = userArray + originalSomaArray
         
         // try retrive images from cache
         if let imageBuddle = imageCache.nextImage(){
@@ -320,6 +322,7 @@ class MarkerFactoryViewController:Image3dViewController{
                     self.originalSomaArray = self.somaList.somaList.map({ (somaInfo)->simd_float3 in
                         return CoordHelper.UploadSomaLocation2DisplaySomaLocation(uploadLoc: somaInfo, center: self.somaPotentialSecondaryResLocation)
                     })
+                    self.userArray.removeAll()
                     //display image
                     if let image = self.imageToDisplay{
                         self.DoneButton.isEnabled = true
