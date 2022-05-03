@@ -37,6 +37,7 @@ class MarkerFactoryViewController:Image3dViewController{
             somaPotentialSecondaryResLocation = PositionInt(x: somaPotentialLocation.loc.x/2,
                                                             y: somaPotentialLocation.loc.y/2,
                                                             z: somaPotentialLocation.loc.z/2)
+            
         }
     }
     
@@ -57,12 +58,12 @@ class MarkerFactoryViewController:Image3dViewController{
         worldModelMatrix.translate(0.0, y: 0.0, z: -4)
         worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
         imageCache = image4DSimpleCache()
-        
 //        request potential location and brainList for later use
         HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { feedback in
             if let feedback = feedback{
                 self.somaPotentialLocation = feedback
                 print("first see potential location: \(self.somaPotentialLocation!)")
+                self.imageCache.addLocation(location: feedback)
             }
         } errorHandler: { error in
             print("soma potential fetch failed")
@@ -164,11 +165,10 @@ class MarkerFactoryViewController:Image3dViewController{
                 print(error)
             }
         }
-        // retrive images from cache
-        if let imageBuddle = imageCache.previousImage(){
-            drawWithImage(image: imageBuddle.image)
-        }else{
-            // alert user no previous image
+        // retrive soma locaiton from cache
+        if let location = imageCache.previousLocation(){
+            self.somaPotentialLocation = location
+            readCloudImage()
         }
     }
     
@@ -189,7 +189,8 @@ class MarkerFactoryViewController:Image3dViewController{
         }
     }
     
-    func deleteCurrentImageCache(){
+    // delete PBD image files to free app storage
+    func deletePBDImageCache(){
         // delete current local image
         let fileManager = FileManager.default
         do{
@@ -206,14 +207,16 @@ class MarkerFactoryViewController:Image3dViewController{
 //        somaArray = userArray + originalSomaArray
         
         // try retrive images from cache
-        if let imageBuddle = imageCache.nextImage(){
-            drawWithImage(image: imageBuddle.image)
+        if let location = imageCache.nextLocation(){
+            self.somaPotentialLocation = location
+            self.readCloudImage()
         }else{
             // request image from server
             HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { feedback in
                 if let feedback = feedback{
                     self.somaPotentialLocation = feedback
                     print("forward see potential location: \(self.somaPotentialLocation!)")
+                    self.imageCache.addLocation(location: feedback)
                     self.readCloudImage()
                 }
             } errorHandler: { error in
@@ -311,14 +314,13 @@ class MarkerFactoryViewController:Image3dViewController{
             self.currentImageURL = url
             self.imageToDisplay = PBDImage.decompressToV3draw()
             print("Image Decompressed successfully")
-            self.deleteCurrentImageCache() //clear PBDimage cache after decompress
+            self.deletePBDImageCache() //clear PBDimage cache after decompress
             // request somaList
             HTTPRequest.SomaPart.getSomaList(centerX: self.somaPotentialLocation.loc.x, centerY: self.somaPotentialLocation.loc.y, centerZ: self.somaPotentialLocation.loc.z, size: self.somaperferredSize, res:"", brainId: self.somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { feedback in
                 if let feedback = feedback{
                     print(feedback)
                     self.somaList = feedback
                     // save to cache
-                    self.imageCache.addImage(image: self.imageToDisplay, list: self.somaList)
                     self.originalSomaArray = self.somaList.somaList.map({ (somaInfo)->simd_float3 in
                         return CoordHelper.UploadSomaLocation2DisplaySomaLocation(uploadLoc: somaInfo, center: self.somaPotentialSecondaryResLocation)
                     })

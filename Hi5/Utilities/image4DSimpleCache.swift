@@ -14,14 +14,48 @@ struct imageMarkerBundle{
 
 struct image4DSimpleCache{
    
-    
-    var imageCache:[imageMarkerBundle] = []
-    let size = 5
+    // MARK: - cache soma potential location
+    var somaPoLocations:[PotentialLocationFeedBack] = []
     var index = -1{
         didSet{
             print("index now is \(index)")
         }
     }
+    
+    mutating func addLocation(location:PotentialLocationFeedBack){
+        somaPoLocations.append(location)
+        print("add a location,total\(somaPoLocations.count)")
+        index += 1
+    }
+    
+    mutating func previousLocation()->PotentialLocationFeedBack?{
+        if index <= 0{
+            print("no previous image location in cache")
+            return nil
+        }else if index >= somaPoLocations.count{
+            print("cache index out of range")
+            return nil
+        }else{
+            index -= 1
+            return somaPoLocations[index]
+        }
+    }
+    
+    mutating func nextLocation()->PotentialLocationFeedBack?{
+        if index >= somaPoLocations.count - 1{
+            print("no next image location in cache")
+            return nil
+        }else{
+            index += 1
+            return somaPoLocations[index]
+        }
+    }
+    
+    
+    // MARK: - cache imageBuddle
+    
+    var imageCache:[imageMarkerBundle] = []
+    let size = 5
     
     mutating func addImage(image:image4DSimple,list:SomaListFeedBack){
         if imageCache.count == size{
