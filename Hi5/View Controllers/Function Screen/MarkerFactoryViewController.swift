@@ -32,6 +32,7 @@ class MarkerFactoryViewController:Image3dViewController{
     @IBOutlet var boringImageButton: UIBarButtonItem!
     @IBOutlet var goodImageButton: UIBarButtonItem!
     
+    
     var somaPotentialLocation:PotentialLocationFeedBack!{
         didSet{
             somaPotentialSecondaryResLocation = PositionInt(x: somaPotentialLocation.loc.x/2,
@@ -48,12 +49,14 @@ class MarkerFactoryViewController:Image3dViewController{
     var resUsed:String!
     
     override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         imageCache.imageCache.removeAll()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureButtons()
+        // hide label
         worldModelMatrix = float4x4()
         worldModelMatrix.translate(0.0, y: 0.0, z: -4)
         worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
@@ -77,9 +80,18 @@ class MarkerFactoryViewController:Image3dViewController{
         } errorHandler: { error in
             print("brain list fetch failed")
         }
+        
+        if somaPotentialLocation == nil || brainListfeed == nil{
+            let alert = UIAlertController(title: "Network Error", message: "Unable to request server image\nPlease try again later", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel,handler: { (action) in
+                self.navigationController?.popViewController(animated: true)
+            }))
+            self.present(alert, animated: true)
+        }
     }
     
     // MARK: - Congfigue UI
+    
     func configureButtons(){
         var backwardConfiguration = UIButton.Configuration.filled()
         backwardConfiguration.cornerStyle = .medium
@@ -298,6 +310,7 @@ class MarkerFactoryViewController:Image3dViewController{
             }
         }
         print("Downloading Image...")
+        
         // download image and fetch somaList
         HTTPRequest.ImagePart.downloadImage(
             centerX: somaPotentialSecondaryResLocation.x,
@@ -332,6 +345,7 @@ class MarkerFactoryViewController:Image3dViewController{
                         self.boringImageButton.isEnabled = true
                         
                         self.drawWithImage(image: image)
+//                        self.animateLabelMessageUp()
                         self.enableButtons()
                     }else{
                         print("No 4d image")

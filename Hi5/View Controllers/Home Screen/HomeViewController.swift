@@ -95,10 +95,7 @@ class HomeViewController: UIViewController,checkLoginStatus{
     }
     
     func backToLogin(){
-        loginUser = User.guestUser()
-        let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
-        let nextViewController = storyBoard.instantiateViewController(withIdentifier: "loginVC") as! LoginViewController
-        self.navigationController?.pushViewController(nextViewController, animated: true)
+        self.navigationController?.popViewController(animated: true)
     }
 }
 

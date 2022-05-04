@@ -48,8 +48,9 @@ struct HTTPRequest{
                     completionHandler(loginFeedBack)
                 }
                 if error != nil || statusCode != 200{
-                    errorHandler("error in login")
-                    print("error in login")
+                    OperationQueue.main.addOperation {
+                        errorHandler("error in login")
+                    }
                 }
             }
         }
@@ -65,8 +66,9 @@ struct HTTPRequest{
                     completionHandler()
                 }
                 if error != nil || statusCode != 200{
-                    errorHandler("error in register")
-                    print("error in register")
+                    OperationQueue.main.addOperation {
+                        errorHandler("error in register")
+                    }
                 }
             }
         }

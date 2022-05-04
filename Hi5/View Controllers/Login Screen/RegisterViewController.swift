@@ -44,6 +44,11 @@ class RegisterViewController: UIViewController {
             errorTextField.text = "Registered Successfully"
             errorTextField.textColor = UIColor.systemGreen
         } errorHandler: { error in
+            let alert = UIAlertController(title: "Register Failed", message: "Please check all text Fields and try again", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel,handler: { (action) in
+                self.navigationController?.popViewController(animated: true)
+            }))
+            self.present(alert, animated: true)
             print(error)
         }
 

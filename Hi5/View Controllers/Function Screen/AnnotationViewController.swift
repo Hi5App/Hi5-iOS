@@ -70,15 +70,16 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate{
     }
     
     func readImageFromDocumentsFolder(filename:String){
+//        showMessage(message: "Reading...")
         let fileManager = FileManager.default
         let reader = v3drawReader()
         let rawImage1Url = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(filename)
         imageToDisplay = reader.read(from: rawImage1Url)
         self.title = imageToDisplay.name
-        
         // display image
         if let image = imageToDisplay{
             drawWithImage(image: image)
+            hideMessageLabel()
         }else{
             print("No 4d image")
         }

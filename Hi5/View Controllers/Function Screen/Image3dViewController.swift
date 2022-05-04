@@ -28,6 +28,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     
     var editStatus:editMode = .View
     var scaleLabel:UIButton!
+    var indicator:UIButton!
     
     var userArray:[simd_float3] = [] // soma marked by user
     var originalSomaArray:[simd_float3] = [] // soma list fetched from server
@@ -47,7 +48,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureScaleLabel()
+        configureLabels()
         configureNavBar()
         self.view.backgroundColor = UIColor(red: 123.0/255.0, green: 133.0/255.0, blue: 199.0/255.0, alpha: 1.0)
         worldModelMatrix = float4x4()
@@ -64,7 +65,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     }
     // MARK: - Congfigue UI
     
-    func configureScaleLabel(){
+    func configureLabels(){
         var backwardConfiguration = UIButton.Configuration.filled()
         backwardConfiguration.cornerStyle = .medium
         backwardConfiguration.baseBackgroundColor = UIColor(named: "mainOrange")
@@ -84,11 +85,49 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
         scaleLabel.addTarget(self, action: #selector(resetScale), for: .touchUpInside)
         view.addSubview(scaleLabel)
         
+        // add Indicator Label
+        var indicatorLabelConfiguration = scaleLabelConfiguration
+        indicatorLabelConfiguration.image = nil
+        indicatorLabelConfiguration.title = "Loading..."
+        indicator = UIButton(configuration: indicatorLabelConfiguration)
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        indicator.alpha = 0
+        view.addSubview(indicator)
+        
         let constraints = [
             scaleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            scaleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10)
+            scaleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
+            
+            indicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            indicator.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20)
         ]
         NSLayoutConstraint.activate(constraints)
+    }
+    
+    func hideMessageLabel(){
+        indicator.alpha = 0
+    }
+    
+    func showMessage(message:String){
+        print("it happens")
+        indicator.alpha = 1
+        indicator.setTitle(message,for: .normal)
+    }
+    
+    func animateLabelMessageDown(message:String){
+        UIView.animate(withDuration: 3, delay: 0, options: [.curveEaseOut], animations:{
+            self.view.layoutIfNeeded()
+        }, completion: { [self]_ in
+            indicator.configuration?.title = message
+        })
+    }
+    
+    func animateLabelMessageUp(){
+        UIView.animate(withDuration: 0.5, delay: 0.5, options: [.curveEaseOut], animations: {
+            let navigationBarHeight: CGFloat = self.navigationController!.navigationBar.frame.height
+            self.indicator.center.y = navigationBarHeight
+            self.view.layoutIfNeeded()
+        }, completion: nil)
     }
     
     @objc func resetScale(){

@@ -76,7 +76,7 @@ struct Hi5API{
     
     static func parseSomaListJSON(jsonData:Data)->SomaListFeedBack?{
         do {
-            let result = try JSONSerialization.jsonObject(with: jsonData, options: .allowFragments) as? [[String:String]]
+            let result = try JSONSerialization.jsonObject(with: jsonData, options: .allowFragments) as? [[String:Any]]
             guard result != nil else {return nil}
             
             var somaList = [SomaInfo]()

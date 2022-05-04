@@ -47,7 +47,7 @@ class LoginViewController: UIViewController {
         // for debug
         emailTextField.text = "kx1126"
         passwordTextField.text = "123456"
-        LoginButtonTapped(signInButton!)
+//        LoginButtonTapped(signInButton!)
         
         stackView.setCustomSpacing(0, after: passwordTextField)
         stackView.setCustomSpacing(0, after: errorTextField)
@@ -66,7 +66,7 @@ class LoginViewController: UIViewController {
             HTTPRequest.UserPart.login(name: emailTextField.text!, passwd: passwordTextField.text!) {
                 loginFeedBack in
                 if let loginResult = loginFeedBack {
-                    print("user \(loginResult.id) login successfully")
+                    print("user \(loginResult.name) login successfully")
                     self.loginNewUser = User(userName: loginResult.name, nickName: loginResult.nickname, email: loginResult.email, password: self.passwordTextField.text!, inviterCode: loginResult.appkey, score: loginResult.score)
                     // jump to home screen
                     let storyBoard:UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
@@ -76,11 +76,21 @@ class LoginViewController: UIViewController {
                 }
             } errorHandler: {
                 error in
+                let alert = UIAlertController(title: "Login Failed", message: "Please check your username or password and try again", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .cancel,handler: { (action) in
+                    self.navigationController?.popViewController(animated: true)
+                }))
+                self.present(alert, animated: true)
                 print(error)
             }
         
         }
     
+    func showErrorMessage(message:String){
+        errorTextField.alpha = 1
+        errorTextField.textColor = UIColor.systemRed
+        errorTextField.text = message
+    }
     // MARK: - set up gesture recognizer
     func setupGestures(){
         let tapOnBackground = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
