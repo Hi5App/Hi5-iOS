@@ -84,6 +84,34 @@
             </objects>
             <point key="canvasLocation" x="1370.7692307692307" y="99.526066350710892"/>
         </scene>
+        <!--Setting Table View Controller-->
+        <scene sceneID="B0a-ck-aZ0">
+            <objects>
+                <tableViewController id="JGt-Si-K9G" customClass="SettingTableViewController" customModule="Hi5" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="xe4-BA-DbS">
+                        <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="OM8-Gy-g6X">
+                                <rect key="frame" x="0.0" y="44.666666030883789" width="390" height="43.666667938232422"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="OM8-Gy-g6X" id="sQb-Ey-IbZ">
+                                    <rect key="frame" x="0.0" y="0.0" width="390" height="43.666667938232422"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="JGt-Si-K9G" id="R1A-Zp-0px"/>
+                            <outlet property="delegate" destination="JGt-Si-K9G" id="1KG-DT-HIM"/>
+                        </connections>
+                    </tableView>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rME-ys-ZTv" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1369" y="770"/>
+        </scene>
         <!--Annotation View Controller-->
         <scene sceneID="JMv-Vm-43f">
             <objects>

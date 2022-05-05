@@ -25,7 +25,12 @@ class HomeViewController: UIViewController,checkLoginStatus{
     
     @IBOutlet var functionCollectionView: UICollectionView!
     let functionDataSource = functionCollectionViewDataSource()
-    var loginUser:User!
+    var loginUser:User!{
+        didSet{
+            UserPref = UserPreferences(username: loginUser.userName, password: loginUser.password, autoLogin: false, ImageShapening: false)
+        }
+    }
+    var UserPref:UserPreferences!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,9 +40,33 @@ class HomeViewController: UIViewController,checkLoginStatus{
         functionCollectionView.dataSource = functionDataSource
         functionCollectionView.delegate = self
         configureCollectionViewLayout()
-        
-        // for debug
-//        showMarkerFactory()
+        saveUserPref()
+    }
+    
+    func saveUserPref(){
+        if let documentURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("userPref.plist"){
+            do{
+                let encoder = PropertyListEncoder()
+                let data = try encoder.encode(UserPref)
+                try data.write(to: documentURL,options: .atomic)
+                print("user pref saved")
+            }catch{
+                print("user pref save failed")
+            }
+        }
+    }
+    
+    func loadUserPref(){
+        if let documentURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("userPref.plist"){
+            do{
+                let data = try Data(contentsOf: documentURL)
+                let unarchiver = PropertyListDecoder()
+                UserPref = try unarchiver.decode(UserPreferences.self, from: data)
+                print("user pref loaded")
+            }catch{
+                print("user pref load failed")
+            }
+        }
     }
     
     func configureCollectionViewLayout(){

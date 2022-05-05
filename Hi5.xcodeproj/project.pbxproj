@@ -26,6 +26,9 @@
 		433B1F3E27DD815B00F44604 /* Vertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 433B1F3B27DD815B00F44604 /* Vertex.swift */; };
 		433B1F4027DD81AF00F44604 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 433B1F3F27DD81AF00F44604 /* Shaders.metal */; };
 		433C55C32813F8D900BC223F /* CoordHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 433C55C22813F8D900BC223F /* CoordHelper.swift */; };
+		4369E3222822AB800016A455 /* UserPref.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4369E3212822AB800016A455 /* UserPref.swift */; };
+		4369E3242822C6560016A455 /* SettingTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4369E3232822C6560016A455 /* SettingTableViewController.swift */; };
+		4369E3282822CDAD0016A455 /* SettingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4369E3272822CDAD0016A455 /* SettingTableViewCell.swift */; };
 		437BA779281C13E6001C0A44 /* AnnotationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437BA778281C13E6001C0A44 /* AnnotationViewController.swift */; };
 		437DA8C227DEF7790080A74C /* Quad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437DA8C127DEF7790080A74C /* Quad.swift */; };
 		438684B527E48C1700F095BB /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 438684B427E48C1700F095BB /* UIColor+Extension.swift */; };
@@ -86,6 +89,9 @@
 		433B1F3B27DD815B00F44604 /* Vertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vertex.swift; sourceTree = "<group>"; };
 		433B1F3F27DD81AF00F44604 /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
 		433C55C22813F8D900BC223F /* CoordHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordHelper.swift; sourceTree = "<group>"; };
+		4369E3212822AB800016A455 /* UserPref.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPref.swift; sourceTree = "<group>"; };
+		4369E3232822C6560016A455 /* SettingTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingTableViewController.swift; sourceTree = "<group>"; };
+		4369E3272822CDAD0016A455 /* SettingTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingTableViewCell.swift; sourceTree = "<group>"; };
 		437BA778281C13E6001C0A44 /* AnnotationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationViewController.swift; sourceTree = "<group>"; };
 		437DA8C127DEF7790080A74C /* Quad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Quad.swift; sourceTree = "<group>"; };
 		438684B427E48C1700F095BB /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
@@ -247,6 +253,8 @@
 				43FA187027E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift */,
 				4392159F280C623400E53631 /* HomeViewController.swift */,
 				439215A1280C62A800E53631 /* UserInfoViewController.swift */,
+				4369E3232822C6560016A455 /* SettingTableViewController.swift */,
+				4369E3272822CDAD0016A455 /* SettingTableViewCell.swift */,
 			);
 			path = "Home Screen";
 			sourceTree = "<group>";
@@ -255,6 +263,7 @@
 			isa = PBXGroup;
 			children = (
 				43B12F532806E19F0049BE9C /* User.swift */,
+				4369E3212822AB800016A455 /* UserPref.swift */,
 			);
 			path = User;
 			sourceTree = "<group>";
@@ -411,6 +420,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4369E3282822CDAD0016A455 /* SettingTableViewCell.swift in Sources */,
+				4369E3242822C6560016A455 /* SettingTableViewController.swift in Sources */,
 				439215A0280C623400E53631 /* HomeViewController.swift in Sources */,
 				43C54BD127EA04990067F559 /* FunctionCollectionViewCell.swift in Sources */,
 				43B12F5B2806F9EE0049BE9C /* HTTPRequest.swift in Sources */,
@@ -427,6 +438,7 @@
 				433B1F3E27DD815B00F44604 /* Vertex.swift in Sources */,
 				4320386927D8EC8000DB2DBC /* MetalViewController.swift in Sources */,
 				439215A6280C630700E53631 /* MarkerFactoryViewController.swift in Sources */,
+				4369E3222822AB800016A455 /* UserPref.swift in Sources */,
 				439215A4280C62CB00E53631 /* LoginViewController.swift in Sources */,
 				43027F66280538940067E792 /* RegisterViewController.swift in Sources */,
 				433B1F4027DD81AF00F44604 /* Shaders.metal in Sources */,

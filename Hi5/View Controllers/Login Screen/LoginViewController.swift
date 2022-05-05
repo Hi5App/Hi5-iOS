@@ -29,6 +29,7 @@ class LoginViewController: UIViewController {
     @IBOutlet var guestModeLabel: UILabel!
     @IBOutlet var forgetPasswordLabel: UILabel!
     var loginNewUser:User!
+    var UserPref:UserPreferences!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,10 +45,11 @@ class LoginViewController: UIViewController {
         logoImageView.image = UIImage(named: "logo")
         
         errorTextField.alpha = 0
-        // for debug
-        emailTextField.text = "kx1126"
-        passwordTextField.text = "123456"
-//        LoginButtonTapped(signInButton!)
+        // for read user pref
+        if loadUserPref() {
+            emailTextField.text = UserPref.username
+            passwordTextField.text = UserPref.password
+        }
         
         stackView.setCustomSpacing(0, after: passwordTextField)
         stackView.setCustomSpacing(0, after: errorTextField)
@@ -72,6 +74,9 @@ class LoginViewController: UIViewController {
                     let storyBoard:UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
                     let nextViewController = storyBoard.instantiateViewController(withIdentifier: "homeVC") as! HomeViewController
                     nextViewController.loginUser = self.loginNewUser // pass user info to home screen
+                    if let userPref = self.UserPref{
+                        nextViewController.UserPref = userPref // pass user pref
+                    }
                     self.navigationController?.pushViewController(nextViewController, animated: true)
                 }
             } errorHandler: {
@@ -110,5 +115,34 @@ class LoginViewController: UIViewController {
         let nextViewController = storyBoard.instantiateViewController(withIdentifier: "homeVC") as! HomeViewController
         nextViewController.loginUser = guestUser // pass user info to home screen
         self.navigationController?.pushViewController(nextViewController, animated: true)
+    }
+    
+    func saveUserPref(){
+        if let documentURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("userPref.plist"){
+            do{
+                let encoder = PropertyListEncoder()
+                let data = try encoder.encode(UserPref)
+                try data.write(to: documentURL,options: .atomic)
+                print("user pref saved")
+            }catch{
+                print("user pref save failed")
+            }
+        }
+    }
+    
+    func loadUserPref()->Bool{
+        if let documentURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("userPref.plist"){
+            do{
+                let data = try Data(contentsOf: documentURL)
+                let unarchiver = PropertyListDecoder()
+                UserPref = try unarchiver.decode(UserPreferences.self, from: data)
+                print("user pref loaded")
+                return true
+            }catch{
+                print("user pref load failed")
+                return false
+            }
+        }
+        return false
     }
 }
