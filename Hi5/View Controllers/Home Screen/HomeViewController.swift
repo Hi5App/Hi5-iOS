@@ -13,7 +13,11 @@ protocol checkLoginStatus{
     var loginStatus:Bool{get set}
 }
 
-class HomeViewController: UIViewController,checkLoginStatus{
+protocol passUserPrefChange{
+    var userPref:UserPreferences!{get set}
+}
+
+class HomeViewController: UIViewController,checkLoginStatus,passUserPrefChange{
     
     var loginStatus: Bool = true{
         didSet{
@@ -27,10 +31,14 @@ class HomeViewController: UIViewController,checkLoginStatus{
     let functionDataSource = functionCollectionViewDataSource()
     var loginUser:User!{
         didSet{
-            UserPref = UserPreferences(username: loginUser.userName, password: loginUser.password, autoLogin: false, ImageShapening: false)
+            userPref = UserPreferences(username: loginUser.userName, password: loginUser.password, autoLogin: false, ImageShapening: false)
         }
     }
-    var UserPref:UserPreferences!
+    var userPref:UserPreferences!{
+        didSet{
+            saveUserPref()
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,7 +55,7 @@ class HomeViewController: UIViewController,checkLoginStatus{
         if let documentURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("userPref.plist"){
             do{
                 let encoder = PropertyListEncoder()
-                let data = try encoder.encode(UserPref)
+                let data = try encoder.encode(userPref)
                 try data.write(to: documentURL,options: .atomic)
                 print("user pref saved")
             }catch{
@@ -61,7 +69,7 @@ class HomeViewController: UIViewController,checkLoginStatus{
             do{
                 let data = try Data(contentsOf: documentURL)
                 let unarchiver = PropertyListDecoder()
-                UserPref = try unarchiver.decode(UserPreferences.self, from: data)
+                userPref = try unarchiver.decode(UserPreferences.self, from: data)
                 print("user pref loaded")
             }catch{
                 print("user pref load failed")
@@ -102,7 +110,26 @@ class HomeViewController: UIViewController,checkLoginStatus{
             image: UIImage(systemName: "gear"),
             style: .done,
             target: self,
-            action: nil)
+            action: #selector(tapSettings))
+    }
+    
+    @objc func tapSettings(){
+        if loginUser.email == "Guest@Guest.com"{
+            let alert = UIAlertController(title: "Attention", message: "You are currently in Guest Mode\nSign in to see account infomation", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            alert.addAction(UIAlertAction(title: "Sign in", style: .default,handler: { (action) in
+                //present loginViewController
+                self.backToLogin()
+            }))
+            self.present(alert, animated: true)
+            return
+        }else{
+            let storyBoard:UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+            let nextViewController = storyBoard.instantiateViewController(withIdentifier: "settingVC") as! SettingTableViewController
+            nextViewController.delegate = self
+            nextViewController.userPref = self.userPref
+            self.navigationController?.pushViewController(nextViewController, animated: true)
+        }
     }
     
     @objc func tapUser(){
@@ -124,6 +151,10 @@ class HomeViewController: UIViewController,checkLoginStatus{
     }
     
     func backToLogin(){
+        userPref.username = ""
+        userPref.password = ""
+        userPref.autoLogin = false
+        saveUserPref()
         self.navigationController?.popViewController(animated: true)
     }
 }
@@ -153,6 +184,7 @@ extension HomeViewController:UICollectionViewDelegate{
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let nextViewController = storyBoard.instantiateViewController(withIdentifier: "AnnoVC") as! AnnotationViewController
         nextViewController.user = self.loginUser
+        nextViewController.imageSharpen = self.userPref.ImageShapening
         self.navigationController?.pushViewController(nextViewController, animated: true)
     }
 }

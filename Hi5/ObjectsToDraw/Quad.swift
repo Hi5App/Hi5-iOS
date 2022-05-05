@@ -21,21 +21,6 @@ class Quad:Node{
             A,B,C ,A,C,D,   //Front
         ]
         
-        //set up 3d texture
-//        var image3dToArray = Array(repeating: UInt8(0), count:128*128*128 )
-//        var position = 0
-//        for i in 0...127{
-//            for j in 0...127{
-//                for k in 0...127{
-//                    image3dToArray[position] = image4DSimple.imageData[i][j][k]
-////                    if k<10 && i==101 && j==0{
-////                        print(image4DSimple.imageData[i][j][k])
-////                    }
-//                    position += 1
-//                }
-//            }
-//        }
-        
         let values:UnsafeMutablePointer = UnsafeMutablePointer(mutating: image4DSimple.imageArray)
         
         let texDescriptor = MTLTextureDescriptor()

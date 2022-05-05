@@ -8,8 +8,8 @@
 import Foundation
 
 struct UserPreferences:Codable{
-    let username:String
-    let password:String
-    let autoLogin:Bool
-    let ImageShapening:Bool
+    var username:String
+    var password:String
+    var autoLogin:Bool
+    var ImageShapening:Bool
 }

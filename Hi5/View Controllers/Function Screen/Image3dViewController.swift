@@ -46,6 +46,8 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     let perferredSize = 128
     let somaperferredSize = 256
     
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureLabels()

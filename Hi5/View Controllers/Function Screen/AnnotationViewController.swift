@@ -13,7 +13,6 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate{
     
     //Controls
     @IBOutlet var modeSwitcher: UISegmentedControl!
-    
     @IBAction func indexChanged(_ sender: UISegmentedControl) {
         switch modeSwitcher.selectedSegmentIndex{
         case 0:

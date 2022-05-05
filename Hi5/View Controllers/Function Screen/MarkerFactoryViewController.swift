@@ -62,31 +62,40 @@ class MarkerFactoryViewController:Image3dViewController{
         worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
         imageCache = image4DSimpleCache()
 //        request potential location and brainList for later use
-        HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { feedback in
-            if let feedback = feedback{
-                self.somaPotentialLocation = feedback
-                print("first see potential location: \(self.somaPotentialLocation!)")
-                self.imageCache.addLocation(location: feedback)
-            }
-        } errorHandler: { error in
-            print("soma potential fetch failed")
-        }
+        
         
         HTTPRequest.ImagePart.getBrainList(name: user.userName, passwd: user.password) { feedback in
             if let feedback = feedback{
                 self.brainListfeed = feedback
                 print("brainList")
+                HTTPRequest.SomaPart.getPotentialLocation(name: self.user.userName, passwd: self.user.password) { feedback in
+                    if let feedback = feedback{
+                        
+                        self.somaPotentialLocation = feedback
+                        
+                        print("first see potential location: \(self.somaPotentialLocation!)")
+                        self.imageCache.addLocation(location: feedback)
+                        
+                        
+                    }
+                } errorHandler: { error in
+                    alertForNetworkError()
+                    print("soma potential fetch failed")
+                }
             }
         } errorHandler: { error in
+            alertForNetworkError()
             print("brain list fetch failed")
         }
         
-        if somaPotentialLocation == nil || brainListfeed == nil{
-            let alert = UIAlertController(title: "Network Error", message: "Unable to request server image\nPlease try again later", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .cancel,handler: { (action) in
-                self.navigationController?.popViewController(animated: true)
-            }))
-            self.present(alert, animated: true)
+        func alertForNetworkError(){
+            if self.somaPotentialLocation == nil || self.brainListfeed == nil{
+                let alert = UIAlertController(title: "Network Error", message: "Unable to request server image\nPlease try again later", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .cancel,handler: { (action) in
+                    self.navigationController?.popViewController(animated: true)
+                }))
+                self.present(alert, animated: true)
+            }
         }
     }
     
@@ -399,6 +408,10 @@ class MarkerFactoryViewController:Image3dViewController{
                         print(removeIndex)
                         userArray.remove(at: removeIndex)
                         somaArray = originalSomaArray + userArray
+                    }else if let removeIndex = originalSomaArray.firstIndex(of: somaPostion){
+                        print(removeIndex)
+                        originalSomaArray.remove(at: removeIndex)
+                        somaArray = originalSomaArray + userArray
                     }
                     // add to remove list
                     let soma = CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaPostion, center: self.somaPotentialSecondaryResLocation)
@@ -406,7 +419,7 @@ class MarkerFactoryViewController:Image3dViewController{
                     for somaInfo in self.somaList.somaList{
                         if (somaInfo.loc.x - soma.loc.x)<0.1 && (somaInfo.loc.y - soma.loc.y)<0.1 && (somaInfo.loc.z - soma.loc.z)<0.1{
                             self.removeSomaArray.append(somaInfo.name) // add to removeList
-                            print("remove server soma with name \(somaInfo.name)")
+                            print("soma with name \(somaInfo.name) add to remove list")
                         }
                     }
                 }

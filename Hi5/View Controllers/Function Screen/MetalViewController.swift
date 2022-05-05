@@ -20,6 +20,7 @@ class MetalViewController: UIViewController {
     var pipelineState: MTLRenderPipelineState!
     var commandQueue: MTLCommandQueue!
     var projectionMatrix: float4x4!
+    var imageSharpen:Bool = false
     @IBOutlet weak var mtkView:MTKView!{
         didSet{
             mtkView.delegate = self
@@ -39,7 +40,10 @@ class MetalViewController: UIViewController {
 
       // 1
       let defaultLibrary = device.makeDefaultLibrary()!
-      let fragmentProgram = defaultLibrary.makeFunction(name: "basic_fragment")
+      var fragmentProgram = defaultLibrary.makeFunction(name: "basic_fragment")
+      if imageSharpen {
+          fragmentProgram = defaultLibrary.makeFunction(name: "basic_fragment_sharpen")
+      }
       let vertexProgram = defaultLibrary.makeFunction(name: "basic_vertex")
       
       // 2

@@ -100,6 +100,51 @@ fragment float4 basic_fragment(VertexOut interpolated [[stage_in]],
     
 }
 
+fragment float4 basic_fragment_sharpen(VertexOut interpolated [[stage_in]],
+                              texture2d<float> frontFace [[texture(0)]],
+                               texture2d<float> backFace [[texture(1)]],
+                               texture3d<uint> image3d [[texture(2)]],
+                              sampler sampler2D [[sampler(0)]])
+{
+    float3 In = frontFace.sample(sampler2D, interpolated.texCoord).xyz;
+    float3 Out = backFace.sample(sampler2D, interpolated.texCoord).xyz;
+    if ( In[0] == Out[0] && In[1] == Out[1] && In[2] == Out[2]){
+            discard_fragment();
+    }
+    
+    float3 ray = In - Out;
+    float ray_length = length(ray);
+    float step = 200;
+    float ray_step = ray_length/step;
+//    float3 ray_step_vec = ray/step;
+    float3 ray_step_vec = float3(ray.x/step,ray.y/step,ray.z/(step));
+    
+    float3 ray_start = In;
+//    float3 ray_end = Out;
+    float3 currentPosi = ray_start;
+
+    sampler simpleSimpler = sampler(mag_filter::linear,min_filter::linear);
+    float maxIntensity = 0;
+
+    while(ray_length > 0){
+        float greyScale = image3d.sample(simpleSimpler,currentPosi).x;
+//        greyScale = greyScale/255.0;
+        if (greyScale <= 90){
+            greyScale = greyScale/255.0*2;
+        }else{
+            greyScale = greyScale/255.0*6;
+        }
+        if(greyScale > maxIntensity){
+            maxIntensity = greyScale;
+        }
+        ray_length -= ray_step;
+        currentPosi -= ray_step_vec;
+    }
+
+    return float4(maxIntensity,maxIntensity,maxIntensity,1.0);
+    
+}
+
 fragment float4 texture_fragment(VertexOut interpolated [[stage_in]])
 {
     return interpolated.color;

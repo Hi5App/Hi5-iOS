@@ -31,6 +31,17 @@ class LoginViewController: UIViewController {
     var loginNewUser:User!
     var UserPref:UserPreferences!
     
+    override func viewWillAppear(_ animated: Bool) {
+        // for read user pref
+        if loadUserPref() {
+            emailTextField.text = UserPref.username
+            passwordTextField.text = UserPref.password
+            if UserPref.autoLogin && emailTextField.text != "" && passwordTextField.text != "" {
+                LoginButtonTapped(self)
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.tintColor = UIColor.systemOrange
@@ -45,11 +56,7 @@ class LoginViewController: UIViewController {
         logoImageView.image = UIImage(named: "logo")
         
         errorTextField.alpha = 0
-        // for read user pref
-        if loadUserPref() {
-            emailTextField.text = UserPref.username
-            passwordTextField.text = UserPref.password
-        }
+        
         
         stackView.setCustomSpacing(0, after: passwordTextField)
         stackView.setCustomSpacing(0, after: errorTextField)
@@ -65,7 +72,7 @@ class LoginViewController: UIViewController {
             return
         }
             // send HTTP request
-            HTTPRequest.UserPart.login(name: emailTextField.text!, passwd: passwordTextField.text!) {
+        HTTPRequest.UserPart.login(name: emailTextField.text!, passwd: passwordTextField.text!) { [self]
                 loginFeedBack in
                 if let loginResult = loginFeedBack {
                     print("user \(loginResult.name) login successfully")
@@ -74,8 +81,10 @@ class LoginViewController: UIViewController {
                     let storyBoard:UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
                     let nextViewController = storyBoard.instantiateViewController(withIdentifier: "homeVC") as! HomeViewController
                     nextViewController.loginUser = self.loginNewUser // pass user info to home screen
-                    if let userPref = self.UserPref{
-                        nextViewController.UserPref = userPref // pass user pref
+                    if var userPref = self.UserPref{
+                        userPref.username = emailTextField.text!
+                        userPref.password = passwordTextField.text!
+                        nextViewController.userPref = userPref // pass user pref
                     }
                     self.navigationController?.pushViewController(nextViewController, animated: true)
                 }
