@@ -318,7 +318,7 @@ class MarkerFactoryViewController:Image3dViewController{
 //                print(self.resUsed!)
             }
         }
-        print("Downloading Image...")
+        showMessage(message: "Downloading...",showProcess: true)
         
         // download image and fetch somaList
         HTTPRequest.ImagePart.downloadImage(
@@ -334,6 +334,7 @@ class MarkerFactoryViewController:Image3dViewController{
             print("Image Downloaded successfully\nDecompress Image...")
             var PBDImage = PBDImage(imageLocation: url!) // decompress image
             self.currentImageURL = url
+                self.showMessage(message: "Decompressing...",showProcess: true)
             self.imageToDisplay = PBDImage.decompressToV3draw()
             print("Image Decompressed successfully")
             self.deletePBDImageCache() //delete PBDimage file after decompress
@@ -349,12 +350,12 @@ class MarkerFactoryViewController:Image3dViewController{
                     self.userArray.removeAll()
                     //display image
                     if let image = self.imageToDisplay{
+                        self.showMessage(message: self.currentImageName,showProcess: false)
                         self.DoneButton.isEnabled = true
                         self.goodImageButton.isEnabled = true
                         self.boringImageButton.isEnabled = true
                         
                         self.drawWithImage(image: image)
-//                        self.animateLabelMessageUp()
                         self.enableButtons()
                     }else{
                         print("No 4d image")

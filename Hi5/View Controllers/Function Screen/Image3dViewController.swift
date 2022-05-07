@@ -41,12 +41,14 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     
     var user:User!
     var currentImageName:String = ""
-    var currentImageURL:URL!
+    var currentImageURL:URL!{
+        didSet{
+            currentImageName = self.trimFromPbdFilename(from: currentImageURL.lastPathComponent)
+        }
+    }
     
     let perferredSize = 128
     let somaperferredSize = 256
-    
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -90,17 +92,18 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
         // add Indicator Label
         var indicatorLabelConfiguration = scaleLabelConfiguration
         indicatorLabelConfiguration.image = nil
-        indicatorLabelConfiguration.title = "Loading..."
+        indicatorLabelConfiguration.imagePadding = 8
+        indicatorLabelConfiguration.showsActivityIndicator = false
+        indicatorLabelConfiguration.title = "No Image"
         indicator = UIButton(configuration: indicatorLabelConfiguration)
         indicator.translatesAutoresizingMaskIntoConstraints = false
-        indicator.alpha = 0
         view.addSubview(indicator)
         
         let constraints = [
             scaleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             scaleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
             
-            indicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            indicator.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 10),
             indicator.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20)
         ]
         NSLayoutConstraint.activate(constraints)
@@ -110,26 +113,9 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
         indicator.alpha = 0
     }
     
-    func showMessage(message:String){
-        print("it happens")
-        indicator.alpha = 1
+    func showMessage(message:String,showProcess show:Bool){
         indicator.setTitle(message,for: .normal)
-    }
-    
-    func animateLabelMessageDown(message:String){
-        UIView.animate(withDuration: 3, delay: 0, options: [.curveEaseOut], animations:{
-            self.view.layoutIfNeeded()
-        }, completion: { [self]_ in
-            indicator.configuration?.title = message
-        })
-    }
-    
-    func animateLabelMessageUp(){
-        UIView.animate(withDuration: 0.5, delay: 0.5, options: [.curveEaseOut], animations: {
-            let navigationBarHeight: CGFloat = self.navigationController!.navigationBar.frame.height
-            self.indicator.center.y = navigationBarHeight
-            self.view.layoutIfNeeded()
-        }, completion: nil)
+        indicator.configuration?.showsActivityIndicator = show
     }
     
     @objc func resetScale(){
@@ -151,7 +137,14 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
         navigationItem.compactAppearance = appearance
     }
     
-    
+    func trimFromPbdFilename(from pbdFileName:String)->String{
+        var imageName = pbdFileName
+        let resStart = imageName.firstIndex(of: "_")!
+        let resEnd = imageName.secondIndex(of: "_")!
+        imageName.removeSubrange(resStart..<resEnd)
+        imageName.removeLast(7)
+        return imageName
+    }
     
    // MARK: - Image Reader
     // define in sub-class

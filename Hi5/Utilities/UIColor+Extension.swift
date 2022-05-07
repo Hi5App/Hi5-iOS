@@ -7,6 +7,14 @@
 
 import UIKit
 
+extension Collection where Element: Equatable {
+    /// Returns the second index where the specified value appears in the collection.
+    func secondIndex(of element: Element) -> Index? {
+        guard let index = firstIndex(of: element) else { return nil }
+        return self[self.index(after: index)...].firstIndex(of: element)
+    }
+}
+
 extension UIColor {
     var redValue: CGFloat{ return CIColor(color: self).red }
     var greenValue: CGFloat{ return CIColor(color: self).green }
