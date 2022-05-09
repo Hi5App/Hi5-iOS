@@ -66,6 +66,12 @@ struct Parameter:Codable{
     let z:Int
 }
 
+struct ParameterFloat:Codable{
+    let x:Float
+    let y:Float
+    let z:Float
+}
+
 struct BoundingBox:Codable{
     let pa1:Parameter
     let pa2:Parameter
@@ -73,8 +79,20 @@ struct BoundingBox:Codable{
     let obj:String
 }
 
+struct BoundingBoxFloat:Codable{
+    let pa1:ParameterFloat
+    let pa2:ParameterFloat
+    let res:String
+    let obj:String
+}
+
 struct DownloadImageStruct:Codable{
     let bb:BoundingBox
+    let user:UserInfo
+}
+
+struct GetSwcStruct:Codable{
+    let bb:BoundingBoxFloat
     let user:UserInfo
 }
 
@@ -141,4 +159,17 @@ struct SomaListFeedBack:Codable{
 
 struct UpdateSomaListFeedback:Codable{
     let code:String
+}
+
+struct ArborInfo:Codable{
+    let id:Int
+    let name:String
+    let somaId:String
+    let image:String
+    let loc:PositionFloat
+    let status:Int
+}
+
+struct QueryArborFeedBack:Codable{
+    let arbors:[ArborInfo]
 }

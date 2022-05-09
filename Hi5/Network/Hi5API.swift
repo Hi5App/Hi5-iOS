@@ -23,6 +23,9 @@ struct Hi5API{
     static let getSomaListURL = serverIP + "/dynamic/soma/getsomalist"
     static let updateSomaListURL = serverIP + "/dynamic/soma/updatesomalist"
     
+    static let getArborURL = serverIP + "/dynamic/arbor/getarbor"
+    static let getSwcURL = serverIP + "/dynamic/swc/cropswc"
+    
     static func parseLoginJSON(jsonData:Data)->LoginFeedback?{
         do {
             let decoder = JSONDecoder()
@@ -105,6 +108,24 @@ struct Hi5API{
         }
     }
     
+    static func parseArborJSON(jsonData:Data)->QueryArborFeedBack?{
+        do {
+            let result = try JSONSerialization.jsonObject(with: jsonData, options: .allowFragments) as? [[String:Any]]
+            guard result != nil else {return nil}
+            
+            var arborList = [ArborInfo]()
+            for item in result! {
+                let data = try! JSONSerialization.data(withJSONObject: item, options: [])
+                let brainItem = try! JSONDecoder().decode(ArborInfo.self, from: data)
+                arborList.append(brainItem)
+            }
+            return QueryArborFeedBack(arbors: arborList)
+        } catch {
+            print("decode arbor json error")
+            return nil
+        }
+    }
+    
     static func generateJSON<T>(_ value:T)->Data? where T : Encodable {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
@@ -113,6 +134,18 @@ struct Hi5API{
             return result
         } catch {
             print("JSON creation failed")
+            return nil
+        }
+    }
+    
+    static func saveSwc(jsonData:Data, arborName:String, res:String, centerX:Int, centerY:Int, centerZ:Int)->URL?{
+        do {
+            let fileName = arborName + "_" + res + "_" + "\(centerX)" + "_" + "\(centerY)" + "_" + "\(centerZ)" + ".swc"
+            let url = FileManager.default.urls(for: .documentDirectory,
+                                                    in: .userDomainMask)[0].appendingPathComponent(fileName)
+            try jsonData.write(to: url)
+            return url
+        } catch {
             return nil
         }
     }
