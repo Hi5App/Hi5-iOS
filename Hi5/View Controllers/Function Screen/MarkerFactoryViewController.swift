@@ -89,10 +89,9 @@ class MarkerFactoryViewController:Image3dViewController{
             alertForNetworkError()
             print("brain list fetch failed")
         }
-        threadQueue.async {
-            self.preDownloadMethod()
-
-        }
+//        threadQueue.async {
+//            self.preDownloadMethod()
+//        }
         
         func alertForNetworkError(){
             if self.somaPotentialLocation == nil || self.brainListfeed == nil{
