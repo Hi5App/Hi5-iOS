@@ -16,6 +16,7 @@ struct image4DSimpleCache{
    
     // MARK: - cache soma potential location
     var somaPoLocations:[PotentialLocationFeedBack] = []
+    var urls:[URL] = []
     var index = -1{
         didSet{
 //            print("index now is \(index)")
@@ -26,6 +27,33 @@ struct image4DSimpleCache{
         somaPoLocations.append(location)
 //        print("add a location,total\(somaPoLocations.count)")
         index += 1
+    }
+    
+    mutating func addLocation(location:PotentialLocationFeedBack, url:URL) {
+        somaPoLocations.append(location)
+        urls.append(url)
+    }
+    
+    mutating func previousOne()->Bool {
+        if index <= 0 {
+            return false
+        }
+        index -= 1
+        if index >= somaPoLocations.count {
+            return false
+        }
+        return true
+    }
+    
+    mutating func nextOne()->Bool {
+        if index >= somaPoLocations.count - 1 {
+            return false
+        }
+        index += 1
+        if index < 0 {
+            return false
+        }
+        return true
     }
     
     mutating func previousLocation()->PotentialLocationFeedBack?{

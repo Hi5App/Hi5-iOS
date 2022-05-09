@@ -14,6 +14,7 @@ class MarkerFactoryViewController:Image3dViewController{
     var backwardButton:UIButton!
     var forwardButton:UIButton!
     
+    var isDownloading = false;
     //Controls
     @IBOutlet var DoneButton: UIBarButtonItem!
     @IBOutlet var modeSwitcher: UISegmentedControl!
@@ -48,6 +49,8 @@ class MarkerFactoryViewController:Image3dViewController{
     var somaList:SomaListFeedBack!
     var resUsed:String!
     
+    let threadQueue = DispatchQueue(label: "Hi5")
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         imageCache.imageCache.removeAll()
@@ -62,8 +65,7 @@ class MarkerFactoryViewController:Image3dViewController{
         worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
         imageCache = image4DSimpleCache()
 //        request potential location and brainList for later use
-        
-        
+
         HTTPRequest.ImagePart.getBrainList(name: user.userName, passwd: user.password) { feedback in
             if let feedback = feedback{
                 self.brainListfeed = feedback
@@ -86,6 +88,10 @@ class MarkerFactoryViewController:Image3dViewController{
         } errorHandler: { error in
             alertForNetworkError()
             print("brain list fetch failed")
+        }
+        threadQueue.async {
+            self.preDownloadMethod()
+
         }
         
         func alertForNetworkError(){
@@ -424,6 +430,57 @@ class MarkerFactoryViewController:Image3dViewController{
                     }
                 }
             }
+        }
+    }
+    
+    func preDownloadMethod() {
+        while (true) {
+            if (imageCache.somaPoLocations.count < 7 && !isDownloading) {
+                HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { potentialLocationFeedback in
+                    if let potentialLocationFeedback = potentialLocationFeedback {
+//                        self.imageCache.addLocation(location: potentialLocationFeedback)
+                        self.isDownloading = true
+                        if let brainListFeed = self.brainListfeed {
+                            self.downloadImage(potentialLocationFeedback: potentialLocationFeedback)
+                        } else {
+                            HTTPRequest.ImagePart.getBrainList(name: self.user.userName, passwd: self.user.password) { feedback in
+                                if let feedback = feedback {
+                                    self.brainListfeed = feedback
+                                    self.downloadImage(potentialLocationFeedback: potentialLocationFeedback)
+                                }
+                            } errorHandler: { error in
+                                print(error)
+                            }
+                        }
+                    }
+                } errorHandler: { error in
+                    print("Error")
+                }
+
+            }
+        }
+    }
+    
+    func downloadImage(potentialLocationFeedback:PotentialLocationFeedBack) {
+        var resUsed = ""
+        
+        for brainInfo in self.brainListfeed.barinList{
+            if brainInfo.name == potentialLocationFeedback.image{
+                let resArray = brainInfo.detail.components(separatedBy: ",")
+                //trim res string
+                let RIndex = resArray[1].firstIndex(of: "R") // use secondary resolution
+                let endIndex = resArray[1].firstIndex(of: ")")
+                resUsed = String(resArray[1][RIndex!...endIndex!])
+//                print(self.resUsed!)
+            }
+        }
+        HTTPRequest.ImagePart.downloadImage(centerX: potentialLocationFeedback.loc.x / 2, centerY: potentialLocationFeedback.loc.y / 2, centerZ: potentialLocationFeedback.loc.z / 2, size: self.perferredSize, res: resUsed, brainId: potentialLocationFeedback.image, name: self.user.userName, passwd: self.user.password) { url in
+            if let url = url{
+                self.imageCache.addLocation(location: potentialLocationFeedback, url:url)
+                self.isDownloading = false
+            }
+        } errorHandler: { error in
+            self.isDownloading = false
         }
     }
 }
