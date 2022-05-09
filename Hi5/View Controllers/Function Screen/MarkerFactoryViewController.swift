@@ -319,6 +319,7 @@ class MarkerFactoryViewController:Image3dViewController{
             }
         }
         showMessage(message: "Downloading...",showProcess: true)
+        disableButtons()
         
         // download image and fetch somaList
         HTTPRequest.ImagePart.downloadImage(
@@ -331,12 +332,10 @@ class MarkerFactoryViewController:Image3dViewController{
             name: self.user.userName,
             passwd: self.user.password) { url in
             guard url != nil else {return}
-            print("Image Downloaded successfully\nDecompress Image...")
             var PBDImage = PBDImage(imageLocation: url!) // decompress image
             self.currentImageURL = url
-                self.showMessage(message: "Decompressing...",showProcess: true)
+            self.showMessage(message: "Decompressing...",showProcess: true)
             self.imageToDisplay = PBDImage.decompressToV3draw()
-            print("Image Decompressed successfully")
             self.deletePBDImageCache() //delete PBDimage file after decompress
             // request somaList
             HTTPRequest.SomaPart.getSomaList(centerX: self.somaPotentialLocation.loc.x, centerY: self.somaPotentialLocation.loc.y, centerZ: self.somaPotentialLocation.loc.z, size: self.somaperferredSize, res:"", brainId: self.somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { feedback in

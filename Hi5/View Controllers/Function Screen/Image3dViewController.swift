@@ -47,6 +47,8 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
         }
     }
     
+    var Tree:neuronTree?
+    
     let perferredSize = 128
     let somaperferredSize = 256
     

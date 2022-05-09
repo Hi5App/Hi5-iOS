@@ -11,6 +11,8 @@ import simd
 
 class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate{
     
+    
+    
     //Controls
     @IBOutlet var modeSwitcher: UISegmentedControl!
     @IBAction func indexChanged(_ sender: UISegmentedControl) {
@@ -63,25 +65,34 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate{
    // MARK: - Image Reader
     func readLocalImage(){
         let v3drawUTType = UTType("com.penglab.Hi5-imageType.v3draw.v3draw")!
-        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [v3drawUTType])
+        let swcUTType = UTType("com.penglab.Hi5-annotationType.swc")!
+        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [v3drawUTType,swcUTType])
         documentPicker.delegate = self
         present(documentPicker, animated: true, completion: nil)
     }
     
     func readImageFromDocumentsFolder(filename:String){
-//        showMessage(message: "Reading...")
-        let fileManager = FileManager.default
-        let reader = v3drawReader()
-        let rawImage1Url = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(filename)
-        imageToDisplay = reader.read(from: rawImage1Url)
-        self.title = imageToDisplay.name
-        // display image
-        if let image = imageToDisplay{
-            drawWithImage(image: image)
-            hideMessageLabel()
-        }else{
-            print("No 4d image")
+        let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(filename)
+        print(URL(string: filename)!.pathExtension)
+        switch URL(string: filename)?.pathExtension {
+        case "v3draw":
+            let reader = v3drawReader()
+            
+            imageToDisplay = reader.read(from: fileURL)
+            self.title = imageToDisplay.name
+            // display image
+            if let image = imageToDisplay{
+                drawWithImage(image: image)
+                hideMessageLabel()
+            }else{
+                print("No 4d image")
+            }
+        case "swc":
+            Tree = neuronTree(from: fileURL)
+        default:
+            fatalError("Unknown File Type")
         }
+        
         
     }
     
