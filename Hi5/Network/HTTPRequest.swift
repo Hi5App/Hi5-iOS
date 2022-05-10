@@ -26,7 +26,7 @@ struct HTTPRequest{
                 return
             }
             else if let data = data {
-//                print(String(decoding: data, as: UTF8.self))
+                print(String(decoding: data, as: UTF8.self))
                 OperationQueue.main.addOperation {  //excute on the main thread,only main thread can update UI
                     completionHandler(data, nil, 200)
                 }
@@ -183,6 +183,46 @@ struct HTTPRequest{
                 }
                 if error != nil && statusCode != 200{
                     errorHandler("error in update soma list")
+                }
+            }
+        }
+    }
+    
+    struct QualityInspectionPart {
+        static func getArbor(name:String, passwd:String, completionHandler:@escaping(QueryArborFeedBack?)->Void, errorHandler:@escaping(String)->Void) {
+            let queryPotentialLocationStruct = QueryPotentialLoactionStruct(user: UserInfo(name: name, passwd: passwd))
+            let jsonData = Hi5API.generateJSON(queryPotentialLocationStruct)
+            guard jsonData != nil else {return}
+            
+            uploadTask(url: Hi5API.getArborURL, uploadData: jsonData!) { data, error, statusCode in
+                if let data = data, statusCode == 200 {
+                    let queryArborFeedback = Hi5API.parseArborJSON(jsonData: data)
+                    completionHandler(queryArborFeedback)
+                }
+                if error != nil && statusCode != 200 {
+                    errorHandler("error in get arbor")
+                }
+            }
+        }
+        
+        static func getSwc(centerX:Float, centerY:Float, centerZ:Float, size:Int, imageId:String, somaId:String, arborName:String, name:String, passwd:String, completionHandler:@escaping(URL?)->Void, errorHandler:@escaping(String)->Void) {
+            let pa1 = ParameterFloat(x: centerX - Float(size / 2), y: centerY - Float(size / 2), z: centerZ - Float(size / 2))
+            let pa2 = ParameterFloat(x: centerX + Float(size / 2), y: centerY + Float(size / 2), z: centerZ + Float(size / 2))
+            let res = "/" + imageId + "/" + somaId
+            let bBox = BoundingBoxFloat(pa1: pa1, pa2: pa2, res: res, obj: arborName)
+            let userInfo = UserInfo(name: name, passwd: passwd)
+            let getSwcStruct = GetSwcStruct(bb: bBox, user: userInfo)
+            
+            let jsonData = Hi5API.generateJSON(getSwcStruct)
+            guard jsonData != nil else {return}
+            
+            uploadTask(url: Hi5API.getSwcURL, uploadData: jsonData!) { data, error, statusCode in
+                if let data = data, statusCode == 200 {
+                    let url = Hi5API.saveSwc(jsonData: data, arborName: arborName, res: res, centerX: Int(centerX), centerY: Int(centerY), centerZ: Int(centerZ))
+                    completionHandler(url)
+                }
+                if error != nil && statusCode != 200 {
+                    errorHandler("error in get swc")
                 }
             }
         }
