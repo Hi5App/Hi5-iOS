@@ -102,7 +102,7 @@ struct BrainInfo:Codable{
 }
 
 struct BrainListFeedBack:Codable{
-    let barinList:[BrainInfo]
+    let brainList:[BrainInfo]
 }
 
 // MARK: - Soma Data Structure
@@ -140,7 +140,7 @@ struct UpdateSomaInfo:Codable {
     let owner:String
     let image:String
     let insertsomalist:[PositionFloat]
-    let deletesomalist:[String]
+    let deletesomalist:[Int]
 }
 
 struct UpdateSomaListStruct:Codable{
@@ -149,7 +149,7 @@ struct UpdateSomaListStruct:Codable{
 }
 
 struct SomaInfo:Codable{
-    let name:String
+    let id:Int
     let loc:PositionFloat
 }
 

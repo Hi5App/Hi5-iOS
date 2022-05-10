@@ -32,7 +32,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     
     var userArray:[simd_float3] = [] // soma marked by user
     var originalSomaArray:[simd_float3] = [] // soma list fetched from server
-    var removeSomaArray:[String] = [] // somaInfo name removed by user
+    var removeSomaArray:[Int] = [] // somaInfo name removed by user
     var somaArray:[simd_float3] = [] // soma needs to be displayed
     
     var panSensivity:Float = 5.0
