@@ -15,7 +15,7 @@ struct CoordHelper{
         let x = ((displayLoc.x*64)+Float(center.x))*2
         let y = ((displayLoc.y*64)+Float(center.y))*2
         let z = ((displayLoc.z*64)+Float(center.z))*2
-        return SomaInfo(name: "", loc: PositionFloat(x: x, y: y, z: z))
+        return SomaInfo(id: -1, loc: PositionFloat(x: x, y: y, z: z))
     }
     
     static func UploadSomaLocation2DisplaySomaLocation(uploadLoc:SomaInfo,center:PositionInt)->simd_float3{

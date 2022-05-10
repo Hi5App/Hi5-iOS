@@ -15,6 +15,7 @@ class MarkerFactoryViewController:Image3dViewController{
     var forwardButton:UIButton!
     
     var isDownloading = false;
+    var isWaiting = false;
     //Controls
     @IBOutlet var DoneButton: UIBarButtonItem!
     @IBOutlet var modeSwitcher: UISegmentedControl!
@@ -66,32 +67,32 @@ class MarkerFactoryViewController:Image3dViewController{
         imageCache = image4DSimpleCache()
 //        request potential location and brainList for later use
 
-        HTTPRequest.ImagePart.getBrainList(name: user.userName, passwd: user.password) { feedback in
-            if let feedback = feedback{
-                self.brainListfeed = feedback
-                print("brainList")
-                HTTPRequest.SomaPart.getPotentialLocation(name: self.user.userName, passwd: self.user.password) { feedback in
-                    if let feedback = feedback{
-                        
-                        self.somaPotentialLocation = feedback
-                        
-                        print("first see potential location: \(self.somaPotentialLocation!)")
-                        self.imageCache.addLocation(location: feedback)
-                        
-                        
-                    }
-                } errorHandler: { error in
-                    alertForNetworkError()
-                    print("soma potential fetch failed")
-                }
-            }
-        } errorHandler: { error in
-            alertForNetworkError()
-            print("brain list fetch failed")
-        }
-//        threadQueue.async {
-//            self.preDownloadMethod()
+//        HTTPRequest.ImagePart.getBrainList(name: user.userName, passwd: user.password) { feedback in
+//            if let feedback = feedback{
+//                self.brainListfeed = feedback
+//                print("brainList")
+//                HTTPRequest.SomaPart.getPotentialLocation(name: self.user.userName, passwd: self.user.password) { feedback in
+//                    if let feedback = feedback{
+//
+//                        self.somaPotentialLocation = feedback
+//
+//                        print("first see potential location: \(self.somaPotentialLocation!)")
+//                        self.imageCache.addLocation(location: feedback)
+//
+//
+//                    }
+//                } errorHandler: { error in
+//                    alertForNetworkError()
+//                    print("soma potential fetch failed")
+//                }
+//            }
+//        } errorHandler: { error in
+//            alertForNetworkError()
+//            print("brain list fetch failed")
 //        }
+        threadQueue.async {
+            self.preDownloadMethod()
+        }
         
         func alertForNetworkError(){
             if self.somaPotentialLocation == nil || self.brainListfeed == nil{
@@ -163,7 +164,7 @@ class MarkerFactoryViewController:Image3dViewController{
     override func configureNavBar(){
         super.configureNavBar()
         // buttons
-        let openImageButton = UIBarButtonItem(image: UIImage(systemName: "icloud.and.arrow.down"), style: .plain, target: self, action: #selector(readCloudImage))
+        let openImageButton = UIBarButtonItem(image: UIImage(systemName: "icloud.and.arrow.down"), style: .plain, target: self, action: #selector(requestForNextImage))
         
         let UndoButton = UIBarButtonItem()
         UndoButton.image = UIImage(systemName: "arrow.counterclockwise")
@@ -192,9 +193,13 @@ class MarkerFactoryViewController:Image3dViewController{
             }
         }
         // retrive soma locaiton from cache
-        if let location = imageCache.previousLocation(){
-            self.somaPotentialLocation = location
-            readCloudImage()
+//        if let location = imageCache.previousLocation(){
+//            self.somaPotentialLocation = location
+//            readCloudImage()
+//        }
+        if imageCache.previousOne() {
+            self.somaPotentialLocation = self.imageCache.somaPoLocations[self.imageCache.index]
+            self.currentImageURL = self.imageCache.urls[self.imageCache.index]
         }
     }
     
@@ -228,26 +233,44 @@ class MarkerFactoryViewController:Image3dViewController{
         }
     }
     
-    func requestForNextImage(){
+    @objc func requestForNextImage(){
 //        userArray.removeAll()
 //        somaArray = userArray + originalSomaArray
         
         // try retrive images from cache
-        if let location = imageCache.nextLocation(){
-            self.somaPotentialLocation = location
-            self.readCloudImage()
-        }else{
-            // request image from server
-            HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { feedback in
-                if let feedback = feedback{
-                    self.somaPotentialLocation = feedback
-                    print("forward see potential location: \(self.somaPotentialLocation!)")
-                    self.imageCache.addLocation(location: feedback)
-                    self.readCloudImage()
-                }
-            } errorHandler: { error in
-                print("soma potential fetch failed")
-            }
+//        if let location = imageCache.nextLocation(){
+//            self.somaPotentialLocation = location
+//            self.readCloudImage()
+//        }else{
+//            // request image from server
+//            HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { feedback in
+//                if let feedback = feedback{
+//                    self.somaPotentialLocation = feedback
+//                    print("forward see potential location: \(self.somaPotentialLocation!)")
+//                    self.imageCache.addLocation(location: feedback)
+//                    self.readCloudImage()
+//                }
+//            } errorHandler: { error in
+//                print("soma potential fetch failed")
+//            }
+//        }
+        if imageCache.nextOne() {
+            self.somaPotentialLocation = imageCache.somaPoLocations[imageCache.index]
+            self.currentImageURL = imageCache.urls[imageCache.index]
+            self.readLocalImage()
+        } else {
+            isWaiting = true
+            self.showMessage(message: "Downloading...",showProcess: true)
+            self.disableButtons()
+            self.perform(#selector(timeOutHandler), with: nil, afterDelay: 30)
+        }
+    }
+    
+    @objc func timeOutHandler() {
+        if isWaiting {
+            self.showMessage(message: self.currentImageName, showProcess: false)
+            isWaiting = false
+            self.enableButtons()
         }
     }
     
@@ -313,7 +336,7 @@ class MarkerFactoryViewController:Image3dViewController{
         }
         
         // get secondary resolution
-        for brainInfo in self.brainListfeed.barinList{
+        for brainInfo in self.brainListfeed.brainList{
             if brainInfo.name == somaPotentialLocation!.image{
                 let resArray = brainInfo.detail.components(separatedBy: ",")
                 //trim res string
@@ -373,6 +396,39 @@ class MarkerFactoryViewController:Image3dViewController{
         }
     }
     
+    func readLocalImage() {
+        var PBDImage = PBDImage(imageLocation: self.currentImageURL!) // decompress image
+        self.showMessage(message: "Decompressing...",showProcess: true)
+        self.imageToDisplay = PBDImage.decompressToV3draw()
+//        self.deletePBDImageCache() //delete PBDimage file after decompress
+        // request somaList
+        HTTPRequest.SomaPart.getSomaList(centerX: self.somaPotentialLocation.loc.x, centerY: self.somaPotentialLocation.loc.y, centerZ: self.somaPotentialLocation.loc.z, size: self.somaperferredSize, res:"", brainId: self.somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { feedback in
+            if let feedback = feedback{
+                print(feedback)
+                self.somaList = feedback
+                // save to cache
+                self.originalSomaArray = self.somaList.somaList.map({ (somaInfo)->simd_float3 in
+                    return CoordHelper.UploadSomaLocation2DisplaySomaLocation(uploadLoc: somaInfo, center: self.somaPotentialSecondaryResLocation)
+                })
+                self.userArray.removeAll()
+                //display image
+                if let image = self.imageToDisplay{
+                    self.showMessage(message: self.currentImageName,showProcess: false)
+                    self.DoneButton.isEnabled = true
+                    self.goodImageButton.isEnabled = true
+                    self.boringImageButton.isEnabled = true
+                    
+                    self.drawWithImage(image: image)
+                    self.enableButtons()
+                }else{
+                    print("No 4d image")
+                }
+            }
+        } errorHandler: { error in
+            print("soma List fetch failed")
+        }
+    }
+    
     //MARK: - setup interaction with images
     
     override func respondEditStatusChange(){
@@ -423,8 +479,8 @@ class MarkerFactoryViewController:Image3dViewController{
                     guard self.somaList != nil else {return}
                     for somaInfo in self.somaList.somaList{
                         if (somaInfo.loc.x - soma.loc.x)<0.1 && (somaInfo.loc.y - soma.loc.y)<0.1 && (somaInfo.loc.z - soma.loc.z)<0.1{
-                            self.removeSomaArray.append(somaInfo.name) // add to removeList
-                            print("soma with name \(somaInfo.name) add to remove list")
+                            self.removeSomaArray.append(somaInfo.id) // add to removeList
+                            print("soma with name \(somaInfo.id) add to remove list")
                         }
                     }
                 }
@@ -434,11 +490,12 @@ class MarkerFactoryViewController:Image3dViewController{
     
     func preDownloadMethod() {
         while (true) {
-            if (imageCache.somaPoLocations.count < 7 && !isDownloading) {
+            if (imageCache.somaPoLocations.count - imageCache.index < 7 && !isDownloading) {
+                self.isDownloading = true
                 HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { potentialLocationFeedback in
                     if let potentialLocationFeedback = potentialLocationFeedback {
 //                        self.imageCache.addLocation(location: potentialLocationFeedback)
-                        self.isDownloading = true
+                        
                         if let brainListFeed = self.brainListfeed {
                             self.downloadImage(potentialLocationFeedback: potentialLocationFeedback)
                         } else {
@@ -463,20 +520,27 @@ class MarkerFactoryViewController:Image3dViewController{
     func downloadImage(potentialLocationFeedback:PotentialLocationFeedBack) {
         var resUsed = ""
         
-        for brainInfo in self.brainListfeed.barinList{
+        for brainInfo in self.brainListfeed.brainList{
             if brainInfo.name == potentialLocationFeedback.image{
                 let resArray = brainInfo.detail.components(separatedBy: ",")
                 //trim res string
                 let RIndex = resArray[1].firstIndex(of: "R") // use secondary resolution
                 let endIndex = resArray[1].firstIndex(of: ")")
                 resUsed = String(resArray[1][RIndex!...endIndex!])
-//                print(self.resUsed!)
             }
         }
         HTTPRequest.ImagePart.downloadImage(centerX: potentialLocationFeedback.loc.x / 2, centerY: potentialLocationFeedback.loc.y / 2, centerZ: potentialLocationFeedback.loc.z / 2, size: self.perferredSize, res: resUsed, brainId: potentialLocationFeedback.image, name: self.user.userName, passwd: self.user.password) { url in
             if let url = url{
                 self.imageCache.addLocation(location: potentialLocationFeedback, url:url)
                 self.isDownloading = false
+                if self.isWaiting {
+                    self.isWaiting = false
+                    self.imageCache.nextOne()
+                    self.somaPotentialLocation = self.imageCache.somaPoLocations[self.imageCache.index]
+                    self.currentImageURL = self.imageCache.urls[self.imageCache.index]
+                    self.readLocalImage()
+                    
+                }
             }
         } errorHandler: { error in
             self.isDownloading = false

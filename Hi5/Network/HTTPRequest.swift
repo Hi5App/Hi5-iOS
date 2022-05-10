@@ -26,7 +26,7 @@ struct HTTPRequest{
                 return
             }
             else if let data = data {
-                print(String(decoding: data, as: UTF8.self))
+//                print(String(decoding: data, as: UTF8.self))
                 OperationQueue.main.addOperation {  //excute on the main thread,only main thread can update UI
                     completionHandler(data, nil, 200)
                 }
@@ -109,6 +109,7 @@ struct HTTPRequest{
                 data, error, statusCode in
                 if let data = data, statusCode == 200 {
                     let url = Hi5API.saveImage(jsonData: data, brainId: brainId, res: res, centerX: centerX, centerY: centerY, centerZ: centerZ)
+                    print(url)
                     completionHandler(url)
                 } else {
                     errorHandler("error in download image")
@@ -168,7 +169,7 @@ struct HTTPRequest{
             }
         }
         
-        static func updateSomaList(imageId:String, locationId:Int, locationType:Int, username:String, passwd:String, insertSomaList:[PositionFloat], deleteSomaList:[String], completionHandler:@escaping()->Void, errorHandler:@escaping(String)->Void) {
+        static func updateSomaList(imageId:String, locationId:Int, locationType:Int, username:String, passwd:String, insertSomaList:[PositionFloat], deleteSomaList:[Int], completionHandler:@escaping()->Void, errorHandler:@escaping(String)->Void) {
             let user = UserInfo(name: username, passwd: passwd)
             let updateSomaInfo = UpdateSomaInfo(locationId: locationId, locationtype: locationType, owner: username, image: imageId, insertsomalist: insertSomaList, deletesomalist: deleteSomaList)
             let updateSomaListStruct = UpdateSomaListStruct(pa: updateSomaInfo, user: user)

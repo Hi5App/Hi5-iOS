@@ -59,7 +59,7 @@ struct Hi5API{
                 brainList.append(brainItem)
             }
             
-            return BrainListFeedBack(barinList: brainList)
+            return BrainListFeedBack(brainList: brainList)
         }catch {
             print("decode brain list json error")
             return nil
