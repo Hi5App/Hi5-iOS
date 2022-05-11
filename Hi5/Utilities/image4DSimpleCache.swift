@@ -12,10 +12,26 @@ struct imageMarkerBundle{
     let somaList:SomaListFeedBack
 }
 
+struct PotentialLocation{
+    let potentialLocationFeedBack:PotentialLocationFeedBack
+    var isBoring:Bool
+    var isFresh:Bool
+    var alreadyUpload:Bool
+    let createdTime:Double
+    
+    init(potentialLocationFeedBack:PotentialLocationFeedBack) {
+        self.potentialLocationFeedBack = potentialLocationFeedBack
+        self.isBoring = false
+        self.isFresh = true
+        self.alreadyUpload = false
+        self.createdTime = Date().timeIntervalSince1970
+    }
+}
+
 struct image4DSimpleCache{
    
     // MARK: - cache soma potential location
-    var somaPoLocations:[PotentialLocationFeedBack] = []
+    var somaPoLocations:[PotentialLocation] = []
     var urls:[URL] = []
     var index = -1{
         didSet{
@@ -24,60 +40,81 @@ struct image4DSimpleCache{
     }
     
     mutating func addLocation(location:PotentialLocationFeedBack){
-        somaPoLocations.append(location)
+        somaPoLocations.append(PotentialLocation(potentialLocationFeedBack: location))
 //        print("add a location,total\(somaPoLocations.count)")
         index += 1
     }
     
     mutating func addLocation(location:PotentialLocationFeedBack, url:URL) {
-        somaPoLocations.append(location)
+        somaPoLocations.append(PotentialLocation(potentialLocationFeedBack: location))
         urls.append(url)
     }
     
     mutating func previousOne()->Bool {
-        if index <= 0 {
+        var tempIndex = index
+        tempIndex -= 1
+        while tempIndex >= 0 {
+            if (!somaPoLocations[tempIndex].isBoring && (checkIfFresh(tempIndex: tempIndex) || somaPoLocations[tempIndex].alreadyUpload)) {
+                break
+            }
+            tempIndex -= 1
+        }
+        if tempIndex < 0 {
             return false
         }
-        index -= 1
-        if index >= somaPoLocations.count {
-            return false
-        }
+        index = tempIndex
         return true
     }
     
     mutating func nextOne()->Bool {
-        if index >= somaPoLocations.count - 1 {
+        var tempIndex = index
+        tempIndex += 1
+        while tempIndex < somaPoLocations.count {
+            if (!somaPoLocations[tempIndex].isBoring && (checkIfFresh(tempIndex: tempIndex) || somaPoLocations[tempIndex].alreadyUpload)) {
+                break
+            }
+            tempIndex += 1
+        }
+        if tempIndex >= somaPoLocations.count {
             return false
         }
-        index += 1
-        if index < 0 {
+        index = tempIndex
+        return true
+    }
+    
+    mutating func checkIfFresh(tempIndex:Int)->Bool {
+        if !somaPoLocations[tempIndex].isFresh {
+            return false
+        }
+        if Date().timeIntervalSince1970 - somaPoLocations[tempIndex].createdTime > 7 * 60 * 1000 {
+            somaPoLocations[tempIndex].isFresh = false
             return false
         }
         return true
     }
     
-    mutating func previousLocation()->PotentialLocationFeedBack?{
-        if index <= 0{
-            print("no previous image location in cache")
-            return nil
-        }else if index >= somaPoLocations.count{
-            print("cache index out of range")
-            return nil
-        }else{
-            index -= 1
-            return somaPoLocations[index]
-        }
-    }
-    
-    mutating func nextLocation()->PotentialLocationFeedBack?{
-        if index >= somaPoLocations.count - 1{
-            print("no next image location in cache")
-            return nil
-        }else{
-            index += 1
-            return somaPoLocations[index]
-        }
-    }
+//    mutating func previousLocation()->PotentialLocationFeedBack?{
+//        if index <= 0{
+//            print("no previous image location in cache")
+//            return nil
+//        }else if index >= somaPoLocations.count{
+//            print("cache index out of range")
+//            return nil
+//        }else{
+//            index -= 1
+//            return somaPoLocations[index]
+//        }
+//    }
+//
+//    mutating func nextLocation()->PotentialLocationFeedBack?{
+//        if index >= somaPoLocations.count - 1{
+//            print("no next image location in cache")
+//            return nil
+//        }else{
+//            index += 1
+//            return somaPoLocations[index]
+//        }
+//    }
     
     
     // MARK: - cache imageBuddle

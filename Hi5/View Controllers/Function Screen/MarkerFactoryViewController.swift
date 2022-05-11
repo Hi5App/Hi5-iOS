@@ -188,6 +188,7 @@ class MarkerFactoryViewController:Image3dViewController{
             }
             HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 1, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
                 print("soma List uploaded successfully,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
+                self.imageCache.somaPoLocations[self.imageCache.index].alreadyUpload = true
             } errorHandler: { error in
                 print(error)
             }
@@ -198,7 +199,7 @@ class MarkerFactoryViewController:Image3dViewController{
 //            readCloudImage()
 //        }
         if imageCache.previousOne() {
-            self.somaPotentialLocation = self.imageCache.somaPoLocations[self.imageCache.index]
+            self.somaPotentialLocation = self.imageCache.somaPoLocations[self.imageCache.index].potentialLocationFeedBack
             self.currentImageURL = self.imageCache.urls[self.imageCache.index]
         }
     }
@@ -212,6 +213,7 @@ class MarkerFactoryViewController:Image3dViewController{
             HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 1, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
                 print("soma List uploaded successfully,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
                 self.requestForNextImage()
+                self.imageCache.somaPoLocations[self.imageCache.index].alreadyUpload = true
             } errorHandler: { error in
                 print(error)
             }
@@ -255,7 +257,7 @@ class MarkerFactoryViewController:Image3dViewController{
 //            }
 //        }
         if imageCache.nextOne() {
-            self.somaPotentialLocation = imageCache.somaPoLocations[imageCache.index]
+            self.somaPotentialLocation = imageCache.somaPoLocations[imageCache.index].potentialLocationFeedBack
             self.currentImageURL = imageCache.urls[imageCache.index]
             self.readLocalImage()
         } else {
@@ -281,6 +283,7 @@ class MarkerFactoryViewController:Image3dViewController{
         HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 2, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
             print("soma marked as Done,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
             self.requestForNextImage()
+            self.imageCache.somaPoLocations[self.imageCache.index].alreadyUpload = true
         } errorHandler: { error in
             print(error)
         }
@@ -288,9 +291,11 @@ class MarkerFactoryViewController:Image3dViewController{
     
     @IBAction func BoringImageButtonTapped(_ sender: Any) {
         if userArray.isEmpty {
+            imageCache.somaPoLocations[imageCache.index].isBoring = true
             HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: -1, username: user.userName, passwd: user.password, insertSomaList: [], deleteSomaList: self.removeSomaArray) {
                 print("image marked as Trash")
                 self.requestForNextImage()
+                self.imageCache.somaPoLocations[self.imageCache.index].alreadyUpload = true
             } errorHandler: { error in
                 print(error)
             }
@@ -314,6 +319,7 @@ class MarkerFactoryViewController:Image3dViewController{
         HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 3, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
             print("Image marked as Good,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
             self.requestForNextImage()
+            self.imageCache.somaPoLocations[self.imageCache.index].alreadyUpload = true
         } errorHandler: { error in
             print(error)
         }
@@ -536,7 +542,7 @@ class MarkerFactoryViewController:Image3dViewController{
                 if self.isWaiting {
                     self.isWaiting = false
                     self.imageCache.nextOne()
-                    self.somaPotentialLocation = self.imageCache.somaPoLocations[self.imageCache.index]
+                    self.somaPotentialLocation = self.imageCache.somaPoLocations[self.imageCache.index].potentialLocationFeedBack
                     self.currentImageURL = self.imageCache.urls[self.imageCache.index]
                     self.readLocalImage()
                     
