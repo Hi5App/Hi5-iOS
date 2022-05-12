@@ -16,6 +16,7 @@ class MarkerFactoryViewController:Image3dViewController{
     
     var isDownloading = false;
     var isWaiting = false;
+    var DownloadThreadEnabled = false
     //Controls
     @IBOutlet var DoneButton: UIBarButtonItem!
     @IBOutlet var modeSwitcher: UISegmentedControl!
@@ -50,11 +51,12 @@ class MarkerFactoryViewController:Image3dViewController{
     var somaList:SomaListFeedBack!
     var resUsed:String!
     
-    let threadQueue = DispatchQueue(label: "Hi5")
+    let threadQueue = DispatchQueue.global()
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         imageCache.imageCache.removeAll()
+        
     }
     
     override func viewDidLoad() {
@@ -90,8 +92,11 @@ class MarkerFactoryViewController:Image3dViewController{
 //            alertForNetworkError()
 //            print("brain list fetch failed")
 //        }
-        threadQueue.async {
-            self.preDownloadMethod()
+        if !DownloadThreadEnabled {
+            DownloadThreadEnabled = true
+            threadQueue.async {
+                self.preDownloadMethod()
+            }
         }
         
         func alertForNetworkError(){
@@ -403,36 +408,44 @@ class MarkerFactoryViewController:Image3dViewController{
     }
     
     func readLocalImage() {
-        var PBDImage = PBDImage(imageLocation: self.currentImageURL!) // decompress image
         self.showMessage(message: "Decompressing...",showProcess: true)
-        self.imageToDisplay = PBDImage.decompressToV3draw()
-//        self.deletePBDImageCache() //delete PBDimage file after decompress
-        // request somaList
-        HTTPRequest.SomaPart.getSomaList(centerX: self.somaPotentialLocation.loc.x, centerY: self.somaPotentialLocation.loc.y, centerZ: self.somaPotentialLocation.loc.z, size: self.somaperferredSize, res:"", brainId: self.somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { feedback in
-            if let feedback = feedback{
-                print(feedback)
-                self.somaList = feedback
-                // save to cache
-                self.originalSomaArray = self.somaList.somaList.map({ (somaInfo)->simd_float3 in
-                    return CoordHelper.UploadSomaLocation2DisplaySomaLocation(uploadLoc: somaInfo, center: self.somaPotentialSecondaryResLocation)
-                })
-                self.userArray.removeAll()
-                //display image
-                if let image = self.imageToDisplay{
-                    self.showMessage(message: self.currentImageName,showProcess: false)
-                    self.DoneButton.isEnabled = true
-                    self.goodImageButton.isEnabled = true
-                    self.boringImageButton.isEnabled = true
-                    
-                    self.drawWithImage(image: image)
-                    self.enableButtons()
-                }else{
-                    print("No 4d image")
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.decompressImage {
+                // request somaList
+                HTTPRequest.SomaPart.getSomaList(centerX: self.somaPotentialLocation.loc.x, centerY: self.somaPotentialLocation.loc.y, centerZ: self.somaPotentialLocation.loc.z, size: self.somaperferredSize, res:"", brainId: self.somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { feedback in
+                    if let feedback = feedback{
+                        print(feedback)
+                        self.somaList = feedback
+                        // save to cache
+                        self.originalSomaArray = self.somaList.somaList.map({ (somaInfo)->simd_float3 in
+                            return CoordHelper.UploadSomaLocation2DisplaySomaLocation(uploadLoc: somaInfo, center: self.somaPotentialSecondaryResLocation)
+                        })
+                        self.userArray.removeAll()
+                        //display image
+                        if let image = self.imageToDisplay{
+                            self.showMessage(message: self.currentImageName,showProcess: false)
+                            self.DoneButton.isEnabled = true
+                            self.goodImageButton.isEnabled = true
+                            self.boringImageButton.isEnabled = true
+                            
+                            self.drawWithImage(image: image)
+                            self.enableButtons()
+                        }else{
+                            print("No 4d image")
+                        }
+                    }
+                } errorHandler: { error in
+                    print("soma List fetch failed")
                 }
             }
-        } errorHandler: { error in
-            print("soma List fetch failed")
         }
+    }
+    
+    
+    func decompressImage(completion:()->()){
+        var PBDImage = PBDImage(imageLocation: self.currentImageURL!) // decompress image
+        self.imageToDisplay = PBDImage.decompressToV3draw()
+        completion()
     }
     
     //MARK: - setup interaction with images
