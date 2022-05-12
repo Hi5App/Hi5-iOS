@@ -66,7 +66,9 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate{
     func readLocalImage(){
         let v3drawUTType = UTType("com.penglab.Hi5-imageType.v3draw.v3draw")!
         let swcUTType = UTType("com.penglab.Hi5-annotationType.swc")!
-        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [v3drawUTType,swcUTType])
+        let pbdUTType = UTType("com.penglab.Hi5-imageType.pbd")!
+        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [v3drawUTType,swcUTType,pbdUTType])
+//        let documentPicker = UIDocumentPickerViewController()
         documentPicker.delegate = self
         present(documentPicker, animated: true, completion: nil)
     }
@@ -79,6 +81,7 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate{
             let reader = v3drawReader()
             
             imageToDisplay = reader.read(from: fileURL)
+            localImageURL = fileURL
             self.title = imageToDisplay.name
             // display image
             if let image = imageToDisplay{
@@ -87,8 +90,28 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate{
             }else{
                 print("No 4d image")
             }
+        case "v3dpbd":
+            var pbdimage = PBDImage(imageLocation: fileURL)
+            imageToDisplay = pbdimage.decompressToV3draw()
+            if let image = imageToDisplay{
+                drawWithImage(image: image)
+                hideMessageLabel()
+            }else{
+                print("No 4d image")
+            }
         case "swc":
             Tree = neuronTree(from: fileURL)
+//            let reader = v3drawReader()
+//
+//            imageToDisplay = reader.read(from: localImageURL)
+//            self.title = imageToDisplay.name
+            // display image
+            if let image = imageToDisplay{
+                drawWithImage(image: image)
+                hideMessageLabel()
+            }else{
+                print("No 4d image")
+            }
         default:
             fatalError("Unknown File Type")
         }
@@ -143,6 +166,4 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate{
             modeSwitcher.sendActions(for: UIControl.Event.valueChanged)
         }
     }
-    
-    
 }

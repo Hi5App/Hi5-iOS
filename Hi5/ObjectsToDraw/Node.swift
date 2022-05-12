@@ -127,7 +127,7 @@ class Node{
     }
     
     // call 60 times a second
-    func render(commandQueue:MTLCommandQueue,pipelineState:MTLRenderPipelineState,drawable:CAMetalDrawable,parentModelViewMatrix:float4x4, projectionMatrix:float4x4,clearColor:MTLClearColor?,somaArray:[simd_float3]){
+    func render(commandQueue:MTLCommandQueue,pipelineState:MTLRenderPipelineState,drawable:CAMetalDrawable,parentModelViewMatrix:float4x4, projectionMatrix:float4x4,clearColor:MTLClearColor?,somaArray:[simd_float3],Tree:neuronTree?){
         _ = bufferProvider.availableResourcesSemaphore.wait(timeout: DispatchTime.distantFuture)
         
         // set up for cube texture
@@ -269,6 +269,52 @@ class Node{
                 renderEncoder.setVertexBuffer(cubeVertexBuffer, offset: 0, index: 0)
                 renderEncoder.setVertexBuffer(uniformBuffer, offset: 0, index: 1)
                 renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: cubeVerticesArray.count)
+            }
+        }
+        
+        // draw swc if it's not empty
+        if let tree = Tree {
+            var head = 0
+            var tail = 1
+            let swcArray = tree.nodes.map { node in
+                return CoordHelper.swcPointsLocation2DisplayLineLocation(from: node.position, swcCenter: tree.centerPosition)
+            }
+            while(tail < swcArray.count-1){
+                let pointALoc = swcArray[head]
+                let pointBLoc = swcArray[tail]
+                let lineColor = UIColor.systemRed
+                let pointA = Vertex(x: pointALoc.x, y: pointALoc.y, z: pointALoc.z, r: Float(lineColor.redValue), g: Float(lineColor.greenValue), b: Float(lineColor.blueValue), a: 1.0, s: 1.0, t: 1.0)
+                let pointB = Vertex(x: pointBLoc.x, y: pointBLoc.y, z: pointBLoc.z, r: Float(lineColor.redValue), g: Float(lineColor.greenValue), b: Float(lineColor.blueValue), a: 1.0, s: 1.0, t: 1.0)
+                let pointArray = [pointA,pointB]
+                let dataSize = pointArray.count * MemoryLayout.size(ofValue: pointArray[0])
+                let pointBuffer = device.makeBuffer(bytes: pointArray, length: dataSize, options: [])
+                
+                //draw triangles
+                let defaultLibrary = device.makeDefaultLibrary()!
+                let fragmentProgram = defaultLibrary.makeFunction(name: "texture_fragment")
+                let vertexProgram = defaultLibrary.makeFunction(name: "texture_vertex")
+                
+                let trianglePipelineStateDescriptor = MTLRenderPipelineDescriptor()
+                trianglePipelineStateDescriptor.label = "draw swc lines"
+                trianglePipelineStateDescriptor.vertexFunction = vertexProgram
+                trianglePipelineStateDescriptor.fragmentFunction = fragmentProgram
+                trianglePipelineStateDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+                
+                let trianglePipelineState = try! device.makeRenderPipelineState(descriptor: trianglePipelineStateDescriptor)
+                
+    //            let renderEncoder = commanBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
+                renderEncoder.setRenderPipelineState(trianglePipelineState)
+                renderEncoder.setVertexBuffer(pointBuffer, offset: 0, index: 0)
+                renderEncoder.setVertexBuffer(uniformBuffer, offset: 0, index: 1)
+                renderEncoder.drawPrimitives(type: .line, vertexStart: 0, vertexCount: pointArray.count)
+                
+                if tree.nodes[tail].parentId == -1{
+                    head += 2
+                    tail += 2
+                }else{
+                    head += 1
+                    tail += 1
+                }
             }
         }
         

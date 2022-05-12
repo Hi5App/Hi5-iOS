@@ -46,8 +46,10 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
             currentImageName = self.trimFromPbdFilename(from: currentImageURL.lastPathComponent)
         }
     }
+    var localImageURL:URL!
     
     var Tree:neuronTree?
+    var swcLineArray:[simd_float3] = []
     
     let perferredSize = 128
     let somaperferredSize = 256
@@ -155,7 +157,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
   //MARK: - MetalViewControllerDelegate
     func renderObjects(drawable:CAMetalDrawable) {
     // draw the view
-        objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil,somaArray:somaArray)
+        objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil,somaArray:somaArray,Tree: Tree)
     }
 
     func updateLogic(timeSinceLastUpdate: CFTimeInterval) {
