@@ -170,7 +170,7 @@ struct PBDImage{
                         decompressionByteBuffer[toFill] = pvb
                         if (fillNumber > 2){
                             toFill += 1
-                            pva = handleDifference(difference: p2, value: pva)
+                            pva = handleDifference(difference: p2, value: pvb)
                             decompressionByteBuffer[toFill] = pva
                             if (fillNumber > 3){
                                 toFill += 1

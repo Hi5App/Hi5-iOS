@@ -109,7 +109,7 @@ struct HTTPRequest{
                 data, error, statusCode in
                 if let data = data, statusCode == 200 {
                     let url = Hi5API.saveImage(jsonData: data, brainId: brainId, res: res, centerX: centerX, centerY: centerY, centerZ: centerZ)
-                    print(url)
+//                    print(url)
                     completionHandler(url)
                 } else {
                     errorHandler("error in download image")

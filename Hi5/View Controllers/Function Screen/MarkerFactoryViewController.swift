@@ -515,7 +515,7 @@ class MarkerFactoryViewController:Image3dViewController{
                     if let potentialLocationFeedback = potentialLocationFeedback {
 //                        self.imageCache.addLocation(location: potentialLocationFeedback)
                         
-                        if let brainListFeed = self.brainListfeed {
+                        if let _ = self.brainListfeed {
                             self.downloadImage(potentialLocationFeedback: potentialLocationFeedback)
                         } else {
                             HTTPRequest.ImagePart.getBrainList(name: self.user.userName, passwd: self.user.password) { feedback in
@@ -554,7 +554,7 @@ class MarkerFactoryViewController:Image3dViewController{
                 self.isDownloading = false
                 if self.isWaiting {
                     self.isWaiting = false
-                    self.imageCache.nextOne()
+                    let _ = self.imageCache.nextOne()
                     self.somaPotentialLocation = self.imageCache.somaPoLocations[self.imageCache.index].potentialLocationFeedBack
                     self.currentImageURL = self.imageCache.urls[self.imageCache.index]
                     self.readLocalImage()
