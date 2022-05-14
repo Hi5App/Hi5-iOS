@@ -34,6 +34,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     var originalSomaArray:[simd_float3] = [] // soma list fetched from server
     var removeSomaArray:[Int] = [] // somaInfo name removed by user
     var somaArray:[simd_float3] = [] // soma needs to be displayed
+    var markerArray:[Marker] = []
     
     var panSensivity:Float = 5.0
     var lastPanLocation:CGPoint!
@@ -157,7 +158,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
   //MARK: - MetalViewControllerDelegate
     func renderObjects(drawable:CAMetalDrawable) {
     // draw the view
-        objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil,somaArray:somaArray,Tree: Tree)
+        objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil, markerArray: markerArray, Tree: Tree)
     }
 
     func updateLogic(timeSinceLastUpdate: CFTimeInterval) {

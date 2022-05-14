@@ -166,6 +166,8 @@ extension HomeViewController:UICollectionViewDelegate{
             showMarkerFactory()
         case "Annotation":
             showAnnotation()
+        case "Check":
+            showCheck()
         default:
             let alert = UIAlertController(title: "Sorry", message: "This function is currently unavailable", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel))
@@ -183,6 +185,14 @@ extension HomeViewController:UICollectionViewDelegate{
     func showAnnotation(){
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let nextViewController = storyBoard.instantiateViewController(withIdentifier: "AnnoVC") as! AnnotationViewController
+        nextViewController.user = self.loginUser
+        nextViewController.imageSharpen = self.userPref.ImageShapening
+        self.navigationController?.pushViewController(nextViewController, animated: true)
+    }
+    
+    func showCheck(){
+        let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
+        let nextViewController = storyBoard.instantiateViewController(withIdentifier: "checkVC") as! CheckModeViewController
         nextViewController.user = self.loginUser
         nextViewController.imageSharpen = self.userPref.ImageShapening
         self.navigationController?.pushViewController(nextViewController, animated: true)

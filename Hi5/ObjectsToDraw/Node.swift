@@ -127,7 +127,7 @@ class Node{
     }
     
     // call 60 times a second
-    func render(commandQueue:MTLCommandQueue,pipelineState:MTLRenderPipelineState,drawable:CAMetalDrawable,parentModelViewMatrix:float4x4, projectionMatrix:float4x4,clearColor:MTLClearColor?,somaArray:[simd_float3],Tree:neuronTree?){
+    func render(commandQueue:MTLCommandQueue,pipelineState:MTLRenderPipelineState,drawable:CAMetalDrawable,parentModelViewMatrix:float4x4, projectionMatrix:float4x4,clearColor:MTLClearColor?,markerArray:[Marker],Tree:neuronTree?){
         _ = bufferProvider.availableResourcesSemaphore.wait(timeout: DispatchTime.distantFuture)
         
         // set up for cube texture
@@ -220,12 +220,13 @@ class Node{
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: vertexCount,instanceCount: 1)
         
         // draw soma if exits
-        if !somaArray.isEmpty {
+        if !markerArray.isEmpty {
             //generate vertices
-            for center in somaArray{
+            for marker in markerArray{
                 // cube vertices
-                let color = UIColor.systemOrange
-                let size = Float(0.03)
+                let center = marker.displayPosition
+                let color = marker.color
+                let size = marker.size
                 let A = Vertex(x: -size+center.x, y:  size+center.y, z:   size+center.z, r:  Float(color.redValue), g:  Float(color.greenValue), b:  Float(color.blueValue), a:  1.0,s: 0.0,t: 0.3)
                 let B = Vertex(x: -size+center.x, y:  -size+center.y, z:   size+center.z, r:  Float(color.redValue), g:  Float(color.greenValue), b:  Float(color.blueValue), a:  1.0,s: 0.0,t: 0.7)
                 let C = Vertex(x:  size+center.x, y:  -size+center.y, z:   size+center.z, r:  Float(color.redValue), g:  Float(color.greenValue), b:  Float(color.blueValue), a:  1.0,s: 1.0,t: 0.7)
@@ -257,7 +258,7 @@ class Node{
                 let vertexProgram = defaultLibrary.makeFunction(name: "texture_vertex")
                 
                 let trianglePipelineStateDescriptor = MTLRenderPipelineDescriptor()
-                trianglePipelineStateDescriptor.label = "draw triangle mark"
+                trianglePipelineStateDescriptor.label = "draw cube marker"
                 trianglePipelineStateDescriptor.vertexFunction = vertexProgram
                 trianglePipelineStateDescriptor.fragmentFunction = fragmentProgram
                 trianglePipelineStateDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm

@@ -1,14 +1,17 @@
 //
-//  mySceneViewContrller.swift
-//  metalLearning
+//  CheckModeViewController.swift
+//  Hi5
 //
-//  Created by 李凯翔 on 2022/3/9.
+//  Created by 李凯翔 on 2022/5/13.
+//
+
+import Foundation
 
 import UIKit
 import UniformTypeIdentifiers
 import simd
 
-class MarkerFactoryViewController:Image3dViewController{
+class CheckModeViewController:Image3dViewController{
  
     //Buttons
     var backwardButton:UIButton!
@@ -17,8 +20,7 @@ class MarkerFactoryViewController:Image3dViewController{
     var isDownloading = false;
     var isWaiting = false;
     var DownloadThreadEnabled = false
-    //Controls
-    @IBOutlet var DoneButton: UIBarButtonItem!
+    //mode switcher
     @IBOutlet var modeSwitcher: UISegmentedControl!
     @IBAction func indexChanged(_ sender: UISegmentedControl) {
         switch modeSwitcher.selectedSegmentIndex{
@@ -32,8 +34,59 @@ class MarkerFactoryViewController:Image3dViewController{
             print("unrecognized index")
         }
     }
-    @IBOutlet var boringImageButton: UIBarButtonItem!
-    @IBOutlet var goodImageButton: UIBarButtonItem!
+    // color buttons
+    var markerColor:UIColor = UIColor.systemOrange
+    var currentMarkerType:MarkerType = .MarkerFactory
+    @IBOutlet var redPenButton: UIBarButtonItem!
+    @IBOutlet var bluePenButton: UIBarButtonItem!
+    @IBOutlet var yellowPenButton: UIBarButtonItem!
+    
+    @IBAction func changeToRed(_ sender:UIBarButtonItem){
+        changeMarkerColor(to: UIColor.systemRed, withType: .WrongMarker, sender: sender)
+    }
+    
+    @IBAction func changeToBlue(_ sender:UIBarButtonItem){
+        changeMarkerColor(to: UIColor.systemBlue, withType: .MissingMarker, sender: sender)
+    }
+    
+    @IBAction func changeToYellow(_ sender:UIBarButtonItem){
+        changeMarkerColor(to: UIColor.systemYellow, withType: .BreakingPointMarker, sender: sender)
+    }
+    
+    func changeMarkerColor(to color:UIColor,withType type:MarkerType, sender:UIBarButtonItem){
+        // clear choosen button state
+        redPenButton.image = UIImage(systemName: "pencil.circle")
+        bluePenButton.image = UIImage(systemName: "pencil.circle")
+        yellowPenButton.image = UIImage(systemName: "pencil.circle")
+        // set new state
+        sender.image = UIImage(systemName: "pencil.circle.fill")
+        // set new color
+        markerColor = color
+        currentMarkerType = type
+    }
+    
+    // type buttons
+    @IBOutlet var GoodTypeButton: UIBarButtonItem!
+    @IBOutlet var SWCBadButton: UIBarButtonItem!
+    @IBOutlet var NormalButton: UIBarButtonItem!
+    @IBOutlet var ImageBadButton: UIBarButtonItem!
+    
+    @IBAction func GoodTypeTapped(_ sender: Any) {
+        
+    }
+    
+    @IBAction func swcBadTapped(_ sender: Any) {
+        
+    }
+    
+    @IBAction func normalTypeTapped(_ sender: Any) {
+        
+    }
+    
+    @IBAction func ImageBadTapped(_ sender: Any) {
+        
+    }
+    
     
     
     var somaPotentialLocation:PotentialLocationFeedBack!{
@@ -110,11 +163,7 @@ class MarkerFactoryViewController:Image3dViewController{
         }
     }
     
-    override func renderObjects(drawable:CAMetalDrawable) {
-    // draw the view
-        markerArray = somaArray.map({ somaLoc in
-            return Marker(type: .MarkerFactory, displayPosition: somaLoc, color: .systemOrange)
-        })
+    override func renderObjects(drawable: CAMetalDrawable) {
         objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil, markerArray: markerArray, Tree: Tree)
     }
     
@@ -159,9 +208,6 @@ class MarkerFactoryViewController:Image3dViewController{
         backwardButton.isEnabled = false
         forwardButton.alpha = 0
         backwardButton.alpha = 0
-        DoneButton.isEnabled = false
-        boringImageButton.isEnabled = false
-        goodImageButton.isEnabled = false
     }
     
     func enableButtons(){
@@ -169,9 +215,6 @@ class MarkerFactoryViewController:Image3dViewController{
         backwardButton.isEnabled = true
         forwardButton.alpha = 1
         backwardButton.alpha = 1
-        DoneButton.isEnabled = true
-        boringImageButton.isEnabled = true
-        goodImageButton.isEnabled = true
     }
     
     override func configureNavBar(){
@@ -289,55 +332,6 @@ class MarkerFactoryViewController:Image3dViewController{
         }
     }
     
-    @IBAction func DoneButtonTapped(_ sender: Any) {
-        let insertList = userArray.map { (somaLoc)->PositionFloat in
-            return CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaLoc, center: self.somaPotentialSecondaryResLocation).loc
-        }
-        HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 2, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
-            print("soma marked as Done,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
-            self.requestForNextImage()
-            self.imageCache.somaPoLocations[self.imageCache.index].alreadyUpload = true
-        } errorHandler: { error in
-            print(error)
-        }
-    }
-    
-    @IBAction func BoringImageButtonTapped(_ sender: Any) {
-        if userArray.isEmpty {
-            imageCache.somaPoLocations[imageCache.index].isBoring = true
-            HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: -1, username: user.userName, passwd: user.password, insertSomaList: [], deleteSomaList: self.removeSomaArray) {
-                print("image marked as Trash")
-                self.requestForNextImage()
-                self.imageCache.somaPoLocations[self.imageCache.index].alreadyUpload = true
-            } errorHandler: { error in
-                print(error)
-            }
-        }else{
-            // alert user for new soma data
-            let alert = UIAlertController(title: "Attention", message: "Image marked as trash can't not have new soma marker,do you want to delete your soma marker?", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "No", style: .cancel))
-            alert.addAction(UIAlertAction(title: "Yes", style: .default,handler: { [self] (action) in
-                self.userArray.removeAll()
-                self.somaArray = originalSomaArray+userArray
-            }))
-            self.present(alert, animated: true)
-            // check for next move
-        }
-    }
-    
-    @IBAction func GoodImageButtonTapped(_ sender: Any) {
-        let insertList = userArray.map { (somaLoc)->PositionFloat in
-            return CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaLoc, center: self.somaPotentialSecondaryResLocation).loc
-        }
-        HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 3, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
-            print("Image marked as Good,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
-            self.requestForNextImage()
-            self.imageCache.somaPoLocations[self.imageCache.index].alreadyUpload = true
-        } errorHandler: { error in
-            print(error)
-        }
-    }
-    
    // MARK: - Image Reader
     
     @objc func readCloudImage(){
@@ -397,9 +391,6 @@ class MarkerFactoryViewController:Image3dViewController{
                     //display image
                     if let image = self.imageToDisplay{
                         self.showMessage(message: self.currentImageName,showProcess: false)
-                        self.DoneButton.isEnabled = true
-                        self.goodImageButton.isEnabled = true
-                        self.boringImageButton.isEnabled = true
                         
                         self.drawWithImage(image: image)
                         self.enableButtons()
@@ -432,10 +423,6 @@ class MarkerFactoryViewController:Image3dViewController{
                         //display image
                         if let image = self.imageToDisplay{
                             self.showMessage(message: self.currentImageName,showProcess: false)
-                            self.DoneButton.isEnabled = true
-                            self.goodImageButton.isEnabled = true
-                            self.boringImageButton.isEnabled = true
-                            
                             self.drawWithImage(image: image)
                             self.enableButtons()
                         }else{
@@ -473,8 +460,17 @@ class MarkerFactoryViewController:Image3dViewController{
     
     @objc override func tap(tapGesture:UITapGestureRecognizer){
         if tapGesture.state == .ended{
+            // check for markType
+            if currentMarkerType == .MarkerFactory{
+                let alert = UIAlertController(title: "Which Marker Type?", message: "Please choose a marker type below", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .cancel,handler:nil))
+                self.present(alert, animated: true)
+                return 
+            }
+            
             // check for mode
             let tapPosition = tapGesture.location(in: self.view)
+            
             if editStatus == .View || editStatus == .Mark{
                 // normal mark mode
                 editStatus = .Mark
@@ -483,8 +479,9 @@ class MarkerFactoryViewController:Image3dViewController{
                 if let somaPosition = findSomaLocation(tapPosition,deleteMode: false){
                     print("find soma at \(somaPosition)")
                     userArray.append(somaPosition)
+                    markerArray.append(Marker(type: currentMarkerType, displayPosition: somaPosition, color: markerColor))
                     self.somaArray =  self.originalSomaArray + self.userArray
-                    print(somaArray)
+//                    print(somaArray)
                 }
                 
             }else if editStatus == .Delete{ // delete mode
@@ -492,22 +489,9 @@ class MarkerFactoryViewController:Image3dViewController{
                 if let somaPostion = findSomaLocation(tapPosition, deleteMode: true){
                     print("find existing soma at \(somaPostion),removed it")
                     // refresh from somaArray
-                    if let removeIndex = userArray.firstIndex(of: somaPostion){
-                        print(removeIndex)
-                        userArray.remove(at: removeIndex)
-                        somaArray = originalSomaArray + userArray
-                    }else if let removeIndex = originalSomaArray.firstIndex(of: somaPostion){
-                        print(removeIndex)
-                        originalSomaArray.remove(at: removeIndex)
-                        somaArray = originalSomaArray + userArray
-                    }
-                    // add to remove list
-                    let soma = CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaPostion, center: self.somaPotentialSecondaryResLocation)
-                    guard self.somaList != nil else {return}
-                    for somaInfo in self.somaList.somaList{
-                        if (somaInfo.loc.x - soma.loc.x)<0.1 && (somaInfo.loc.y - soma.loc.y)<0.1 && (somaInfo.loc.z - soma.loc.z)<0.1{
-                            self.removeSomaArray.append(somaInfo.id) // add to removeList
-                            print("soma with name \(somaInfo.id) add to remove list")
+                    for marker in markerArray{
+                        if marker.displayPosition == somaPostion{
+                            markerArray = markerArray.filter{ $0 != marker}
                         }
                     }
                 }
