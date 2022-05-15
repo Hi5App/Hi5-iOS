@@ -11,6 +11,13 @@ import UIKit
 import UniformTypeIdentifiers
 import simd
 
+enum ReconstructionType {
+    case Good
+    case BadSwcGoodImage
+    case NormalSwcNormalImage
+    case BadImage
+}
+
 class CheckModeViewController:Image3dViewController{
  
     //Buttons
@@ -34,6 +41,9 @@ class CheckModeViewController:Image3dViewController{
             print("unrecognized index")
         }
     }
+    // tool bars
+    @IBOutlet var markToolbar: UIToolbar!
+    @IBOutlet var swcTypeToolbar: UIToolbar!
     // color buttons
     var markerColor:UIColor = UIColor.systemOrange
     var currentMarkerType:MarkerType = .MarkerFactory
@@ -87,6 +97,11 @@ class CheckModeViewController:Image3dViewController{
         
     }
     
+    func updateReconstractionType(type:ReconstructionType){
+        // organize marker array
+        
+        // upload status with/without marker array
+    }
     
     
     var somaPotentialLocation:PotentialLocationFeedBack!{
@@ -106,10 +121,11 @@ class CheckModeViewController:Image3dViewController{
     
     let threadQueue = DispatchQueue.global()
     
+    var showingSWC:Bool = false
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         imageCache.imageCache.removeAll()
-        
     }
     
     override func viewDidLoad() {
@@ -161,6 +177,24 @@ class CheckModeViewController:Image3dViewController{
                 self.present(alert, animated: true)
             }
         }
+        
+        // adjust swc switch constraint
+        swcSwitch.alpha = 1
+        swcSwitch.isEnabled = true
+        showingSWC = true
+        let bottomConstraint = swcSwitch.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -(markToolbar.frame.height+swcTypeToolbar.frame.height+CGFloat(20)))
+        NSLayoutConstraint.activate([bottomConstraint])
+        swcSwitch.addTarget(self, action: #selector(toggleSWC), for: .touchUpInside)
+    }
+    
+    @objc func toggleSWC(){
+        if showingSWC {
+            showingSWC = false
+            swcSwitch.configuration?.image = UIImage(systemName: "eye.slash.fill")
+        }else{
+            showingSWC = true
+            swcSwitch.configuration?.image = UIImage(systemName: "eye.fill")
+        }
     }
     
     override func renderObjects(drawable: CAMetalDrawable) {
@@ -208,6 +242,11 @@ class CheckModeViewController:Image3dViewController{
         backwardButton.isEnabled = false
         forwardButton.alpha = 0
         backwardButton.alpha = 0
+        // other buttons
+        GoodTypeButton.isEnabled = false
+        SWCBadButton.isEnabled = false
+        NormalButton.isEnabled = false
+        ImageBadButton.isEnabled = false
     }
     
     func enableButtons(){
@@ -215,6 +254,10 @@ class CheckModeViewController:Image3dViewController{
         backwardButton.isEnabled = true
         forwardButton.alpha = 1
         backwardButton.alpha = 1
+        GoodTypeButton.isEnabled = true
+        SWCBadButton.isEnabled = true
+        NormalButton.isEnabled = true
+        ImageBadButton.isEnabled = true
     }
     
     override func configureNavBar(){
@@ -489,11 +532,7 @@ class CheckModeViewController:Image3dViewController{
                 if let somaPostion = findSomaLocation(tapPosition, deleteMode: true){
                     print("find existing soma at \(somaPostion),removed it")
                     // refresh from somaArray
-                    for marker in markerArray{
-                        if marker.displayPosition == somaPostion{
-                            markerArray = markerArray.filter{ $0 != marker}
-                        }
-                    }
+                    markerArray = markerArray.filter({$0.displayPosition != somaPostion})
                 }
             }
         }

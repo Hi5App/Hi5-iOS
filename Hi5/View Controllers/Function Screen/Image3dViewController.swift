@@ -29,6 +29,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     var editStatus:editMode = .View
     var scaleLabel:UIButton!
     var indicator:UIButton!
+    var swcSwitch:UIButton!
     
     var userArray:[simd_float3] = [] // soma marked by user
     var originalSomaArray:[simd_float3] = [] // soma list fetched from server
@@ -104,12 +105,27 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
         indicator.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(indicator)
         
+        // add swc switch
+        var swcSwitchConfiguration = scaleLabelConfiguration
+        swcSwitchConfiguration.image = UIImage(systemName: "eye.fill")
+        swcSwitchConfiguration.imagePadding = 10
+        swcSwitchConfiguration.title = "Show swc"
+        swcSwitch = UIButton(configuration: swcSwitchConfiguration)
+        swcSwitch.translatesAutoresizingMaskIntoConstraints = false
+        swcSwitch.alpha = 0
+        swcSwitch.isEnabled = false
+        view.addSubview(swcSwitch)
+        
+        
         let constraints = [
             scaleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             scaleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
             
             indicator.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 10),
-            indicator.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20)
+            indicator.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            
+            swcSwitch.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 10),
+            swcSwitch.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -100)
         ]
         NSLayoutConstraint.activate(constraints)
     }

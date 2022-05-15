@@ -305,7 +305,7 @@
                                     </barButtonItem>
                                 </items>
                             </toolbar>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="n9p-NX-xxO">
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="n9p-NX-xxO" userLabel="swcTypeToolbar">
                                 <rect key="frame" x="0.0" y="769" width="414" height="44"/>
                                 <items>
                                     <barButtonItem title="Good" id="doW-3O-h5W">
@@ -360,9 +360,11 @@
                         <outlet property="NormalButton" destination="Hu9-jN-oB4" id="mmx-iD-QSv"/>
                         <outlet property="SWCBadButton" destination="FwM-Dt-IKA" id="S0W-T1-AUN"/>
                         <outlet property="bluePenButton" destination="PFI-Hn-LMl" id="p4Y-dW-Szb"/>
+                        <outlet property="markToolbar" destination="KlO-RK-9Qu" id="GEE-Mo-xXD"/>
                         <outlet property="modeSwitcher" destination="uj1-hE-vH2" id="BA1-kL-9gX"/>
                         <outlet property="mtkView" destination="KOa-PG-xte" id="eLx-Ad-IbT"/>
                         <outlet property="redPenButton" destination="KOb-qL-boN" id="nWj-Tj-ct6"/>
+                        <outlet property="swcTypeToolbar" destination="n9p-NX-xxO" id="VPq-DT-ayw"/>
                         <outlet property="yellowPenButton" destination="SPF-px-gZ5" id="wX3-RB-1Ux"/>
                     </connections>
                 </viewController>
