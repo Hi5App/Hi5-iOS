@@ -11,8 +11,6 @@ import simd
 
 class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate{
     
-    
-    
     //Controls
     @IBOutlet var modeSwitcher: UISegmentedControl!
     @IBAction func indexChanged(_ sender: UISegmentedControl) {
@@ -101,10 +99,9 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate{
             }
         case "swc":
             Tree = neuronTree(from: fileURL)
-//            let reader = v3drawReader()
-//
-//            imageToDisplay = reader.read(from: localImageURL)
-//            self.title = imageToDisplay.name
+            if let branches = Tree?.organizeBranch(){
+                Tree?.branchIndexes = branches
+            }
             // display image
             if let image = imageToDisplay{
                 drawWithImage(image: image)
