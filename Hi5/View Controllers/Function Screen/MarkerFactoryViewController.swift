@@ -51,7 +51,11 @@ class MarkerFactoryViewController:Image3dViewController{
     var somaList:SomaListFeedBack!
     var resUsed:String!
     
-    let threadQueue = DispatchQueue.global()
+
+//    let threadQueue = DispatchQueue.global()
+
+    var preDownloadThread = Thread()
+
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -92,12 +96,23 @@ class MarkerFactoryViewController:Image3dViewController{
 //            alertForNetworkError()
 //            print("brain list fetch failed")
 //        }
-        if !DownloadThreadEnabled {
-            DownloadThreadEnabled = true
-            threadQueue.async {
-                self.preDownloadMethod()
-            }
-        }
+
+//        if !DownloadThreadEnabled {
+//            DownloadThreadEnabled = true
+//            threadQueue.async {
+//                self.preDownloadMethod()
+//            }
+//        }
+
+//        threadQueue.async {
+//            self.preDownloadMethod()
+//        }
+        
+        preDownloadThread = Thread(target: self, selector: #selector(preDownloadMethod), object: nil)
+        preDownloadThread.start()
+        
+//        let timer = Timer.scheduledTimer(timeInterval: 30, target: MarkerFactoryViewController.self, selector: #selector(MarkerFactoryViewController.checkFresh), userInfo: nil, repeats: true)
+
         
         func alertForNetworkError(){
             if self.somaPotentialLocation == nil || self.brainListfeed == nil{
@@ -110,12 +125,19 @@ class MarkerFactoryViewController:Image3dViewController{
         }
     }
     
+
     override func renderObjects(drawable:CAMetalDrawable) {
     // draw the view
         markerArray = somaArray.map({ somaLoc in
             return Marker(type: .MarkerFactory, displayPosition: somaLoc, color: .systemOrange)
         })
         objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil, markerArray: markerArray, Tree: Tree)
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        preDownloadThread.cancel()
+
     }
     
     // MARK: - Congfigue UI
@@ -515,8 +537,11 @@ class MarkerFactoryViewController:Image3dViewController{
         }
     }
     
-    func preDownloadMethod() {
+    @objc func preDownloadMethod() {
         while (true) {
+            if (preDownloadThread.isCancelled) {
+                Thread.exit()
+            }
             if (imageCache.somaPoLocations.count - imageCache.index < 7 && !isDownloading) {
                 self.isDownloading = true
                 HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { potentialLocationFeedback in
@@ -571,6 +596,18 @@ class MarkerFactoryViewController:Image3dViewController{
             }
         } errorHandler: { error in
             self.isDownloading = false
+        }
+    }
+    
+    @objc func checkFresh() {
+        let curPotentialLocation = self.imageCache.somaPoLocations[self.imageCache.index]
+        if (somaPotentialLocation != nil && !curPotentialLocation.alreadyUpload && self.imageCache.ifStillFresh(tempIndex: self.imageCache.index)) {
+            let expiredAlert = UIAlertController(title: "Attention", message: "Current file is expired, will change another file for you.", preferredStyle: .alert )
+            let confirmAction = UIAlertAction(title: "Confirm", style: .default) { action in
+                self.requestForNextImage()
+            }
+            expiredAlert.addAction(confirmAction)
+            self.present(expiredAlert, animated: true)
         }
     }
 }
