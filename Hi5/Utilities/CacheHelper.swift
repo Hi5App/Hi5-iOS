@@ -8,7 +8,6 @@
 import Foundation
 
 struct CacheHlper {
-    
     /**
      iOS App
          ├── Documents --- all image/swc file is cached here

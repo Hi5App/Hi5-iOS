@@ -57,8 +57,6 @@ class SettingTableViewController: UITableViewController,passUserPrefChange,AutoS
             userPref.autoLogin = value
         case 1:
             userPref.ImageShapening = value
-            CacheHlper.getCacheSize()
-            CacheHlper.deleteCacheFile()
         default:
             print("unknow setting option")
         }
