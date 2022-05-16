@@ -49,6 +49,7 @@
 		43F72BE8282E794D0088BB9E /* CheckModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43F72BE7282E794D0088BB9E /* CheckModeViewController.swift */; };
 		43FA187127E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FA187027E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift */; };
 		489ED89D280ACACE000781C6 /* HTTPModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489ED89C280ACACE000781C6 /* HTTPModel.swift */; };
+		676FFB65282CE76000E4F362 /* CacheHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676FFB64282CE76000E4F362 /* CacheHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -115,6 +116,7 @@
 		43F72BE7282E794D0088BB9E /* CheckModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckModeViewController.swift; sourceTree = "<group>"; };
 		43FA187027E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionCollectionViewDataSource.swift; sourceTree = "<group>"; };
 		489ED89C280ACACE000781C6 /* HTTPModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPModel.swift; sourceTree = "<group>"; };
+		676FFB64282CE76000E4F362 /* CacheHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -250,6 +252,7 @@
 				43EEA48B27FFDF8D00B0E8B7 /* float4x4+Extensions.swift */,
 				43CFDB232810FDA000AF33FB /* image4DSimpleCache.swift */,
 				433C55C22813F8D900BC223F /* CoordHelper.swift */,
+				676FFB64282CE76000E4F362 /* CacheHelper.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -447,6 +450,7 @@
 				433B1F3C27DD815B00F44604 /* Node.swift in Sources */,
 				43108E7527C776CA00F3287D /* v3drawReader.swift in Sources */,
 				4370D728282FDBED00EA127E /* Marker.swift in Sources */,
+				676FFB65282CE76000E4F362 /* CacheHelper.swift in Sources */,
 				433B1F3E27DD815B00F44604 /* Vertex.swift in Sources */,
 				4320386927D8EC8000DB2DBC /* MetalViewController.swift in Sources */,
 				439215A6280C630700E53631 /* MarkerFactoryViewController.swift in Sources */,

@@ -54,7 +54,7 @@ struct image4DSimpleCache{
         var tempIndex = index
         tempIndex -= 1
         while tempIndex >= 0 {
-            if (!somaPoLocations[tempIndex].isBoring && (checkIfFresh(tempIndex: tempIndex) || somaPoLocations[tempIndex].alreadyUpload)) {
+            if (!somaPoLocations[tempIndex].isBoring && (ifStillFresh(tempIndex: tempIndex) || somaPoLocations[tempIndex].alreadyUpload)) {
                 break
             }
             tempIndex -= 1
@@ -70,7 +70,7 @@ struct image4DSimpleCache{
         var tempIndex = index
         tempIndex += 1
         while tempIndex < somaPoLocations.count {
-            if (!somaPoLocations[tempIndex].isBoring && (checkIfFresh(tempIndex: tempIndex) || somaPoLocations[tempIndex].alreadyUpload)) {
+            if (!somaPoLocations[tempIndex].isBoring && (ifStillFresh(tempIndex: tempIndex) || somaPoLocations[tempIndex].alreadyUpload)) {
                 break
             }
             tempIndex += 1
@@ -82,7 +82,7 @@ struct image4DSimpleCache{
         return true
     }
     
-    mutating func checkIfFresh(tempIndex:Int)->Bool {
+    mutating func ifStillFresh(tempIndex:Int)->Bool {
         if !somaPoLocations[tempIndex].isFresh {
             return false
         }
