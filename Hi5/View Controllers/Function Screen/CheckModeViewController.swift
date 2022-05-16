@@ -180,8 +180,8 @@ class CheckModeViewController:Image3dViewController{
         
         // adjust swc switch constraint
         swcSwitch.alpha = 1
-        swcSwitch.isEnabled = true
-        showingSWC = true
+        swcSwitch.isEnabled = false
+        showingSWC = false
         let bottomConstraint = swcSwitch.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -(markToolbar.frame.height+swcTypeToolbar.frame.height+CGFloat(20)))
         NSLayoutConstraint.activate([bottomConstraint])
         swcSwitch.addTarget(self, action: #selector(toggleSWC), for: .touchUpInside)
