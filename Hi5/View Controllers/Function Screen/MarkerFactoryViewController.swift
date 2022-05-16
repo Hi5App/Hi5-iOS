@@ -562,7 +562,11 @@ class MarkerFactoryViewController:Image3dViewController{
                         }
                     }
                 } errorHandler: { error in
-                    print("Error")
+                    print(error)
+                    if (error == "Empty") {
+                        print("No more file")
+                    }
+                    self.isDownloading = false
                 }
 
             }
