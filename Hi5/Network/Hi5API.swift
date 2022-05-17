@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Metal
 
 let serverIP = "http://139.155.28.154:26000"
 
@@ -25,6 +26,11 @@ struct Hi5API{
     
     static let getArborURL = serverIP + "/dynamic/arbor/getarbor"
     static let getSwcURL = serverIP + "/dynamic/swc/cropswc"
+    static let queryArborResult = serverIP + "/dynamic/arbor/queryarborresult"
+    static let updateArborResult = serverIP + "/dynamic/arbor/updatearborresult"
+    static let queryMarkerListURL = serverIP + "/dynamic/arbordetail/query"
+    static let insertMarkerListURL = serverIP + "/dynamic/arbordetail/insert"
+    static let deleteMarkerListURL = serverIP + "/dynamic/arbordetail/delete"
     
     static func parseLoginJSON(jsonData:Data)->LoginFeedback?{
         do {
@@ -108,7 +114,7 @@ struct Hi5API{
         }
     }
     
-    static func parseArborJSON(jsonData:Data)->QueryArborFeedBack?{
+    static func parseArborJSON(jsonData:Data) -> QueryArborFeedBack? {
         do {
             let result = try JSONSerialization.jsonObject(with: jsonData, options: .allowFragments) as? [[String:Any]]
             guard result != nil else {return nil}
@@ -126,7 +132,25 @@ struct Hi5API{
         }
     }
     
-    static func generateJSON<T>(_ value:T)->Data? where T : Encodable {
+    static func parseMarkerList(jsonData:Data) -> QueryMarkerListFeedBack? {
+        do {
+            let result = try JSONSerialization.jsonObject(with: jsonData, options: .allowFragments) as? [[String:Any]]
+            guard result != nil else {return nil}
+            
+            var markerList = [ArborDetail]()
+            for item in result! {
+                let data = try! JSONSerialization.data(withJSONObject: item, options: [])
+                let markerItem = try! JSONDecoder().decode(ArborDetail.self, from: data)
+                markerList.append(markerItem)
+            }
+            return QueryMarkerListFeedBack(markerList: markerList)
+        } catch {
+            print("decode marker list error")
+            return nil
+        }
+    }
+    
+    static func generateJSON<T>(_ value:T) -> Data? where T : Encodable {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
         do {
@@ -138,7 +162,7 @@ struct Hi5API{
         }
     }
     
-    static func saveSwc(jsonData:Data, arborName:String, res:String, centerX:Int, centerY:Int, centerZ:Int)->URL?{
+    static func saveSwc(jsonData:Data, arborName:String, res:String, centerX:Int, centerY:Int, centerZ:Int) -> URL? {
         do {
             let fileName = arborName + "_" + res + "_" + "\(centerX)" + "_" + "\(centerY)" + "_" + "\(centerZ)" + ".swc"
             let url = FileManager.default.urls(for: .documentDirectory,
