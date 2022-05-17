@@ -227,5 +227,113 @@ struct HTTPRequest{
                 }
             }
         }
+        
+        static func queryArborsResult(arborId:Int, name:String, passwd:String,  completionHandler:@escaping()->Void, errorHandler:@escaping(String)->Void) {
+            let userInfo = UserInfo(name: name, passwd: passwd)
+            let queryArborResultStruct = QueryArborResultStruct(user: userInfo, arborId: arborId)
+            
+            let jsonData = Hi5API.generateJSON(queryArborResultStruct)
+            guard jsonData != nil else {return}
+            
+            uploadTask(url: Hi5API.queryArborResult, uploadData: jsonData!) { data, error, statusCode in
+                if let data = data, statusCode == 200 {
+                    
+                    // TODO: parse data of query arbor result
+                    print(String(data: data, encoding:.utf8))
+                    completionHandler()
+                }
+                
+                if error != nil && statusCode != 200 {
+                    errorHandler("error in insert marker list")
+                }
+            }
+        }
+        
+        static func updateSingleArborResult(arborId:Int, result:Int, name:String, passwd:String,  completionHandler:@escaping()->Void, errorHandler:@escaping(String)->Void) {
+            var resultList = [ArborResult]()
+            resultList.append(ArborResult(arborid: arborId, result: result, owner: name))
+            
+            updateArborsResult(insertList: resultList, name: name, passwd: passwd, completionHandler: completionHandler, errorHandler: errorHandler)
+        }
+        
+        static func updateArborsResult(insertList:[ArborResult], name:String, passwd:String,  completionHandler:@escaping()->Void, errorHandler:@escaping(String)->Void) {
+            let userInfo = UserInfo(name: name, passwd: passwd)
+            let updateArborResultStruct = UpdateArborResultStruct(user: userInfo, pa: UpdateArborResultParam(insertlist: insertList))
+            
+            let jsonData = Hi5API.generateJSON(updateArborResultStruct)
+            guard jsonData != nil else {return}
+            
+            uploadTask(url: Hi5API.updateArborResult, uploadData: jsonData!) { data, error, statusCode in
+                if statusCode == 200 {
+                    completionHandler()
+                }
+                
+                if error != nil && statusCode != 200 {
+                    errorHandler("error in insert marker list")
+                }
+            }
+        }
+        
+        static func queryMarkerList(arborId:Int, name:String, passwd:String, completionHandler:@escaping(QueryMarkerListFeedBack?)->Void, errorHandler:@escaping(String)->Void) {
+            let userInfo = UserInfo(name: name, passwd: passwd)
+            let pa = ArborDetail(arborId: arborId)
+            let queryMarkerListStruct = QueryMarkerListStruct(user: userInfo, pa: pa)
+            
+            let jsonData = Hi5API.generateJSON(queryMarkerListStruct)
+            guard jsonData != nil else {return}
+            
+            uploadTask(url: Hi5API.queryMarkerListURL, uploadData: jsonData!) { data, error, statusCode in
+                if let data = data, statusCode == 200 {
+                    let markerList = Hi5API.parseMarkerList(jsonData: data)
+                    completionHandler(markerList)
+                }
+                if error != nil && statusCode != 200 {
+                    errorHandler("error in query marker list")
+                }
+            }
+        }
+        
+        // need arborId, loc and type in ArborDetail, for example:
+        //        var markerList = [Int]()
+        //        markerList.append(ArborDetail(arborId: 73937, loc: PositionFloat(x: 9400, y: 30200, z: 6200), type: 2))
+        static func insertMarkerList(insertMarkerList:[ArborDetail], name:String, passwd:String,  completionHandler:@escaping()->Void, errorHandler:@escaping(String)->Void) {
+            let userInfo = UserInfo(name: name, passwd: passwd)
+            let insertMarkerListStruct = InsertMarkerListStruct(user: userInfo, pa: insertMarkerList)
+            
+            let jsonData = Hi5API.generateJSON(insertMarkerListStruct)
+            guard jsonData != nil else {return}
+            
+            uploadTask(url: Hi5API.insertMarkerListURL, uploadData: jsonData!) { data, error, statusCode in
+                if statusCode == 200 {
+                    completionHandler()
+                }
+                
+                if error != nil && statusCode != 200 {
+                    errorHandler("error in insert marker list")
+                }
+            }
+        }
+        
+        // Only need id of ArborDetail, for example:
+        //        var markerList = [Int]()
+        //        markerList.append(28)
+        static func deleteMarkerList( name:String, passwd:String, deleteMarkerList:[Int], completionHandler:@escaping()->Void, errorHandler:@escaping(String)->Void) {
+            let userInfo = UserInfo(name: name, passwd: passwd)
+            let deleteMarkerListStruct = DeleteMarkerListStruct(user: userInfo, pa: deleteMarkerList)
+            
+            let jsonData = Hi5API.generateJSON(deleteMarkerListStruct)
+            guard jsonData != nil else {return}
+            
+            uploadTask(url: Hi5API.deleteMarkerListURL, uploadData: jsonData!) { data, error, statusCode in
+                if statusCode == 200 {
+                    completionHandler()
+                }
+                
+                if error != nil && statusCode != 200 {
+                    errorHandler("error in insert marker list")
+                }
+            }
+        }
+        
     }
 }

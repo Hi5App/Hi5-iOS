@@ -173,3 +173,51 @@ struct ArborInfo:Codable{
 struct QueryArborFeedBack:Codable{
     let arbors:[ArborInfo]
 }
+
+struct ArborResult:Codable {
+    var arborid:Int = 0
+    var result:Int = 0
+    var form:Int = 0
+    var owner:String = ""
+}
+
+struct ArborDetail:Codable {
+    var id:Int = 0
+    var arborId:Int = 0
+    var loc:PositionFloat = PositionFloat(x: 0.0, y: 0.0, z: 0.0)
+    var type:Int = 0
+    var owner:String = ""
+}
+
+struct UpdateArborResultParam:Codable {
+    let insertlist:[ArborResult]
+}
+
+struct UpdateArborResultStruct:Codable {
+    let user:UserInfo
+    let pa:UpdateArborResultParam
+}
+
+struct QueryArborResultStruct:Codable {
+    let user:UserInfo
+    let arborId:Int
+}
+
+struct QueryMarkerListStruct:Codable {
+    let user:UserInfo
+    let pa:ArborDetail
+}
+
+struct QueryMarkerListFeedBack:Codable {
+    let markerList:[ArborDetail]
+}
+
+struct InsertMarkerListStruct:Codable {
+    let user:UserInfo
+    let pa:[ArborDetail]
+}
+
+struct DeleteMarkerListStruct:Codable {
+    let user:UserInfo
+    let pa:[Int]
+}
