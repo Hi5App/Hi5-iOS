@@ -86,7 +86,7 @@ struct image4DSimpleCache{
         if !somaPoLocations[tempIndex].isFresh {
             return false
         }
-        if Date().timeIntervalSince1970 - somaPoLocations[tempIndex].createdTime > 7 * 60 * 1000 {
+        if Date().timeIntervalSince1970 - somaPoLocations[tempIndex].createdTime > 7 * 60 {
             somaPoLocations[tempIndex].isFresh = false
             return false
         }
