@@ -162,14 +162,15 @@ struct Hi5API{
         }
     }
     
-    static func saveSwc(jsonData:Data, arborName:String, res:String, centerX:Int, centerY:Int, centerZ:Int) -> URL? {
+    static func saveSwc(jsonData:Data, arborName:String, centerX:Int, centerY:Int, centerZ:Int) -> URL? {
         do {
-            let fileName = arborName + "_" + res + "_" + "\(centerX)" + "_" + "\(centerY)" + "_" + "\(centerZ)" + ".swc"
+            let fileName = arborName + "_" + "\(centerX)" + "_" + "\(centerY)" + "_" + "\(centerZ)" + ".swc"
             let url = FileManager.default.urls(for: .documentDirectory,
                                                     in: .userDomainMask)[0].appendingPathComponent(fileName)
             try jsonData.write(to: url)
             return url
         } catch {
+            print(error)
             return nil
         }
     }

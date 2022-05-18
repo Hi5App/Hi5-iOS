@@ -26,7 +26,7 @@ struct HTTPRequest{
                 return
             }
             else if let data = data {
-//                print(String(decoding: data, as: UTF8.self))
+                print(String(decoding: data, as: UTF8.self))
                 OperationQueue.main.addOperation {  //excute on the main thread,only main thread can update UI
                     completionHandler(data, nil, 200)
                 }
@@ -219,7 +219,7 @@ struct HTTPRequest{
             
             uploadTask(url: Hi5API.getSwcURL, uploadData: jsonData!) { data, error, statusCode in
                 if let data = data, statusCode == 200 {
-                    let url = Hi5API.saveSwc(jsonData: data, arborName: arborName, res: res, centerX: Int(centerX), centerY: Int(centerY), centerZ: Int(centerZ))
+                    let url = Hi5API.saveSwc(jsonData: data, arborName: arborName, centerX: Int(centerX), centerY: Int(centerY), centerZ: Int(centerZ))
                     completionHandler(url)
                 }
                 if error != nil && statusCode != 200 {

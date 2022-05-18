@@ -55,6 +55,7 @@ class MarkerFactoryViewController:Image3dViewController{
 //    let threadQueue = DispatchQueue.global()
 
     var preDownloadThread = Thread()
+    var checkFreshTimer = Timer()
 
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -111,8 +112,8 @@ class MarkerFactoryViewController:Image3dViewController{
         preDownloadThread = Thread(target: self, selector: #selector(preDownloadMethod), object: nil)
         preDownloadThread.start()
         
-//        let timer = Timer.scheduledTimer(timeInterval: 30, target: MarkerFactoryViewController.self, selector: #selector(MarkerFactoryViewController.checkFresh), userInfo: nil, repeats: true)
-
+        checkFreshTimer = Timer.scheduledTimer(timeInterval: 30, target: self, selector: #selector(checkFresh), userInfo: nil, repeats: true)
+        
         
         func alertForNetworkError(){
             if self.somaPotentialLocation == nil || self.brainListfeed == nil{
@@ -604,8 +605,11 @@ class MarkerFactoryViewController:Image3dViewController{
     }
     
     @objc func checkFresh() {
+        if (self.imageCache.index < 0) {
+            return
+        }
         let curPotentialLocation = self.imageCache.somaPoLocations[self.imageCache.index]
-        if (somaPotentialLocation != nil && !curPotentialLocation.alreadyUpload && self.imageCache.ifStillFresh(tempIndex: self.imageCache.index)) {
+        if (somaPotentialLocation != nil && !curPotentialLocation.alreadyUpload && !self.imageCache.ifStillFresh(tempIndex: self.imageCache.index)) {
             let expiredAlert = UIAlertController(title: "Attention", message: "Current file is expired, will change another file for you.", preferredStyle: .alert )
             let confirmAction = UIAlertAction(title: "Confirm", style: .default) { action in
                 self.requestForNextImage()
