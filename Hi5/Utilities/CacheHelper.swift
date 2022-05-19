@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CacheHlper {
+struct CacheCleanHelper {
     /**
      iOS App
          ├── Documents --- all image/swc file is cached here
@@ -24,7 +24,7 @@ struct CacheHlper {
     static func getCacheSize() -> Double {
         var cacheSize: Double = 0
         cacheSize = caculateFileSize(url: rootURL) / 1024 / 1024
-        print(String(format: "%.1fM", cacheSize))
+//        print(String(format: "%.1fM", cacheSize))
         return cacheSize
     }
     

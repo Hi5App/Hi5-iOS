@@ -30,9 +30,16 @@ struct CoordHelper{
                            z:Float((uploadLoc.loc.z/2-Float(center.z)))/64.0)
     }
     
+    // global coord to display coord
     static func swcPointsLocation2DisplayLineLocation(from swcPoints:PositionFloat,swcCenter:PositionFloat)->simd_float3{
         return simd_float3(x: (swcPoints.x - swcCenter.x)/128,
                            y: (swcPoints.y - swcCenter.y)/128,
                            z: (swcPoints.z - swcCenter.z)/128)
+    }
+    
+    static func DisplayMarkerLocation2GlobalLocation(from displayLoc:simd_float3,center:PositionFloat)->PositionFloat{
+        return PositionFloat(x: Float(displayLoc.x)*128+center.x,
+                             y: Float(displayLoc.y)*128+center.y,
+                             z: Float(displayLoc.z)*128+center.z)
     }
 }

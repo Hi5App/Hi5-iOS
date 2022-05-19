@@ -18,6 +18,16 @@ enum ReconstructionType {
     case BadImage
 }
 
+struct arborFeedbackManagement{
+    var currentFeedback:QueryArborFeedBack
+    
+    var nextFeedback:QueryArborFeedBack?
+    
+    func getPosition(at currentFeedbackIndex:Int) -> ArborInfo{
+        return currentFeedback.arbors[currentFeedbackIndex]
+    }
+}
+
 class CheckModeViewController:Image3dViewController{
  
     //Buttons
@@ -64,6 +74,8 @@ class CheckModeViewController:Image3dViewController{
     }
     
     func changeMarkerColor(to color:UIColor,withType type:MarkerType, sender:UIBarButtonItem){
+        self.editStatus = .Mark
+        self.respondEditStatusChange()
         // clear choosen button state
         redPenButton.image = UIImage(systemName: "pencil.circle")
         bluePenButton.image = UIImage(systemName: "pencil.circle")
@@ -82,19 +94,43 @@ class CheckModeViewController:Image3dViewController{
     @IBOutlet var ImageBadButton: UIBarButtonItem!
     
     @IBAction func GoodTypeTapped(_ sender: Any) {
-        
+        HTTPRequest.QualityInspectionPart.updateSingleArborResult(arborId: currentArbor.id, result: 4, name: self.user.userName, passwd: self.user.password) {
+            //TODO: add label showing result
+            print("image marked as Good")
+        } errorHandler: { error in
+            print("error")
+        }
+        forwardButtonTapped()
     }
     
     @IBAction func swcBadTapped(_ sender: Any) {
-        
+        HTTPRequest.QualityInspectionPart.updateSingleArborResult(arborId: currentArbor.id, result: 3, name: self.user.userName, passwd: self.user.password) {
+            //TODO: add label showing result
+            print("image marked as swc Bad")
+        } errorHandler: { error in
+            print("error")
+        }
+        forwardButtonTapped()
     }
     
     @IBAction func normalTypeTapped(_ sender: Any) {
-        
+        HTTPRequest.QualityInspectionPart.updateSingleArborResult(arborId: currentArbor.id, result: 2, name: self.user.userName, passwd: self.user.password) {
+            //TODO: add label showing result
+            print("image marked as normal")
+        } errorHandler: { error in
+            print("error")
+        }
+        forwardButtonTapped()
     }
     
     @IBAction func ImageBadTapped(_ sender: Any) {
-        
+        HTTPRequest.QualityInspectionPart.updateSingleArborResult(arborId: currentArbor.id, result: -1, name: self.user.userName, passwd: self.user.password) {
+            //TODO: add label showing result
+            print("image marked as Bad")
+        } errorHandler: { error in
+            print("error")
+        }
+        forwardButtonTapped()
     }
     
     func updateReconstractionType(type:ReconstructionType){
@@ -121,7 +157,26 @@ class CheckModeViewController:Image3dViewController{
     
     let threadQueue = DispatchQueue.global()
     
-    var showingSWC:Bool = false
+    var getArborFeedBack:arborFeedbackManagement!
+    var currentFeedbackIndex = 0
+    var currentArbor:ArborInfo!
+    var currentMarkerFeedBack:QueryMarkerListFeedBack!
+    var emptyTree:neuronTree? = nil
+    var cacheTree:neuronTree?
+    var showingSWC:Bool = false{
+        didSet{
+            if showingSWC {
+                if let tree = cacheTree{
+                    self.Tree = tree
+                }
+            } else{
+                cacheTree = self.Tree
+                self.Tree = emptyTree
+            }
+        }
+    }
+    
+    //MARK: - Lifecycle
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -131,42 +186,39 @@ class CheckModeViewController:Image3dViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         configureButtons()
-        // hide label
         worldModelMatrix = float4x4()
         worldModelMatrix.translate(0.0, y: 0.0, z: -4)
         worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
         imageCache = image4DSimpleCache()
-//        request potential location and brainList for later use
-
-//        HTTPRequest.ImagePart.getBrainList(name: user.userName, passwd: user.password) { feedback in
-//            if let feedback = feedback{
-//                self.brainListfeed = feedback
-//                print("brainList")
-//                HTTPRequest.SomaPart.getPotentialLocation(name: self.user.userName, passwd: self.user.password) { feedback in
-//                    if let feedback = feedback{
-//
-//                        self.somaPotentialLocation = feedback
-//
-//                        print("first see potential location: \(self.somaPotentialLocation!)")
-//                        self.imageCache.addLocation(location: feedback)
-//
-//
-//                    }
-//                } errorHandler: { error in
-//                    alertForNetworkError()
-//                    print("soma potential fetch failed")
-//                }
-//            }
-//        } errorHandler: { error in
-//            alertForNetworkError()
-//            print("brain list fetch failed")
-//        }
-        if !DownloadThreadEnabled {
-            DownloadThreadEnabled = true
-            threadQueue.async {
-                self.preDownloadMethod()
+        // down brainlist
+        HTTPRequest.ImagePart.getBrainList(name: self.user.userName, passwd: self.user.password) { feedback in
+            if let feedback = feedback {
+                self.brainListfeed = feedback
+                // download arbor
+                HTTPRequest.QualityInspectionPart.getArbor(name: self.user.userName, passwd: self.user.password) { feedback in
+                    if let feed = feedback{
+//                        print(feed)
+                        
+                        self.getArborFeedBack = arborFeedbackManagement(currentFeedback: feed)
+                        self.currentArbor = feed.arbors[0]
+                        // debug
+                        self.readCloudImage()
+                    }
+                } errorHandler: { error in
+                    print(error)
+                }
             }
+        } errorHandler: { error in
+            print(error)
         }
+        
+        
+//        if !DownloadThreadEnabled {
+//            DownloadThreadEnabled = true
+//            threadQueue.async {
+//                self.preDownloadMethod()
+//            }
+//        }
         
         func alertForNetworkError(){
             if self.somaPotentialLocation == nil || self.brainListfeed == nil{
@@ -247,6 +299,7 @@ class CheckModeViewController:Image3dViewController{
         SWCBadButton.isEnabled = false
         NormalButton.isEnabled = false
         ImageBadButton.isEnabled = false
+        swcSwitch.isEnabled = false
     }
     
     func enableButtons(){
@@ -258,6 +311,7 @@ class CheckModeViewController:Image3dViewController{
         SWCBadButton.isEnabled = true
         NormalButton.isEnabled = true
         ImageBadButton.isEnabled = true
+        swcSwitch.isEnabled = true
     }
     
     override func configureNavBar(){
@@ -273,51 +327,91 @@ class CheckModeViewController:Image3dViewController{
     }
     
     @objc func undoAMarker(){
-        if !userArray.isEmpty{
-            userArray.remove(at: userArray.count-1)
-            somaArray = originalSomaArray + userArray
+        if !markerArray.isEmpty{
+            markerArray.remove(at: markerArray.count-1)
         }
     }
     
     @objc func backButtonTapped(){
         // update soma list
-        if !userArray.isEmpty || !removeSomaArray.isEmpty{
-            let insertList = userArray.map { (somaLoc)->PositionFloat in
-                return CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaLoc, center: self.somaPotentialSecondaryResLocation).loc
-            }
-            HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 1, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
-                print("soma List uploaded successfully,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
-                self.imageCache.somaPoLocations[self.imageCache.index].alreadyUpload = true
-            } errorHandler: { error in
-                print(error)
-            }
-        }
-        // retrive soma locaiton from cache
-//        if let location = imageCache.previousLocation(){
-//            self.somaPotentialLocation = location
-//            readCloudImage()
-//        }
-        if imageCache.previousOne() {
-            self.somaPotentialLocation = self.imageCache.somaPoLocations[self.imageCache.index].potentialLocationFeedBack
-            self.currentImageURL = self.imageCache.urls[self.imageCache.index]
-        }
+        uploadMarkerArray()
+        uploadDeleteMarkerArray()
+        // change index and require image
+        handleArborFeedback(direction: 0)
+        readCloudImage()
     }
     
     @objc func forwardButtonTapped(){
         // update soma list
-        if !userArray.isEmpty || !removeSomaArray.isEmpty{
-            let insertList = userArray.map { (somaLoc)->PositionFloat in
-                return CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaLoc, center: self.somaPotentialSecondaryResLocation).loc
+        uploadMarkerArray()
+        uploadDeleteMarkerArray()
+        // change index and require image
+        handleArborFeedback(direction: 1)
+        readCloudImage()
+    }
+    
+    func handleArborFeedback(direction:Int){ // direction 1 = forward  / 0 = backward
+        // check for arbor status
+        if direction == 1{
+            currentFeedbackIndex += 1
+        }else if direction == 0{
+            if currentFeedbackIndex != 0{
+                currentFeedbackIndex -= 1
             }
-            HTTPRequest.SomaPart.updateSomaList(imageId: self.somaPotentialLocation.image, locationId:self.somaPotentialLocation.id, locationType: 1, username: user.userName, passwd: user.password, insertSomaList: insertList, deleteSomaList: self.removeSomaArray) {
-                print("soma List uploaded successfully,add \(insertList.count) soma, delete \(self.removeSomaArray.count) soma")
-                self.requestForNextImage()
-                self.imageCache.somaPoLocations[self.imageCache.index].alreadyUpload = true
+        }
+        print("index now is \(currentFeedbackIndex)")
+        currentArbor = getArborFeedBack.getPosition(at: currentFeedbackIndex)
+        if currentFeedbackIndex >= 5 && getArborFeedBack.nextFeedback == nil{
+            HTTPRequest.QualityInspectionPart.getArbor(name: self.user.userName, passwd: self.user.password) { feedback in
+                if let feed = feedback{
+                    self.getArborFeedBack.nextFeedback = feed
+                }
             } errorHandler: { error in
                 print(error)
             }
-        }else{
-            self.requestForNextImage()
+        }
+        if currentFeedbackIndex > 9{
+            currentFeedbackIndex = 1
+            if let feed = getArborFeedBack.nextFeedback{
+                getArborFeedBack.currentFeedback = feed
+            }else{
+                //TODO: alert user for no more arbor feedback
+            }
+            getArborFeedBack.nextFeedback = nil
+        }
+    }
+    
+    func uploadMarkerArray(){
+        if !markerArray.isEmpty{
+            let insertMarkerList = markerArray.map { (marker) -> ArborDetail in
+                switch marker.type{
+                case .MissingMarker:
+                    return ArborDetail(arborId: currentArbor.id, loc: CoordHelper.DisplayMarkerLocation2GlobalLocation(from: marker.displayPosition, center: self.centerPosition), type: 3)
+                case .WrongMarker:
+                    return ArborDetail(arborId: currentArbor.id, loc: CoordHelper.DisplayMarkerLocation2GlobalLocation(from: marker.displayPosition, center: self.centerPosition), type: 2)
+                case .BreakingPointMarker:
+                    return ArborDetail(arborId: currentArbor.id, loc: CoordHelper.DisplayMarkerLocation2GlobalLocation(from: marker.displayPosition, center: self.centerPosition), type: 6)
+                default:
+                    fatalError("unknown mark type")
+                }
+            }
+            HTTPRequest.QualityInspectionPart.insertMarkerList(insertMarkerList: insertMarkerList, name: self.user.userName, passwd: self.user.password) {
+                print("\(insertMarkerList.count) markers uploaded")
+            } errorHandler: { error in
+                print(error)
+            }
+        }
+    }
+    
+    func uploadDeleteMarkerArray(){
+        if !deleteMarkerIndexArray.isEmpty{
+            HTTPRequest.QualityInspectionPart.deleteMarkerList(name: self.user.userName, passwd: self.user.password, deleteMarkerList: deleteMarkerIndexArray) {
+                print("\(self.deleteMarkerIndexArray.count) markers were deleted")
+                self.deleteMarkerIndexArray.removeAll()
+            } errorHandler: { error in
+                print(error)
+            }
+
         }
     }
     
@@ -335,26 +429,6 @@ class CheckModeViewController:Image3dViewController{
     }
     
     @objc func requestForNextImage(){
-//        userArray.removeAll()
-//        somaArray = userArray + originalSomaArray
-        
-        // try retrive images from cache
-//        if let location = imageCache.nextLocation(){
-//            self.somaPotentialLocation = location
-//            self.readCloudImage()
-//        }else{
-//            // request image from server
-//            HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { feedback in
-//                if let feedback = feedback{
-//                    self.somaPotentialLocation = feedback
-//                    print("forward see potential location: \(self.somaPotentialLocation!)")
-//                    self.imageCache.addLocation(location: feedback)
-//                    self.readCloudImage()
-//                }
-//            } errorHandler: { error in
-//                print("soma potential fetch failed")
-//            }
-//        }
         if imageCache.nextOne() {
             self.somaPotentialLocation = imageCache.somaPoLocations[imageCache.index].potentialLocationFeedBack
             self.currentImageURL = imageCache.urls[imageCache.index]
@@ -385,68 +459,110 @@ class CheckModeViewController:Image3dViewController{
             self.present(alert, animated: true)
             return
         }
-        // check location and brainList
-        guard somaPotentialLocation != nil && brainListfeed != nil else {
-            // alert user for network issue
+        
+        disableButtons()
+        
+        // check for arbor
+        if getArborFeedBack == nil || self.brainListfeed == nil{
+            // alert user
             return
         }
         
         // get secondary resolution
         for brainInfo in self.brainListfeed.brainList{
-            if brainInfo.name == somaPotentialLocation!.image{
+            if brainInfo.name == currentArbor.image{
                 let resArray = brainInfo.detail.components(separatedBy: ",")
                 //trim res string
                 let RIndex = resArray[1].firstIndex(of: "R") // use secondary resolution
                 let endIndex = resArray[1].firstIndex(of: ")")
                 self.resUsed = String(resArray[1][RIndex!...endIndex!])
-//                print(self.resUsed!)
             }
         }
-        showMessage(message: "Downloading...",showProcess: true)
-        disableButtons()
-        
-        // download image and fetch somaList
+        showMessage(message: "Downloading Image...", showProcess: true)
+        // down image and swc
         HTTPRequest.ImagePart.downloadImage(
-            centerX: somaPotentialSecondaryResLocation.x,
-            centerY: somaPotentialSecondaryResLocation.y,
-            centerZ: somaPotentialSecondaryResLocation.z,
+            centerX: Int(currentArbor.loc.x)/2,
+            centerY: Int(currentArbor.loc.y)/2,
+            centerZ: Int(currentArbor.loc.z)/2,
             size: perferredSize,
             res: self.resUsed,
-            brainId: somaPotentialLocation.image,
+            brainId: currentArbor.image,
             name: self.user.userName,
-            passwd: self.user.password) { url in
+            passwd: self.user.password) { [self] url in
             guard url != nil else {return}
             var PBDImage = PBDImage(imageLocation: url!) // decompress image
             self.currentImageURL = url
             self.showMessage(message: "Decompressing...",showProcess: true)
             self.imageToDisplay = PBDImage.decompressToV3draw()
-//            self.deletePBDImageCache() //delete PBDimage file after decompress
-            // request somaList
-            HTTPRequest.SomaPart.getSomaList(centerX: self.somaPotentialLocation.loc.x, centerY: self.somaPotentialLocation.loc.y, centerZ: self.somaPotentialLocation.loc.z, size: self.somaperferredSize, res:"", brainId: self.somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { feedback in
-                if let feedback = feedback{
-                    print(feedback)
-                    self.somaList = feedback
-                    // save to cache
-                    self.originalSomaArray = self.somaList.somaList.map({ (somaInfo)->simd_float3 in
-                        return CoordHelper.UploadSomaLocation2DisplaySomaLocation(uploadLoc: somaInfo, center: self.somaPotentialSecondaryResLocation)
-                    })
-                    self.userArray.removeAll()
-                    //display image
-                    if let image = self.imageToDisplay{
-                        self.showMessage(message: self.currentImageName,showProcess: false)
-                        
-                        self.drawWithImage(image: image)
-                        self.enableButtons()
-                    }else{
-                        print("No 4d image")
+            self.drawWithImage(image: self.imageToDisplay)
+            self.showMessage(message: "Downloading swc file...", showProcess: true)
+            // request swc
+            showMessage(message: "Downloading swc...", showProcess: true)
+            HTTPRequest.QualityInspectionPart.getSwc(
+                centerX: currentArbor.loc.x,
+                centerY: currentArbor.loc.y,
+                centerZ: currentArbor.loc.z,
+                size: self.somaperferredSize,
+                imageId: currentArbor.image,
+                somaId: currentArbor.somaId,
+                arborName: currentArbor.name,
+                name: self.user.userName,
+                passwd: self.user.password) { [self] url in
+                    if let url = url{
+                        Tree = neuronTree(from: url)
+                        showingSWC = true
+                        swcSwitch.configuration?.image = UIImage(systemName: "eye.fill")
+                        if let branches = Tree?.organizeBranch(){
+                            Tree?.branchIndexes = branches
+                        }else{
+                            fatalError("Neuron Tree Fail to init")
+                        }
+                        print("init swc")
+                        showMessage(message: "Request Marker...", showProcess: true)
+                        HTTPRequest.QualityInspectionPart.queryMarkerList(arborId: currentArbor.id, name: self.user.userName, passwd: self.user.password) { [self] feedback in
+                            if let feed = feedback{
+                                print(feed)
+                                self.currentMarkerFeedBack = feed
+                                self.markerArray = feed.markerList.map({ item in
+                                    switch item.type{
+                                    case 3:
+                                        return Marker(type: .MissingMarker, displayPosition: CoordHelper.swcPointsLocation2DisplayLineLocation(from: item.loc, swcCenter: self.centerPosition), color: .systemBlue)
+                                    case 2:
+                                        return Marker(type: .WrongMarker, displayPosition: CoordHelper.swcPointsLocation2DisplayLineLocation(from: item.loc, swcCenter: self.centerPosition), color: .systemRed)
+                                    case 6:
+                                        return Marker(type: .BreakingPointMarker, displayPosition: CoordHelper.swcPointsLocation2DisplayLineLocation(from: item.loc, swcCenter: self.centerPosition), color: .systemYellow)
+                                    default:
+                                        fatalError("unknown marker type")
+                                    }
+                                })
+                                self.originalSomaArray = self.markerArray.map({ marker in
+                                    return simd_float3(x: marker.displayPosition.x, y: marker.displayPosition.y, z: marker.displayPosition.z)
+                                })
+                                
+                                showMessage(message: self.currentImageName, showProcess: false)
+                                if let image = imageToDisplay{
+                                    drawWithImage(image: image)
+                                    enableButtons()
+                                }else{
+                                    print("No 4d image")
+                                }
+                            }
+                        } errorHandler: { error in
+                            print(error)
+                        }
                     }
+                } errorHandler: { error in
+                    print("error in get swc")
+                    print(error)
                 }
-            } errorHandler: { error in
-                print("soma List fetch failed")
-            }
         } errorHandler: { error in
             print(error)
         }
+        
+        
+        
+
+        
     }
     
     func readLocalImage() {
@@ -504,17 +620,18 @@ class CheckModeViewController:Image3dViewController{
     @objc override func tap(tapGesture:UITapGestureRecognizer){
         if tapGesture.state == .ended{
             // check for markType
-            if currentMarkerType == .MarkerFactory{
-                let alert = UIAlertController(title: "Which Marker Type?", message: "Please choose a marker type below", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .cancel,handler:nil))
-                self.present(alert, animated: true)
-                return 
-            }
+            
             
             // check for mode
             let tapPosition = tapGesture.location(in: self.view)
             
             if editStatus == .View || editStatus == .Mark{
+                if currentMarkerType == .MarkerFactory{
+                    let alert = UIAlertController(title: "Which Marker Type?", message: "Please choose a marker type below", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .cancel,handler:nil))
+                    self.present(alert, animated: true)
+                    return
+                }
                 // normal mark mode
                 editStatus = .Mark
                 respondEditStatusChange()
@@ -531,7 +648,19 @@ class CheckModeViewController:Image3dViewController{
                 // detect possible soma
                 if let somaPostion = findSomaLocation(tapPosition, deleteMode: true){
                     print("find existing soma at \(somaPostion),removed it")
-                    // refresh from somaArray
+                    // get delete soma id in feedback
+                    let position = CoordHelper.DisplayMarkerLocation2GlobalLocation(from: somaPostion, center: Tree!.centerPosition)
+                    if let feed = self.currentMarkerFeedBack{
+                        if !feed.markerList.isEmpty{
+                            let id = feed.markerList.filter({
+                                abs($0.loc.x - position.x) < 1 && abs($0.loc.y - position.y) < 1 && abs($0.loc.z - position.z) < 1
+                            })[0].id
+                            deleteMarkerIndexArray.append(id)
+                        }
+                    }
+                    originalSomaArray = originalSomaArray.filter({$0 != somaPostion})
+                    userArray = userArray.filter({$0 != somaPostion})
+                    self.somaArray =  self.originalSomaArray + self.userArray
                     markerArray = markerArray.filter({$0.displayPosition != somaPostion})
                 }
             }

@@ -187,6 +187,16 @@ struct ArborDetail:Codable {
     var loc:PositionFloat = PositionFloat(x: 0.0, y: 0.0, z: 0.0)
     var type:Int = 0
     var owner:String = ""
+    
+    init(arborId:Int,loc:PositionFloat,type:Int){
+        self.arborId = arborId
+        self.loc = loc
+        self.type = type
+    }
+    
+    init(arborId:Int){
+        self.arborId = arborId
+    }
 }
 
 struct UpdateArborResultParam:Codable {

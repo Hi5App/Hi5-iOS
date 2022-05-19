@@ -377,17 +377,7 @@ class MarkerFactoryViewController:Image3dViewController{
             return
         }
         
-        // get secondary resolution
-        for brainInfo in self.brainListfeed.brainList{
-            if brainInfo.name == somaPotentialLocation!.image{
-                let resArray = brainInfo.detail.components(separatedBy: ",")
-                //trim res string
-                let RIndex = resArray[1].firstIndex(of: "R") // use secondary resolution
-                let endIndex = resArray[1].firstIndex(of: ")")
-                self.resUsed = String(resArray[1][RIndex!...endIndex!])
-//                print(self.resUsed!)
-            }
-        }
+        
         showMessage(message: "Downloading...",showProcess: true)
         disableButtons()
         

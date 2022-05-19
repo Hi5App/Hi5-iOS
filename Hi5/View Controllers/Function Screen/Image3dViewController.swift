@@ -36,6 +36,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     var removeSomaArray:[Int] = [] // somaInfo name removed by user
     var somaArray:[simd_float3] = [] // soma needs to be displayed
     var markerArray:[Marker] = []
+    var deleteMarkerIndexArray:[Int] = []
     
     var panSensivity:Float = 5.0
     var lastPanLocation:CGPoint!
@@ -50,7 +51,14 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     }
     var localImageURL:URL!
     
-    var Tree:neuronTree?
+    var centerPosition:PositionFloat!
+    var Tree:neuronTree?{
+        didSet{
+            if let Tree = Tree {
+                centerPosition = Tree.centerPosition
+            }
+        }
+    }
     var swcLineArray:[simd_float3] = []
     
     let perferredSize = 128
@@ -125,7 +133,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
             indicator.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             
             swcSwitch.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 10),
-            swcSwitch.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -100)
+//            swcSwitch.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -100)
         ]
         NSLayoutConstraint.activate(constraints)
     }

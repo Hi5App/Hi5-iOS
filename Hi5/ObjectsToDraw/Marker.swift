@@ -14,6 +14,7 @@ enum MarkerType{
     case MissingMarker
     case WrongMarker
     case BreakingPointMarker
+    case DeleteMarker
 }
 
 struct Marker:Equatable{

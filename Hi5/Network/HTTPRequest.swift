@@ -26,7 +26,7 @@ struct HTTPRequest{
                 return
             }
             else if let data = data {
-                print(String(decoding: data, as: UTF8.self))
+//                print(String(decoding: data, as: UTF8.self))
                 OperationQueue.main.addOperation {  //excute on the main thread,only main thread can update UI
                     completionHandler(data, nil, 200)
                 }
@@ -239,7 +239,7 @@ struct HTTPRequest{
                 if let data = data, statusCode == 200 {
                     
                     // TODO: parse data of query arbor result
-                    print(String(data: data, encoding:.utf8))
+//                    print(String(data: data, encoding:.utf8))
                     completionHandler()
                 }
                 
