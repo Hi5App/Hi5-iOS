@@ -343,6 +343,7 @@ class CheckModeViewController:Image3dViewController{
     
     @objc func forwardButtonTapped(){
         // update soma list
+        showMessage(message: "Uploading Marker...", showProcess: true)
         uploadMarkerArray()
         uploadDeleteMarkerArray()
         // change index and require image
@@ -359,18 +360,19 @@ class CheckModeViewController:Image3dViewController{
                 currentFeedbackIndex -= 1
             }
         }
-        print("index now is \(currentFeedbackIndex)")
-        currentArbor = getArborFeedBack.getPosition(at: currentFeedbackIndex)
         if currentFeedbackIndex >= 5 && getArborFeedBack.nextFeedback == nil{
+            print("reach threshold")
             HTTPRequest.QualityInspectionPart.getArbor(name: self.user.userName, passwd: self.user.password) { feedback in
                 if let feed = feedback{
                     self.getArborFeedBack.nextFeedback = feed
+                    print("next feedback download success")
                 }
             } errorHandler: { error in
                 print(error)
             }
         }
         if currentFeedbackIndex > 9{
+            print("switch backup")
             currentFeedbackIndex = 1
             if let feed = getArborFeedBack.nextFeedback{
                 getArborFeedBack.currentFeedback = feed
@@ -379,6 +381,8 @@ class CheckModeViewController:Image3dViewController{
             }
             getArborFeedBack.nextFeedback = nil
         }
+        print("index now is \(currentFeedbackIndex)")
+        currentArbor = getArborFeedBack.getPosition(at: currentFeedbackIndex)
     }
     
     func uploadMarkerArray(){

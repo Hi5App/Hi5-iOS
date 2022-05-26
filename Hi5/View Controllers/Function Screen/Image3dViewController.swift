@@ -262,6 +262,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
                     print("find soma at \(somaPosition)")
                     userArray.append(somaPosition)
                     self.somaArray =  self.originalSomaArray + self.userArray
+                    mapToMarkerArray()
                     print(somaArray)
                 }
                 
@@ -274,6 +275,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
                         print(removeIndex)
                         userArray.remove(at: removeIndex)
                         somaArray = originalSomaArray + userArray
+                        mapToMarkerArray()
                     }
                 }
             }
@@ -341,5 +343,11 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
         }else{
             return nil
         }
+    }
+    
+    func mapToMarkerArray(){
+        self.markerArray = self.somaArray.map({ loc in
+            return Marker(type: .MarkerFactory, displayPosition: loc, color: .systemOrange)
+        })
     }
 }
