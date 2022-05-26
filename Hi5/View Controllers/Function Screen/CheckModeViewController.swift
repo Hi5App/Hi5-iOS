@@ -181,6 +181,8 @@ class CheckModeViewController:Image3dViewController{
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         imageCache.imageCache.removeAll()
+        uploadMarkerArray()
+        uploadDeleteMarkerArray()
     }
     
     override func viewDidLoad() {
@@ -514,6 +516,7 @@ class CheckModeViewController:Image3dViewController{
                 passwd: self.user.password) { [self] url in
                     if let url = url{
                         Tree = neuronTree(from: url)
+                        cacheTree = nil
                         showingSWC = true
                         swcSwitch.configuration?.image = UIImage(systemName: "eye.fill")
                         if let branches = Tree?.organizeBranch(){

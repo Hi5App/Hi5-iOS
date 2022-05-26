@@ -54,6 +54,7 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate{
         if !userArray.isEmpty{
             userArray.remove(at: userArray.count-1)
             somaArray = originalSomaArray + userArray
+            mapToMarkerArray()
         }
     }
     

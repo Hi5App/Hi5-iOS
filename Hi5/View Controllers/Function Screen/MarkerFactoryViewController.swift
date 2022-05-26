@@ -213,6 +213,7 @@ class MarkerFactoryViewController:Image3dViewController{
         if !userArray.isEmpty{
             userArray.remove(at: userArray.count-1)
             somaArray = originalSomaArray + userArray
+            mapToMarkerArray()
         }
     }
     
@@ -234,6 +235,7 @@ class MarkerFactoryViewController:Image3dViewController{
 //            self.somaPotentialLocation = location
 //            readCloudImage()
 //        }
+        disableButtons()
         if imageCache.previousOne() {
             self.somaPotentialLocation = self.imageCache.somaPoLocations[self.imageCache.index].potentialLocationFeedBack
             self.currentImageURL = self.imageCache.urls[self.imageCache.index]
@@ -254,6 +256,7 @@ class MarkerFactoryViewController:Image3dViewController{
                 print(error)
             }
         }else{
+            disableButtons()
             self.requestForNextImage()
         }
     }
