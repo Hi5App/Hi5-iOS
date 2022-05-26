@@ -25,7 +25,7 @@ class Quad:Node{
         
         let texDescriptor = MTLTextureDescriptor()
         texDescriptor.textureType = .type3D
-        texDescriptor.pixelFormat = .r8Uint // red 8 bit
+        texDescriptor.pixelFormat = .r8Unorm // red 8 bit
         texDescriptor.width = image4DSimple.sizeX
         texDescriptor.height = image4DSimple.sizeY
         texDescriptor.depth = image4DSimple.sizeZ

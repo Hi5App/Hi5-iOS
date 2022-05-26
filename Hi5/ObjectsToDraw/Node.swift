@@ -317,9 +317,9 @@ class Node{
     
     class func defaultSampler(device:MTLDevice) ->MTLSamplerState{
         let sampler = MTLSamplerDescriptor()
-        sampler.minFilter = MTLSamplerMinMagFilter.nearest
-        sampler.magFilter = MTLSamplerMinMagFilter.nearest
-        sampler.mipFilter = MTLSamplerMipFilter.nearest
+        sampler.minFilter = MTLSamplerMinMagFilter.linear
+        sampler.magFilter = MTLSamplerMinMagFilter.linear
+        sampler.mipFilter = MTLSamplerMipFilter.linear
         sampler.maxAnisotropy = 1
         sampler.sAddressMode = .clampToEdge
         sampler.tAddressMode = .clampToEdge
