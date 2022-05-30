@@ -128,7 +128,7 @@ struct PositionInt:Codable{
     let z:Int 
 }
 
-struct PositionFloat:Codable{
+struct PositionFloat:Codable,Equatable{
     let x:Float
     let y:Float
     let z:Float
@@ -161,7 +161,16 @@ struct UpdateSomaListFeedback:Codable{
     let code:String
 }
 
-struct ArborInfo:Codable{
+struct ArborInfo:Codable,Equatable{
+    static func == (lhs: ArborInfo, rhs: ArborInfo) -> Bool {
+        return (lhs.id == rhs.id &&
+                lhs.name == rhs.name &&
+                lhs.somaId == rhs.somaId &&
+                lhs.image == rhs.image &&
+                lhs.loc == rhs.loc &&
+                lhs.status == rhs.status)
+    }
+    
     let id:Int
     let name:String
     let somaId:String
