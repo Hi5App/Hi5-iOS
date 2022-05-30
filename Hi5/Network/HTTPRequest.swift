@@ -236,7 +236,7 @@ struct HTTPRequest{
             guard jsonData != nil else {return}
             
             uploadTask(url: Hi5API.queryArborResult, uploadData: jsonData!) { data, error, statusCode in
-                if let data = data, statusCode == 200 {
+                if  statusCode == 200 {
                     
                     // TODO: parse data of query arbor result
 //                    print(String(data: data, encoding:.utf8))

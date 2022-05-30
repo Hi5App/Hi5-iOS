@@ -20,7 +20,15 @@ enum ReconstructionType {
 
 struct arborFeedbackManagement{
     var currentFeedback:QueryArborFeedBack
-    
+    var downloadStatus:[URL?]{
+        didSet{
+            let indicatorArray = downloadStatus.map { item in
+                return item == nil ? 0 : 1
+            }
+            print(indicatorArray)
+//            print("download \(downloadStatus.count) images")
+        }
+    }
     var nextFeedback:QueryArborFeedBack?
     
     func getPosition(at currentFeedbackIndex:Int) -> ArborInfo{
@@ -176,6 +184,8 @@ class CheckModeViewController:Image3dViewController{
         }
     }
     
+    var checkTimer:Timer = Timer()
+    
     //MARK: - Lifecycle
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -201,10 +211,11 @@ class CheckModeViewController:Image3dViewController{
                     if let feed = feedback{
 //                        print(feed)
                         
-                        self.getArborFeedBack = arborFeedbackManagement(currentFeedback: feed)
+                        self.getArborFeedBack = arborFeedbackManagement(currentFeedback: feed,downloadStatus: Array(repeating: nil, count: feed.arbors.count))
                         self.currentArbor = feed.arbors[0]
                         // debug
-                        self.readCloudImage()
+//                        self.readCloudImage()
+                        self.downloadImages()
                     }
                 } errorHandler: { error in
                     print(error)
@@ -319,7 +330,7 @@ class CheckModeViewController:Image3dViewController{
     override func configureNavBar(){
         super.configureNavBar()
         // buttons
-        let openImageButton = UIBarButtonItem(image: UIImage(systemName: "icloud.and.arrow.down"), style: .plain, target: self, action: #selector(requestForNextImage))
+        let openImageButton = UIBarButtonItem(image: UIImage(systemName: "icloud.and.arrow.down"), style: .plain, target: self, action: #selector(readCloudImage))
         
         let UndoButton = UIBarButtonItem()
         UndoButton.image = UIImage(systemName: "arrow.counterclockwise")
@@ -374,10 +385,11 @@ class CheckModeViewController:Image3dViewController{
             }
         }
         if currentFeedbackIndex > 9{
-            print("switch backup")
-            currentFeedbackIndex = 1
+            currentFeedbackIndex = 0
             if let feed = getArborFeedBack.nextFeedback{
                 getArborFeedBack.currentFeedback = feed
+                getArborFeedBack.downloadStatus = Array(repeating: nil, count: feed.arbors.count)
+                downloadImages()
             }else{
                 //TODO: alert user for no more arbor feedback
             }
@@ -458,118 +470,84 @@ class CheckModeViewController:Image3dViewController{
    // MARK: - Image Reader
     
     @objc func readCloudImage(){
-        // check Guest Mode
-        if user.email == "Guest@Guest.com"{
-            let alert = UIAlertController(title: "Attention", message: "You are currently in Guest Mode\nGuest can not request for server image, please sign in to continue", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .cancel))
-            self.present(alert, animated: true)
-            return
-        }
-        
         disableButtons()
         
-        // check for arbor
-        if getArborFeedBack == nil || self.brainListfeed == nil{
-            // alert user
-            return
-        }
-        
-        // get secondary resolution
-        for brainInfo in self.brainListfeed.brainList{
-            if brainInfo.name == currentArbor.image{
-                let resArray = brainInfo.detail.components(separatedBy: ",")
-                //trim res string
-                let RIndex = resArray[1].firstIndex(of: "R") // use secondary resolution
-                let endIndex = resArray[1].firstIndex(of: ")")
-                self.resUsed = String(resArray[1][RIndex!...endIndex!])
-            }
-        }
         showMessage(message: "Downloading Image...", showProcess: true)
-        // down image and swc
-        HTTPRequest.ImagePart.downloadImage(
-            centerX: Int(currentArbor.loc.x)/2,
-            centerY: Int(currentArbor.loc.y)/2,
-            centerZ: Int(currentArbor.loc.z)/2,
-            size: perferredSize,
-            res: self.resUsed,
-            brainId: currentArbor.image,
-            name: self.user.userName,
-            passwd: self.user.password) { [self] url in
-            guard url != nil else {return}
-            var PBDImage = PBDImage(imageLocation: url!) // decompress image
+        // search image and swc
+        checkTimer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(checkForExistingImage), userInfo: nil, repeats: true)
+        print("read finish")
+    }
+    
+    @objc func checkForExistingImage(){
+        if let url = getArborFeedBack.downloadStatus[currentFeedbackIndex] {
+            print("image download")
             self.currentImageURL = url
-            self.showMessage(message: "Decompressing...",showProcess: true)
-            self.imageToDisplay = PBDImage.decompressToV3draw()
-            self.drawWithImage(image: self.imageToDisplay)
-            self.showMessage(message: "Downloading swc file...", showProcess: true)
-            // request swc
-            showMessage(message: "Downloading swc...", showProcess: true)
-            HTTPRequest.QualityInspectionPart.getSwc(
-                centerX: currentArbor.loc.x,
-                centerY: currentArbor.loc.y,
-                centerZ: currentArbor.loc.z,
-                size: self.somaperferredSize,
-                imageId: currentArbor.image,
-                somaId: currentArbor.somaId,
-                arborName: currentArbor.name,
-                name: self.user.userName,
-                passwd: self.user.password) { [self] url in
-                    if let url = url{
-                        Tree = neuronTree(from: url)
-                        cacheTree = nil
-                        showingSWC = true
-                        swcSwitch.configuration?.image = UIImage(systemName: "eye.fill")
-                        if let branches = Tree?.organizeBranch(){
-                            Tree?.branchIndexes = branches
-                        }else{
-                            fatalError("Neuron Tree Fail to init")
-                        }
-                        print("init swc")
-                        showMessage(message: "Request Marker...", showProcess: true)
-                        HTTPRequest.QualityInspectionPart.queryMarkerList(arborId: currentArbor.id, name: self.user.userName, passwd: self.user.password) { [self] feedback in
-                            if let feed = feedback{
-                                print(feed)
-                                self.currentMarkerFeedBack = feed
-                                self.markerArray = feed.markerList.map({ item in
-                                    switch item.type{
-                                    case 3:
-                                        return Marker(type: .MissingMarker, displayPosition: CoordHelper.swcPointsLocation2DisplayLineLocation(from: item.loc, swcCenter: self.centerPosition), color: .systemBlue)
-                                    case 2:
-                                        return Marker(type: .WrongMarker, displayPosition: CoordHelper.swcPointsLocation2DisplayLineLocation(from: item.loc, swcCenter: self.centerPosition), color: .systemRed)
-                                    case 6:
-                                        return Marker(type: .BreakingPointMarker, displayPosition: CoordHelper.swcPointsLocation2DisplayLineLocation(from: item.loc, swcCenter: self.centerPosition), color: .systemYellow)
-                                    default:
-                                        fatalError("unknown marker type")
-                                    }
-                                })
-                                self.originalSomaArray = self.markerArray.map({ marker in
-                                    return simd_float3(x: marker.displayPosition.x, y: marker.displayPosition.y, z: marker.displayPosition.z)
-                                })
-                                
-                                showMessage(message: self.currentImageName, showProcess: false)
-                                if let image = imageToDisplay{
-                                    drawWithImage(image: image)
-                                    enableButtons()
-                                }else{
-                                    print("No 4d image")
-                                }
-                            }
-                        } errorHandler: { error in
-                            print(error)
-                        }
-                    }
-                } errorHandler: { error in
-                    print("error in get swc")
-                    print(error)
-                }
-        } errorHandler: { error in
-            print(error)
-        }
-        
-        
-        
+            checkTimer.invalidate()
+            showMessage(message: "Decompressing swc...", showProcess: true)
+            self.decompressImage{
+//            request swc
+                 HTTPRequest.QualityInspectionPart.getSwc(
+                     centerX: currentArbor.loc.x,
+                     centerY: currentArbor.loc.y,
+                     centerZ: currentArbor.loc.z,
+                     size: self.somaperferredSize,
+                     imageId: currentArbor.image,
+                     somaId: currentArbor.somaId,
+                     arborName: currentArbor.name,
+                     name: self.user.userName,
+                     passwd: self.user.password) { [self] url in
+                         if let url = url{
+                             Tree = neuronTree(from: url)
+                             showingSWC = true
+                             swcSwitch.configuration?.image = UIImage(systemName: "eye.fill")
+                             if let branches = Tree?.organizeBranch(){
+                                 Tree?.branchIndexes = branches
+                             }else{
+                                 fatalError("Neuron Tree Fail to init")
+                             }
+                             print("init swc")
+                             showMessage(message: "Request Marker...", showProcess: true)
+                             HTTPRequest.QualityInspectionPart.queryMarkerList(arborId: currentArbor.id, name: self.user.userName, passwd: self.user.password) { [self] feedback in
+                                 if let feed = feedback{
+                                     print(feed)
+                                     self.currentMarkerFeedBack = feed
+                                     self.markerArray = feed.markerList.map({ item in
+                                         switch item.type{
+                                         case 3:
+                                             return Marker(type: .MissingMarker, displayPosition: CoordHelper.swcPointsLocation2DisplayLineLocation(from: item.loc, swcCenter: self.centerPosition), color: .systemBlue)
+                                         case 2:
+                                             return Marker(type: .WrongMarker, displayPosition: CoordHelper.swcPointsLocation2DisplayLineLocation(from: item.loc, swcCenter: self.centerPosition), color: .systemRed)
+                                         case 6:
+                                             return Marker(type: .BreakingPointMarker, displayPosition: CoordHelper.swcPointsLocation2DisplayLineLocation(from: item.loc, swcCenter: self.centerPosition), color: .systemYellow)
+                                         default:
+                                             fatalError("unknown marker type")
+                                         }
+                                     })
+                                     self.originalSomaArray = self.markerArray.map({ marker in
+                                         return simd_float3(x: marker.displayPosition.x, y: marker.displayPosition.y, z: marker.displayPosition.z)
+                                     })
 
-        
+                                     showMessage(message: self.currentImageName, showProcess: false)
+                                     if let image = imageToDisplay{
+                                         drawWithImage(image: image)
+                                         enableButtons()
+                                     }else{
+                                         print("No 4d image")
+                                     }
+                                 }
+                             } errorHandler: { error in
+                                 print(error)
+                             }
+                         }
+                     } errorHandler: { error in
+                         print("error in get swc")
+                         print(error)
+                     }
+            }
+//
+        }else{
+            print("waiting")
+        }
     }
     
     func readLocalImage() {
@@ -607,6 +585,45 @@ class CheckModeViewController:Image3dViewController{
         var PBDImage = PBDImage(imageLocation: self.currentImageURL!) // decompress image
         self.imageToDisplay = PBDImage.decompressToV3draw()
         completion()
+    }
+    
+    func downloadImages(){
+        
+        // check for arbor
+        if getArborFeedBack == nil || self.brainListfeed == nil{
+            // alert user
+            return
+        }
+        
+        // get secondary resolution
+        for brainInfo in self.brainListfeed.brainList{
+            if brainInfo.name == currentArbor.image{
+                let resArray = brainInfo.detail.components(separatedBy: ",")
+                //trim res string
+                let RIndex = resArray[1].firstIndex(of: "R") // use secondary resolution
+                let endIndex = resArray[1].firstIndex(of: ")")
+                self.resUsed = String(resArray[1][RIndex!...endIndex!])
+            }
+        }
+        
+        for arbor in getArborFeedBack.currentFeedback.arbors{
+            HTTPRequest.ImagePart.downloadImage(
+                centerX: Int(arbor.loc.x)/2,
+                centerY: Int(arbor.loc.y)/2,
+                centerZ: Int(arbor.loc.z)/2,
+                size: perferredSize,
+                res: self.resUsed,
+                brainId: arbor.image,
+                name: self.user.userName,
+                passwd: self.user.password){ url in
+//                    print("file \(String(describing: url)) downloaded successfully")
+                    if let index = self.getArborFeedBack.currentFeedback.arbors.firstIndex(of:arbor){
+                        self.getArborFeedBack.downloadStatus[index] = url
+                    }
+                }errorHandler: { error in
+                    print(error)
+                }
+        }
     }
     
     //MARK: - setup interaction with images
