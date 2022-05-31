@@ -150,6 +150,17 @@ struct Hi5API{
         }
     }
     
+    static func parseArborFormerResult(jsonData:Data) -> QueryArborFormerResults? {
+        do {
+            let formerFeedbacks:[QueryArborFormerResult] = try JSONDecoder().decode([QueryArborFormerResult].self,from: jsonData)
+            let feedback = QueryArborFormerResults(formerResults: formerFeedbacks)
+            return feedback
+        } catch {
+            print("decode arbor former results error")
+            return nil
+        }
+    }
+    
     static func generateJSON<T>(_ value:T) -> Data? where T : Encodable {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted

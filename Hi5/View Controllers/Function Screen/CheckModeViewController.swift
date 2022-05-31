@@ -250,6 +250,12 @@ class CheckModeViewController:Image3dViewController{
         let bottomConstraint = swcSwitch.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -(markToolbar.frame.height+swcTypeToolbar.frame.height+CGFloat(20)))
         NSLayoutConstraint.activate([bottomConstraint])
         swcSwitch.addTarget(self, action: #selector(toggleSWC), for: .touchUpInside)
+        
+        //show label for former result
+        formerArborResult.alpha = 1
+        formerArborResult.setTitle("No Results", for: .normal)
+        let fbottomConstraint = formerArborResult.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -(markToolbar.frame.height+swcTypeToolbar.frame.height+CGFloat(20)))
+        NSLayoutConstraint.activate([fbottomConstraint])
     }
     
     @objc func toggleSWC(){
@@ -310,6 +316,7 @@ class CheckModeViewController:Image3dViewController{
         // other buttons
         GoodTypeButton.isEnabled = false
         SWCBadButton.isEnabled = false
+        formerArborResult.isEnabled = false
         NormalButton.isEnabled = false
         ImageBadButton.isEnabled = false
         swcSwitch.isEnabled = false
@@ -325,6 +332,7 @@ class CheckModeViewController:Image3dViewController{
         NormalButton.isEnabled = true
         ImageBadButton.isEnabled = true
         swcSwitch.isEnabled = true
+        formerArborResult.isEnabled = true
     }
     
     override func configureNavBar(){
@@ -526,6 +534,19 @@ class CheckModeViewController:Image3dViewController{
                                      self.originalSomaArray = self.markerArray.map({ marker in
                                          return simd_float3(x: marker.displayPosition.x, y: marker.displayPosition.y, z: marker.displayPosition.z)
                                      })
+                                     
+                                     // query former results
+                                     HTTPRequest.QualityInspectionPart.queryArborsResult(arborId: self.currentArbor.id, name: self.user.userName, passwd: self.user.password) { [self] feedback in
+                                         if let feed = feedback{
+                                             if feed.formerResults.count > 0{
+                                                 formerArborResult.setTitle("\(feed.formerResults.count) Former Results", for: .normal)
+                                                 formerArborResult.configuration?.image = UIImage(systemName: "bag.fill")
+                                             }
+                                         }
+                                     } errorHandler: { error in
+                                         print(error)
+                                     }
+
 
                                      showMessage(message: self.currentImageName, showProcess: false)
                                      if let image = imageToDisplay{

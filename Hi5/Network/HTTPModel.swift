@@ -222,6 +222,17 @@ struct QueryArborResultStruct:Codable {
     let arborId:Int
 }
 
+struct QueryArborFormerResult:Codable{
+    let ArborId:Int
+    let Result:Int
+    let Form:Int
+    let Owner:String
+}
+
+struct QueryArborFormerResults{
+    let formerResults:[QueryArborFormerResult]
+}
+
 struct QueryMarkerListStruct:Codable {
     let user:UserInfo
     let pa:ArborDetail

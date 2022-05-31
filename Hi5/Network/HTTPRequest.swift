@@ -228,7 +228,7 @@ struct HTTPRequest{
             }
         }
         
-        static func queryArborsResult(arborId:Int, name:String, passwd:String,  completionHandler:@escaping()->Void, errorHandler:@escaping(String)->Void) {
+        static func queryArborsResult(arborId:Int, name:String, passwd:String,  completionHandler:@escaping(QueryArborFormerResults?)->Void, errorHandler:@escaping(String)->Void) {
             let userInfo = UserInfo(name: name, passwd: passwd)
             let queryArborResultStruct = QueryArborResultStruct(user: userInfo, arborId: arborId)
             
@@ -236,11 +236,12 @@ struct HTTPRequest{
             guard jsonData != nil else {return}
             
             uploadTask(url: Hi5API.queryArborResult, uploadData: jsonData!) { data, error, statusCode in
-                if  statusCode == 200 {
+                if let data = data, statusCode == 200 {
                     
                     // TODO: parse data of query arbor result
 //                    print(String(data: data, encoding:.utf8))
-                    completionHandler()
+                    let feedback = Hi5API.parseArborFormerResult(jsonData: data)
+                    completionHandler(feedback)
                 }
                 
                 if error != nil && statusCode != 200 {

@@ -30,6 +30,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     var scaleLabel:UIButton!
     var indicator:UIButton!
     var swcSwitch:UIButton!
+    var formerArborResult:UIButton!
     
     var userArray:[simd_float3] = [] // soma marked by user
     var originalSomaArray:[simd_float3] = [] // soma list fetched from server
@@ -124,6 +125,17 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
         swcSwitch.isEnabled = false
         view.addSubview(swcSwitch)
         
+        // add former results button
+        var formerArborResultConfiguration = scaleLabelConfiguration
+        formerArborResultConfiguration.image = UIImage(systemName: "bag")
+        formerArborResultConfiguration.imagePadding = 10
+        formerArborResultConfiguration.title = "Former Results"
+        formerArborResult = UIButton(configuration: formerArborResultConfiguration)
+        formerArborResult.translatesAutoresizingMaskIntoConstraints = false
+        formerArborResult.alpha = 0
+        formerArborResult.isEnabled = false
+        view.addSubview(formerArborResult)
+        
         
         let constraints = [
             scaleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
@@ -133,7 +145,10 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
             indicator.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             
             swcSwitch.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 10),
-//            swcSwitch.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -100)
+//            swcSwitch.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -100),
+            
+            formerArborResult.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
+//            formerArborResult.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -100)
         ]
         NSLayoutConstraint.activate(constraints)
     }
