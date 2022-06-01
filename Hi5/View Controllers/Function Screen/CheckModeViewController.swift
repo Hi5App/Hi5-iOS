@@ -11,11 +11,11 @@ import UIKit
 import UniformTypeIdentifiers
 import simd
 
-enum ReconstructionType {
-    case Good
-    case BadSwcGoodImage
-    case NormalSwcNormalImage
-    case BadImage
+enum ReconstructionType:Int {
+    case Good = 4
+    case BadSwcGoodImage = 3
+    case NormalSwcNormalImage = 2
+    case BadImage = -1
 }
 
 struct arborFeedbackManagement{
@@ -169,6 +169,7 @@ class CheckModeViewController:Image3dViewController{
     var currentFeedbackIndex = 0
     var currentArbor:ArborInfo!
     var currentMarkerFeedBack:QueryMarkerListFeedBack!
+    var currentFormerResults:QueryArborFormerResults!
     var emptyTree:neuronTree? = nil
     var cacheTree:neuronTree?
     var showingSWC:Bool = false{
@@ -226,13 +227,6 @@ class CheckModeViewController:Image3dViewController{
         }
         
         
-//        if !DownloadThreadEnabled {
-//            DownloadThreadEnabled = true
-//            threadQueue.async {
-//                self.preDownloadMethod()
-//            }
-//        }
-        
         func alertForNetworkError(){
             if self.somaPotentialLocation == nil || self.brainListfeed == nil{
                 let alert = UIAlertController(title: "Network Error", message: "Unable to request server image\nPlease try again later", preferredStyle: .alert)
@@ -256,6 +250,7 @@ class CheckModeViewController:Image3dViewController{
         formerArborResult.setTitle("No Results", for: .normal)
         let fbottomConstraint = formerArborResult.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -(markToolbar.frame.height+swcTypeToolbar.frame.height+CGFloat(20)))
         NSLayoutConstraint.activate([fbottomConstraint])
+        formerArborResult.addTarget(self, action: #selector(showFormerResults), for: .touchUpInside)
     }
     
     @objc func toggleSWC(){
@@ -266,6 +261,27 @@ class CheckModeViewController:Image3dViewController{
             showingSWC = true
             swcSwitch.configuration?.image = UIImage(systemName: "eye.fill")
         }
+    }
+    
+    @objc func showFormerResults(){
+        let vc = FormerResultsController(results: currentFormerResults)
+        vc.title = "Results"
+        let nav = UINavigationController(rootViewController: vc)
+
+        let DoneButton = UIBarButtonItem(systemItem: .done, primaryAction: .init(handler: { _ in
+            vc.dismiss(animated: true)
+        }), menu: nil)
+        vc.navigationItem.rightBarButtonItem = DoneButton
+        vc.navigationController?.navigationBar.prefersLargeTitles = true
+        
+        if let sheet = nav.sheetPresentationController{
+            sheet.detents = [.medium()]
+            sheet.prefersScrollingExpandsWhenScrolledToEdge = false
+            sheet.prefersGrabberVisible = true
+            sheet.preferredCornerRadius = 20
+        }
+        
+        present(nav, animated: true)
     }
     
     override func renderObjects(drawable: CAMetalDrawable) {
@@ -539,6 +555,7 @@ class CheckModeViewController:Image3dViewController{
                                      HTTPRequest.QualityInspectionPart.queryArborsResult(arborId: self.currentArbor.id, name: self.user.userName, passwd: self.user.password) { [self] feedback in
                                          if let feed = feedback{
                                              if feed.formerResults.count > 0{
+                                                 self.currentFormerResults = feed
                                                  formerArborResult.setTitle("\(feed.formerResults.count) Former Results", for: .normal)
                                                  formerArborResult.configuration?.image = UIImage(systemName: "bag.fill")
                                              }
