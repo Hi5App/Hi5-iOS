@@ -56,12 +56,13 @@ class MarkerFactoryViewController:Image3dViewController{
 
     var preDownloadThread = Thread()
     var checkFreshTimer = Timer()
+    var checkDownloadTimer:Timer!
 
-    
+    // MARK: - Life Cycle
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         imageCache.imageCache.removeAll()
-        
+        checkDownloadTimer.invalidate()
     }
     
     override func viewDidLoad() {
@@ -73,44 +74,10 @@ class MarkerFactoryViewController:Image3dViewController{
         worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
         imageCache = image4DSimpleCache()
 //        request potential location and brainList for later use
-
-//        HTTPRequest.ImagePart.getBrainList(name: user.userName, passwd: user.password) { feedback in
-//            if let feedback = feedback{
-//                self.brainListfeed = feedback
-//                print("brainList")
-//                HTTPRequest.SomaPart.getPotentialLocation(name: self.user.userName, passwd: self.user.password) { feedback in
-//                    if let feedback = feedback{
-//
-//                        self.somaPotentialLocation = feedback
-//
-//                        print("first see potential location: \(self.somaPotentialLocation!)")
-//                        self.imageCache.addLocation(location: feedback)
-//
-//
-//                    }
-//                } errorHandler: { error in
-//                    alertForNetworkError()
-//                    print("soma potential fetch failed")
-//                }
-//            }
-//        } errorHandler: { error in
-//            alertForNetworkError()
-//            print("brain list fetch failed")
-//        }
-
-//        if !DownloadThreadEnabled {
-//            DownloadThreadEnabled = true
-//            threadQueue.async {
-//                self.preDownloadMethod()
-//            }
-//        }
-
-//        threadQueue.async {
-//            self.preDownloadMethod()
-//        }
         
-        preDownloadThread = Thread(target: self, selector: #selector(preDownloadMethod), object: nil)
-        preDownloadThread.start()
+        preDownloadMethod()
+//        preDownloadThread = Thread(target: self, selector: #selector(preDownloadMethod), object: nil)
+//        preDownloadThread.start()
         
         checkFreshTimer = Timer.scheduledTimer(timeInterval: 30, target: self, selector: #selector(checkFresh), userInfo: nil, repeats: true)
         
@@ -532,38 +499,42 @@ class MarkerFactoryViewController:Image3dViewController{
     }
     
     @objc func preDownloadMethod() {
-        while (true) {
-            if (preDownloadThread.isCancelled) {
-                Thread.exit()
-            }
-            if (imageCache.somaPoLocations.count - imageCache.index < 7 && !isDownloading) {
-                self.isDownloading = true
-                HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { potentialLocationFeedback in
-                    if let potentialLocationFeedback = potentialLocationFeedback {
+        checkDownloadTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(preLoad), userInfo: nil, repeats: true)
+        
+    }
+    
+    @objc func preLoad(){
+        print("download checked")
+        if (preDownloadThread.isCancelled) {
+            Thread.exit()
+        }
+        if (imageCache.somaPoLocations.count - imageCache.index < 7 && !isDownloading) {
+            self.isDownloading = true
+            HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { potentialLocationFeedback in
+                if let potentialLocationFeedback = potentialLocationFeedback {
 //                        self.imageCache.addLocation(location: potentialLocationFeedback)
-                        
-                        if let _ = self.brainListfeed {
-                            self.downloadImage(potentialLocationFeedback: potentialLocationFeedback)
-                        } else {
-                            HTTPRequest.ImagePart.getBrainList(name: self.user.userName, passwd: self.user.password) { feedback in
-                                if let feedback = feedback {
-                                    self.brainListfeed = feedback
-                                    self.downloadImage(potentialLocationFeedback: potentialLocationFeedback)
-                                }
-                            } errorHandler: { error in
-                                print(error)
+                    
+                    if let _ = self.brainListfeed {
+                        self.downloadImage(potentialLocationFeedback: potentialLocationFeedback)
+                    } else {
+                        HTTPRequest.ImagePart.getBrainList(name: self.user.userName, passwd: self.user.password) { feedback in
+                            if let feedback = feedback {
+                                self.brainListfeed = feedback
+                                self.downloadImage(potentialLocationFeedback: potentialLocationFeedback)
                             }
+                        } errorHandler: { error in
+                            print(error)
                         }
                     }
-                } errorHandler: { error in
-                    print(error)
-                    if (error == "Empty") {
-                        print("No more file")
-                    }
-                    self.isDownloading = false
                 }
-
+            } errorHandler: { error in
+                print(error)
+                if (error == "Empty") {
+                    print("No more file")
+                }
+                self.isDownloading = false
             }
+
         }
     }
     
