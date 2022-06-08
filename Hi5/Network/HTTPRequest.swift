@@ -44,6 +44,7 @@ struct HTTPRequest{
             uploadTask(url:Hi5API.loginURL, uploadData: jsonData!) {
                 data, error, statusCode in
                 if let data = data, statusCode == 200 {
+                    print(String(decoding:data,as:UTF8.self))
                     let loginFeedBack = Hi5API.parseLoginJSON(jsonData: data)
                     completionHandler(loginFeedBack)
                 }
