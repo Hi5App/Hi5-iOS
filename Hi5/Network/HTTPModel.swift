@@ -38,6 +38,13 @@ struct RegisterFeedback:Codable {
     let code:String
 }
 
+struct performanceFeedback:Codable{
+    let totalsoma:Int
+    let dailysoma:Int
+    let totalCheck:Int
+    let dailyCheck:Int
+}
+
 // MARK: - Image Data Structure
 struct QueryCondition:Codable{
     let off:Int

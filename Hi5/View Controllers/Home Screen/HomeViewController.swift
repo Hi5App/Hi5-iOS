@@ -31,7 +31,7 @@ class HomeViewController: UIViewController,checkLoginStatus,passUserPrefChange{
     let functionDataSource = functionCollectionViewDataSource()
     var loginUser:User!{
         didSet{
-            userPref = UserPreferences(username: loginUser.userName, password: loginUser.password, autoLogin: false, ImageShapening: false)
+            userPref = UserPreferences(username: loginUser.userName, password: loginUser.password, autoLogin: false, ImageShapening: false,genderPicture: true,dailyGoals: 0)
         }
     }
     var userPref:UserPreferences!{
@@ -132,24 +132,6 @@ class HomeViewController: UIViewController,checkLoginStatus,passUserPrefChange{
         }
     }
     
-//    @objc func tapUser(){
-//        if loginUser.email == "Guest@Guest.com"{
-//            let alert = UIAlertController(title: "Attention", message: "You are currently in Guest Mode\nSign in to see account infomation", preferredStyle: .alert)
-//            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-//            alert.addAction(UIAlertAction(title: "Sign in", style: .default,handler: { (action) in
-//                //present loginViewController
-//                self.backToLogin()
-//            }))
-//            self.present(alert, animated: true)
-//            return
-//        }else{
-//            let UserInfoVC = UserInfoViewController(style: .insetGrouped)
-//            UserInfoVC.loginUser = self.loginUser
-//            UserInfoVC.delagate = self
-//            self.present(UserInfoVC, animated: true)
-//        }
-//    }
-    
     @objc func tapUser(){
         if loginUser.email == "Guest@Guest.com"{
             let alert = UIAlertController(title: "Attention", message: "You are currently in Guest Mode\nSign in to see account infomation", preferredStyle: .alert)
@@ -163,7 +145,9 @@ class HomeViewController: UIViewController,checkLoginStatus,passUserPrefChange{
         }else{
             let storyBoard:UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
             let nextViewController = storyBoard.instantiateViewController(withIdentifier: "userDetailVC") as! UserDetailViewController
+            nextViewController.delegate = self
             nextViewController.loginUser = self.loginUser
+            nextViewController.userPref = self.userPref
             self.navigationController?.pushViewController(nextViewController, animated: true)
         }
     }

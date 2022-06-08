@@ -12,4 +12,7 @@ struct UserPreferences:Codable{
     var password:String
     var autoLogin:Bool
     var ImageShapening:Bool
+    
+    var genderPicture:Bool
+    var dailyGoals:Int
 }

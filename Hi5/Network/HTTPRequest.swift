@@ -44,7 +44,7 @@ struct HTTPRequest{
             uploadTask(url:Hi5API.loginURL, uploadData: jsonData!) {
                 data, error, statusCode in
                 if let data = data, statusCode == 200 {
-                    print(String(decoding:data,as:UTF8.self))
+//                    print(String(decoding:data,as:UTF8.self))
                     let loginFeedBack = Hi5API.parseLoginJSON(jsonData: data)
                     completionHandler(loginFeedBack)
                 }
@@ -70,6 +70,23 @@ struct HTTPRequest{
                     OperationQueue.main.addOperation {
                         errorHandler("error in register")
                     }
+                }
+            }
+        }
+        
+        static func queryPerformance(name:String, passwd:String, completionHandler:@escaping(performanceFeedback?)->Void, errorHandler:@escaping(String)->Void){
+            let queryPotentialLocationStruct = QueryPotentialLoactionStruct(user: UserInfo(name: name, passwd: passwd))
+            let jsonData = Hi5API.generateJSON(queryPotentialLocationStruct)
+            guard jsonData != nil else {return}
+            
+            uploadTask(url: Hi5API.queryCheckAndSomaCounts, uploadData: jsonData!) { data, error, statusCode in
+                if let data = data, statusCode == 200 {
+//                    print(String(decoding: data, as: UTF8.self))
+                    let feedback = Hi5API.parsePerformanceResult(jsonData: data)
+                    completionHandler(feedback)
+                }
+                if error != nil && statusCode != 200 {
+                    errorHandler("error in get performance")
                 }
             }
         }
@@ -238,9 +255,6 @@ struct HTTPRequest{
             
             uploadTask(url: Hi5API.queryArborResult, uploadData: jsonData!) { data, error, statusCode in
                 if let data = data, statusCode == 200 {
-                    
-                    // TODO: parse data of query arbor result
-//                    print(String(data: data, encoding:.utf8))
                     let feedback = Hi5API.parseArborFormerResult(jsonData: data)
                     completionHandler(feedback)
                 }

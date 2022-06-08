@@ -7,10 +7,13 @@
 
 import UIKit
 
-class UserDetailViewController: UIViewController,UITableViewDataSource,UITableViewDelegate{
+class UserDetailViewController: UIViewController,UITableViewDataSource,UITableViewDelegate,passUserPrefChange{
     
     var loginUser:User!
+    var userPref:UserPreferences!
     var options:[option]!
+    
+    var delegate:passUserPrefChange!
     
     @IBOutlet var profileImageView: UIImageView!
     @IBOutlet var userNameLabel: UILabel!
@@ -25,25 +28,50 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
     
     @IBOutlet var signOutButton: UIButton!
     
+    override func viewWillDisappear(_ animated: Bool) {
+        delegate.userPref = self.userPref
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupOptions()
         actionTableView.dataSource = self
         actionTableView.delegate = self
         actionTableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        requestForNumberCounts()
         fillLabels()
+        requestForNumberCounts()
         tapImageGesture()
+        
+        //use userPref
+        setupProfileImage()
+        updateDailySomaGoal(goal: userPref.dailyGoals)
         profileImageView.layer.cornerRadius = 40
     }
     
+    func setupProfileImage(){
+        if userPref.genderPicture{
+            profileImageView.image = UIImage(named: "man")
+        }else{
+            profileImageView.image = UIImage(named: "woman")
+        }
+    }
+    
     func requestForNumberCounts(){
-        
+        HTTPRequest.UserPart.queryPerformance(name: loginUser.userName, passwd: loginUser.password) { [self] feedback in
+            if let feed = feedback{
+                fillCounts(checkNumber: feed.totalCheck, DCheckNumber: feed.dailyCheck, somaNumber: feed.totalsoma, DSomaNumber: feed.dailysoma)
+                updateDailySomaGoal(goal: userPref.dailyGoals)
+            }
+        } errorHandler: { error in
+            print(error)
+        }
+
     }
     
     func fillLabels(){
         userNameLabel.text = loginUser.userName
         emailLabel.text = loginUser.email
+        fillCounts(checkNumber: 0, DCheckNumber: 0, somaNumber: 0, DSomaNumber: 0)
     }
     
     func fillCounts(checkNumber:Int,DCheckNumber:Int,somaNumber:Int,DSomaNumber:Int){
@@ -63,9 +91,11 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
         let actionsheet = UIAlertController(title: "Choose your gender", message: nil, preferredStyle: .actionSheet)
         let manChoice = UIAlertAction(title: "Male", style: .default) { _ in
             self.profileImageView.image = UIImage(named: "man")
+            self.userPref.genderPicture = true
         }
         let womanChoice = UIAlertAction(title: "Female", style: .default) { _ in
             self.profileImageView.image = UIImage(named: "woman")
+            self.userPref.genderPicture = false
         }
         let cancel = UIAlertAction(title: "Cancel", style: .cancel)
         actionsheet.addAction(manChoice)
@@ -74,6 +104,14 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
         self.present(actionsheet, animated: true)
     }
     
+    func updateDailySomaGoal(goal:Int){
+        if goal <= 0{
+            return
+        }else{
+            dailySomaCheck.text = "0/\(goal)"
+            userPref.dailyGoals = goal
+        }
+    }
     
     // MARK: - table view setup
     struct option{
@@ -100,6 +138,32 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
         cell.imageView?.image = UIImage(systemName: options[indexPath.row].imageName)
         cell.backgroundColor = UIColor(named: "cellBackground")
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let title = options[indexPath.row].title
+        switch title{
+        case "Daily Goals":
+            let inputView = UIAlertController(title: "Set your daily Goals", message: nil, preferredStyle: .alert)
+            
+            inputView.addTextField { textfield in
+                textfield.placeholder = "Your daily soma Goal"
+                textfield.keyboardType = .numberPad
+            }
+            
+            inputView.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+                let text = inputView.textFields![0].text!
+                print("goal is \(text)")
+                if let goal = Int(text){
+                    self.updateDailySomaGoal(goal: goal)
+                }
+            }))
+            self.present(inputView, animated: true)
+        default:
+            let alertView = UIAlertController(title: "Sorry", message: "This options is under Development", preferredStyle: .alert)
+            alertView.addAction(UIAlertAction(title: "OK", style: .cancel))
+            self.present(alertView, animated: true)
+        }
     }
 
 }

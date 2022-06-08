@@ -32,6 +32,8 @@ struct Hi5API{
     static let insertMarkerListURL = serverIP + "/dynamic/arbordetail/insert"
     static let deleteMarkerListURL = serverIP + "/dynamic/arbordetail/delete"
     
+    static let queryCheckAndSomaCounts = serverIP + "/dynamic/user/getuserperformance"
+    
     static func parseLoginJSON(jsonData:Data)->LoginFeedback?{
         do {
             let decoder = JSONDecoder()
@@ -157,6 +159,16 @@ struct Hi5API{
             return feedback
         } catch {
             print("decode arbor former results error")
+            return nil
+        }
+    }
+    
+    static func parsePerformanceResult(jsonData:Data) -> performanceFeedback? {
+        do {
+            let feedback = try JSONDecoder().decode(performanceFeedback.self,from: jsonData)
+            return feedback
+        } catch {
+            print("decode performance results error")
             return nil
         }
     }
