@@ -9,6 +9,16 @@ import UniformTypeIdentifiers
 import simd
 
 class MarkerFactoryViewController:Image3dViewController{
+    
+    var timeoutNumber:Int = 0{
+        didSet{
+            if timeoutNumber > 6{
+                OperationQueue.main.addOperation {
+                    self.alertForNetworkError()
+                }
+            }
+        }
+    }
  
     //Buttons
     var backwardButton:UIButton!
@@ -74,25 +84,22 @@ class MarkerFactoryViewController:Image3dViewController{
         worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
         imageCache = image4DSimpleCache()
 //        request potential location and brainList for later use
-        
-        preDownloadMethod()
-//        preDownloadThread = Thread(target: self, selector: #selector(preDownloadMethod), object: nil)
-//        preDownloadThread.start()
+        self.preDownloadMethod()
         
         checkFreshTimer = Timer.scheduledTimer(timeInterval: 30, target: self, selector: #selector(checkFresh), userInfo: nil, repeats: true)
-        
-        
-        func alertForNetworkError(){
-            if self.somaPotentialLocation == nil || self.brainListfeed == nil{
-                let alert = UIAlertController(title: "Network Error", message: "Unable to request server image\nPlease try again later", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .cancel,handler: { (action) in
-                    self.navigationController?.popViewController(animated: true)
-                }))
-                self.present(alert, animated: true)
-            }
-        }
+     
     }
     
+    func alertForNetworkError(){
+        if self.somaPotentialLocation == nil || self.brainListfeed == nil{
+            let alert = UIAlertController(title: "Network Error", message: "Unable to request server image\nPlease try again later", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel,handler: { (action) in
+                self.checkDownloadTimer.invalidate()
+                self.navigationController?.popViewController(animated: true)
+            }))
+            self.present(alert, animated: true)
+        }
+    }
 
     override func renderObjects(drawable:CAMetalDrawable) {
     // draw the view
@@ -242,26 +249,6 @@ class MarkerFactoryViewController:Image3dViewController{
     }
     
     @objc func requestForNextImage(){
-//        userArray.removeAll()
-//        somaArray = userArray + originalSomaArray
-        
-        // try retrive images from cache
-//        if let location = imageCache.nextLocation(){
-//            self.somaPotentialLocation = location
-//            self.readCloudImage()
-//        }else{
-//            // request image from server
-//            HTTPRequest.SomaPart.getPotentialLocation(name: user.userName, passwd: user.password) { feedback in
-//                if let feedback = feedback{
-//                    self.somaPotentialLocation = feedback
-//                    print("forward see potential location: \(self.somaPotentialLocation!)")
-//                    self.imageCache.addLocation(location: feedback)
-//                    self.readCloudImage()
-//                }
-//            } errorHandler: { error in
-//                print("soma potential fetch failed")
-//            }
-//        }
         if imageCache.nextOne() {
             self.somaPotentialLocation = imageCache.somaPoLocations[imageCache.index].potentialLocationFeedBack
             self.currentImageURL = imageCache.urls[imageCache.index]
@@ -402,6 +389,16 @@ class MarkerFactoryViewController:Image3dViewController{
         self.showMessage(message: "Decompressing...",showProcess: true)
         DispatchQueue.global(qos: .userInitiated).async {
             self.decompressImage {
+                if let image = self.imageToDisplay{
+                    self.drawWithImage(image: image)
+                    
+                }else{
+                    print("No 4d image")
+                }
+                let queue = DispatchQueue.global()
+                queue.async {
+                    self.imageToDisplay.make3DArrayFrom1DArray()
+                }
                 // request somaList
                 HTTPRequest.SomaPart.getSomaList(centerX: self.somaPotentialLocation.loc.x, centerY: self.somaPotentialLocation.loc.y, centerZ: self.somaPotentialLocation.loc.z, size: self.somaperferredSize, res:"", brainId: self.somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { feedback in
                     if let feedback = feedback{
@@ -413,17 +410,13 @@ class MarkerFactoryViewController:Image3dViewController{
                         })
                         self.userArray.removeAll()
                         //display image
-                        if let image = self.imageToDisplay{
-                            self.showMessage(message: self.currentImageName,showProcess: false)
-                            self.DoneButton.isEnabled = true
-                            self.goodImageButton.isEnabled = true
-                            self.boringImageButton.isEnabled = true
-                            
-                            self.drawWithImage(image: image)
-                            self.enableButtons()
-                        }else{
-                            print("No 4d image")
-                        }
+                        self.showMessage(message: self.currentImageName,showProcess: false)
+                        self.DoneButton.isEnabled = true
+                        self.goodImageButton.isEnabled = true
+                        self.boringImageButton.isEnabled = true
+                        
+                        self.enableButtons()
+                        
                     }
                 } errorHandler: { error in
                     print("soma List fetch failed")
@@ -498,6 +491,7 @@ class MarkerFactoryViewController:Image3dViewController{
         }
     }
     
+    //MARK: - Pre download
     @objc func preDownloadMethod() {
         checkDownloadTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(preLoad), userInfo: nil, repeats: true)
         
@@ -523,12 +517,14 @@ class MarkerFactoryViewController:Image3dViewController{
                                 self.downloadImage(potentialLocationFeedback: potentialLocationFeedback)
                             }
                         } errorHandler: { error in
+                            self.timeoutNumber += 1
                             print(error)
                         }
                     }
                 }
             } errorHandler: { error in
                 print(error)
+                self.timeoutNumber += 1
                 if (error == "Empty") {
                     print("No more file")
                 }

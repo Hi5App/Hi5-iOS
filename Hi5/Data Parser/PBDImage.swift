@@ -86,20 +86,21 @@ struct PBDImage{
         decompressionByteBuffer = Array(repeating: UInt8(0), count: Int(size[0]*size[1]*size[2]))
         // decompress image data
         decompressPBDImageData(compressionBufferPointer: 43, decompressionBufferPointer: 0, decompressionSize: Int(size[0]*size[1]*size[2]))
-        var imageDataStart = 0
-        var array128x128x128 = Array(repeating: Array(repeating: Array(repeating: UInt8(0), count: 128), count: 128), count: 128)
-        for i in 0...127{
-            for j in 0...127{
-                for k in 0...127{
-                    array128x128x128[i][j][k] = decompressionByteBuffer[imageDataStart]
-                    imageDataStart += 1
-                }
-            }
-        }
-        if imageDataStart == decompressionByteBuffer.count {
-            print("Image \(PBDimageURL.lastPathComponent) read finished")
-        }
-        
+//        var imageDataStart = 0
+        var array128x128x128 = [[[UInt8(0)]]]
+//        Array(repeating: Array(repeating: Array(repeating: UInt8(0), count: 128), count: 128), count: 128)
+//        for i in 0...127{
+//            for j in 0...127{
+//                for k in 0...127{
+//                    array128x128x128[i][j][k] = decompressionByteBuffer[imageDataStart]
+//                    imageDataStart += 1
+//                }
+//            }
+//        }
+//        if imageDataStart == decompressionByteBuffer.count {
+//            print("Image \(PBDimageURL.lastPathComponent) read finished")
+//        }
+        print("Image \(PBDimageURL.lastPathComponent) read finished")
         // init a image4DSimple
         let image4DSimple = image4DSimple(name: PBDimageURL.lastPathComponent, endiannessType: endianness, dataType: datatype, Int(size[0]), Int(size[1]), Int(size[2]), Int(size[3]), array128x128x128 ,array: decompressionByteBuffer)
 //        print("initialized a image4DSimple obejct from pbd file")

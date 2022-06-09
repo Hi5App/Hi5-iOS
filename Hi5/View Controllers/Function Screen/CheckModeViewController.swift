@@ -187,6 +187,9 @@ class CheckModeViewController:Image3dViewController{
     
     var checkTimer:Timer = Timer()
     
+    var t1:Date!
+    var t2:Date!
+    
     //MARK: - Lifecycle
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -215,7 +218,7 @@ class CheckModeViewController:Image3dViewController{
                         self.getArborFeedBack = arborFeedbackManagement(currentFeedback: feed,downloadStatus: Array(repeating: nil, count: feed.arbors.count))
                         self.currentArbor = feed.arbors[0]
                         // debug
-//                        self.readCloudImage()
+                        self.readCloudImage()
                         self.downloadImages()
                     }
                 } errorHandler: { error in
@@ -379,6 +382,8 @@ class CheckModeViewController:Image3dViewController{
     }
     
     @objc func forwardButtonTapped(){
+        // record time
+        t1 = Date()
         // update soma list
         showMessage(message: "Uploading Marker...", showProcess: true)
         uploadMarkerArray()
@@ -494,12 +499,12 @@ class CheckModeViewController:Image3dViewController{
    // MARK: - Image Reader
     
     @objc func readCloudImage(){
+        self.Tree = nil
         disableButtons()
         
         showMessage(message: "Downloading Image...", showProcess: true)
         // search image and swc
         checkTimer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(checkForExistingImage), userInfo: nil, repeats: true)
-        print("read finish")
     }
     
     @objc func checkForExistingImage(){
@@ -509,6 +514,15 @@ class CheckModeViewController:Image3dViewController{
             checkTimer.invalidate()
             showMessage(message: "Decompressing swc...", showProcess: true)
             self.decompressImage{
+                if let image = imageToDisplay{
+                    drawWithImage(image: image)
+                }else{
+                    print("No 4d image")
+                }
+                let queue = DispatchQueue.global()
+                queue.async {
+                    self.imageToDisplay.make3DArrayFrom1DArray()
+                }
 //            request swc
                  HTTPRequest.QualityInspectionPart.getSwc(
                      centerX: currentArbor.loc.x,
@@ -566,12 +580,13 @@ class CheckModeViewController:Image3dViewController{
 
 
                                      showMessage(message: self.currentImageName, showProcess: false)
-                                     if let image = imageToDisplay{
-                                         drawWithImage(image: image)
-                                         enableButtons()
-                                     }else{
-                                         print("No 4d image")
+                                     t2 = Date()
+                                     if t1 != nil{
+                                         print("times used: " + String(format: "%.2f", t2.timeIntervalSince(t1)))
                                      }
+                                     enableButtons()
+                                     
+                                     
                                  }
                              } errorHandler: { error in
                                  print(error)
