@@ -145,10 +145,10 @@ class LoginViewController: UIViewController {
                 let data = try Data(contentsOf: documentURL)
                 let unarchiver = PropertyListDecoder()
                 UserPref = try unarchiver.decode(UserPreferences.self, from: data)
-                print("user pref loaded")
+                print("user pref loaded in login screen")
                 return true
             }catch{
-                print("user pref load failed")
+                print("user pref load in login screen failed")
                 return false
             }
         }

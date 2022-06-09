@@ -57,9 +57,10 @@ class HomeViewController: UIViewController,checkLoginStatus,passUserPrefChange{
                 let encoder = PropertyListEncoder()
                 let data = try encoder.encode(userPref)
                 try data.write(to: documentURL,options: .atomic)
-                print("user pref saved")
+//                print(userPref)
+                print("user pref saved in home screen")
             }catch{
-                print("user pref save failed")
+                print("user pref save in home screen failed")
             }
         }
     }
@@ -70,9 +71,9 @@ class HomeViewController: UIViewController,checkLoginStatus,passUserPrefChange{
                 let data = try Data(contentsOf: documentURL)
                 let unarchiver = PropertyListDecoder()
                 userPref = try unarchiver.decode(UserPreferences.self, from: data)
-                print("user pref loaded")
+                print("user pref loaded in home screen")
             }catch{
-                print("user pref load failed")
+                print("user pref load in home screen failed")
             }
         }
     }
@@ -146,6 +147,7 @@ class HomeViewController: UIViewController,checkLoginStatus,passUserPrefChange{
             let storyBoard:UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
             let nextViewController = storyBoard.instantiateViewController(withIdentifier: "userDetailVC") as! UserDetailViewController
             nextViewController.delegate = self
+            nextViewController.loginDelagate = self
             nextViewController.loginUser = self.loginUser
             nextViewController.userPref = self.userPref
             self.navigationController?.pushViewController(nextViewController, animated: true)

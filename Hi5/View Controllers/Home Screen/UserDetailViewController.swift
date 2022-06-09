@@ -15,6 +15,8 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
     
     var delegate:passUserPrefChange!
     
+    var loginDelagate:checkLoginStatus?
+    
     @IBOutlet var profileImageView: UIImageView!
     @IBOutlet var userNameLabel: UILabel!
     @IBOutlet var emailLabel: UILabel!
@@ -28,8 +30,14 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
     
     @IBOutlet var signOutButton: UIButton!
     
+    @IBAction func signOut(_ sender: Any) {
+        self.navigationController?.popViewController(animated: true)
+        self.loginDelagate?.loginStatus = false
+    }
     override func viewWillDisappear(_ animated: Bool) {
-        delegate.userPref = self.userPref
+        if self.loginDelagate?.loginStatus != false {
+            delegate.userPref = self.userPref
+        }
     }
     
     override func viewDidLoad() {

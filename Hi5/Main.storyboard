@@ -235,16 +235,22 @@
                                 <edgeInsets key="layoutMargins" top="15" left="20" bottom="15" right="20"/>
                             </stackView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" verticalCompressionResistancePriority="752" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" estimatedSectionHeaderHeight="-1" sectionFooterHeight="28" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="5bm-ez-Nnu">
-                                <rect key="frame" x="9.6666666666666572" y="373.33333333333326" width="370.66666666666674" height="390.66666666666674"/>
+                                <rect key="frame" x="9.6666666666666572" y="373.33333333333326" width="370.66666666666674" height="381.66666666666674"/>
                                 <color key="backgroundColor" name="homeBackground"/>
                                 <color key="tintColor" name="mainOrange"/>
                             </tableView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2wi-do-fmo" userLabel="signOutButton">
-                                <rect key="frame" x="155" y="774" width="80" height="31"/>
+                                <rect key="frame" x="19" y="765" width="352" height="40"/>
+                                <color key="backgroundColor" name="cellBackground"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="srm-lr-6Fd"/>
+                                </constraints>
+                                <color key="tintColor" name="mainOrange"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Sign Out">
-                                    <color key="baseBackgroundColor" name="mainOrange"/>
-                                </buttonConfiguration>
+                                <buttonConfiguration key="configuration" style="plain" title="Sign Out" cornerStyle="medium"/>
+                                <connections>
+                                    <action selector="signOut:" destination="hgq-3V-SRw" eventType="touchUpInside" id="Won-hR-neM"/>
+                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="5Th-TG-lWx"/>
@@ -252,6 +258,7 @@
                         <constraints>
                             <constraint firstItem="5bm-ez-Nnu" firstAttribute="top" secondItem="lBi-SD-d4Y" secondAttribute="bottom" constant="20" id="19Q-7L-v8i"/>
                             <constraint firstItem="DJf-AI-uxx" firstAttribute="centerX" secondItem="5Th-TG-lWx" secondAttribute="centerX" id="8Mz-yw-sHd"/>
+                            <constraint firstItem="2wi-do-fmo" firstAttribute="width" secondItem="lBi-SD-d4Y" secondAttribute="width" multiplier="0.95" id="8aF-u2-jOy"/>
                             <constraint firstItem="5bm-ez-Nnu" firstAttribute="width" secondItem="lBi-SD-d4Y" secondAttribute="width" id="8vK-8p-D7j"/>
                             <constraint firstItem="DJf-AI-uxx" firstAttribute="width" secondItem="5Th-TG-lWx" secondAttribute="width" id="Fgh-br-B7M"/>
                             <constraint firstItem="2wi-do-fmo" firstAttribute="centerX" secondItem="5Th-TG-lWx" secondAttribute="centerX" id="L79-b6-dsg"/>
