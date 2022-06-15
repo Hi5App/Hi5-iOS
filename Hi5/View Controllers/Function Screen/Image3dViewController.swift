@@ -65,6 +65,9 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     let perferredSize = 128
     let somaperferredSize = 256
     
+    var achievementVC:UIViewController!
+    var dismissButton:UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureLabels()
@@ -188,6 +191,45 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
         imageName.removeSubrange(resStart..<resEnd)
         imageName.removeLast(7)
         return imageName
+    }
+    
+    @objc func showAchievements(){
+        let type = AchievementType.dailySomaGoal
+        
+        achievementVC = AchievementsViewController()
+        self.addChild(achievementVC)
+        view.addSubview(achievementVC.view)
+        
+        achievementVC.view.translatesAutoresizingMaskIntoConstraints = false
+        achievementVC.view.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        achievementVC.view.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+        achievementVC.view.widthAnchor.constraint(equalToConstant: 264).isActive = true
+        achievementVC.view.heightAnchor.constraint(equalToConstant: 364).isActive = true
+        
+        achievementVC.drawAchievementsView(for: type)
+        
+        var buttonConfig = UIButton.Configuration.filled()
+        buttonConfig.background.cornerRadius = 10
+        buttonConfig.buttonSize = .medium
+        buttonConfig.baseBackgroundColor = UIColor.systemOrange
+        buttonConfig.title = "Got it!"
+        dismissButton = UIButton(configuration: buttonConfig)
+        
+        achievementVC.view.addSubview(dismissButton)
+        dismissButton.translatesAutoresizingMaskIntoConstraints = false
+        dismissButton.centerXAnchor.constraint(equalTo: achievementVC.view.centerXAnchor).isActive = true
+        dismissButton.bottomAnchor.constraint(equalTo: achievementVC.view.bottomAnchor,constant: -15).isActive = true
+        dismissButton.addTarget(self, action: #selector(dismissAchievementView), for: .touchUpInside)
+        
+        achievementVC.didMove(toParent: self)
+        
+    }
+    
+    @objc func dismissAchievementView(){
+        achievementVC.willMove(toParent: nil)
+        // deactivate constraints
+        achievementVC.view.removeFromSuperview()
+        achievementVC.removeFromParent()
     }
     
    // MARK: - Image Reader

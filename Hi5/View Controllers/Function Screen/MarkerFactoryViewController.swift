@@ -19,6 +19,8 @@ class MarkerFactoryViewController:Image3dViewController{
             }
         }
     }
+    
+    var userPref:UserPreferences!
  
     //Buttons
     var backwardButton:UIButton!

@@ -87,7 +87,7 @@ struct PBDImage{
         // decompress image data
         decompressPBDImageData(compressionBufferPointer: 43, decompressionBufferPointer: 0, decompressionSize: Int(size[0]*size[1]*size[2]))
 //        var imageDataStart = 0
-        var array128x128x128 = [[[UInt8(0)]]]
+        let array128x128x128 = [[[UInt8(0)]]]
 //        Array(repeating: Array(repeating: Array(repeating: UInt8(0), count: 128), count: 128), count: 128)
 //        for i in 0...127{
 //            for j in 0...127{

@@ -49,6 +49,11 @@ class HomeViewController: UIViewController,checkLoginStatus,passUserPrefChange{
         functionCollectionView.delegate = self
         configureCollectionViewLayout()
         saveUserPref()
+//        showAchievements()
+    }
+    
+    func showAchievements(){
+        drawAchievementsView(for: .dailySomaGoal)
     }
     
     func saveUserPref(){
@@ -183,6 +188,7 @@ extension HomeViewController:UICollectionViewDelegate{
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let nextViewController = storyBoard.instantiateViewController(withIdentifier: "MarkFactoryVC") as! MarkerFactoryViewController
         nextViewController.user = self.loginUser
+        nextViewController.userPref = self.userPref
         self.navigationController?.pushViewController(nextViewController, animated: true)
     }
     
@@ -191,6 +197,7 @@ extension HomeViewController:UICollectionViewDelegate{
         let nextViewController = storyBoard.instantiateViewController(withIdentifier: "AnnoVC") as! AnnotationViewController
         nextViewController.user = self.loginUser
         nextViewController.imageSharpen = self.userPref.ImageShapening
+        nextViewController.userPref = self.userPref
         self.navigationController?.pushViewController(nextViewController, animated: true)
     }
     
@@ -199,6 +206,7 @@ extension HomeViewController:UICollectionViewDelegate{
         let nextViewController = storyBoard.instantiateViewController(withIdentifier: "checkVC") as! CheckModeViewController
         nextViewController.user = self.loginUser
         nextViewController.imageSharpen = self.userPref.ImageShapening
+        nextViewController.userPref = self.userPref
         self.navigationController?.pushViewController(nextViewController, animated: true)
     }
 }

@@ -101,6 +101,8 @@ class CheckModeViewController:Image3dViewController{
     @IBOutlet var NormalButton: UIBarButtonItem!
     @IBOutlet var ImageBadButton: UIBarButtonItem!
     
+    var userPref:UserPreferences!
+    
     @IBAction func GoodTypeTapped(_ sender: Any) {
         HTTPRequest.QualityInspectionPart.updateSingleArborResult(arborId: currentArbor.id, result: 4, name: self.user.userName, passwd: self.user.password) {
             //TODO: add label showing result
@@ -189,7 +191,6 @@ class CheckModeViewController:Image3dViewController{
     
     var t1:Date!
     var t2:Date!
-    
     //MARK: - Lifecycle
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -255,6 +256,8 @@ class CheckModeViewController:Image3dViewController{
         NSLayoutConstraint.activate([fbottomConstraint])
         formerArborResult.addTarget(self, action: #selector(showFormerResults), for: .touchUpInside)
     }
+    
+    
     
     @objc func toggleSWC(){
         if showingSWC {
@@ -357,13 +360,13 @@ class CheckModeViewController:Image3dViewController{
     override func configureNavBar(){
         super.configureNavBar()
         // buttons
-        let openImageButton = UIBarButtonItem(image: UIImage(systemName: "icloud.and.arrow.down"), style: .plain, target: self, action: #selector(readCloudImage))
+//        let openImageButton = UIBarButtonItem(image: UIImage(systemName: "icloud.and.arrow.down"), style: .plain, target: self, action: #selector(readCloudImage))
         
         let UndoButton = UIBarButtonItem()
         UndoButton.image = UIImage(systemName: "arrow.counterclockwise")
         UndoButton.target = self
         UndoButton.action = #selector(undoAMarker)
-        navigationItem.rightBarButtonItems = [openImageButton,UndoButton]
+        navigationItem.rightBarButtonItems = [UndoButton]
     }
     
     @objc func undoAMarker(){

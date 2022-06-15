@@ -15,4 +15,7 @@ struct UserPreferences:Codable{
     
     var genderPicture:Bool
     var dailyGoals:Int
+    
+    var dailySoma:Int = 0
+    var dailyCheck:Int = 0
 }

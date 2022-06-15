@@ -33,6 +33,8 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate{
         
     }
     
+    var userPref:UserPreferences!
+    
     // MARK: - Congfigue UI
     override func configureNavBar(){
         super.configureNavBar()

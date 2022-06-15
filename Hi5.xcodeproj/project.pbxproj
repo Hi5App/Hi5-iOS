@@ -38,6 +38,8 @@
 		439215A4280C62CB00E53631 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439215A3280C62CB00E53631 /* LoginViewController.swift */; };
 		439215A6280C630700E53631 /* MarkerFactoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439215A5280C630700E53631 /* MarkerFactoryViewController.swift */; };
 		439215A8280C650D00E53631 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 439215A7280C650D00E53631 /* Main.storyboard */; };
+		43A018E42858812D00E2983E /* AchievementsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A018E32858812D00E2983E /* AchievementsViewController.swift */; };
+		43A018E62858849600E2983E /* AchievementsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A018E52858849600E2983E /* AchievementsView.swift */; };
 		43A68F9E284F3C9B0006A38C /* UserDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A68F9D284F3C9B0006A38C /* UserDetailViewController.swift */; };
 		43B12F542806E19F0049BE9C /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F532806E19F0049BE9C /* User.swift */; };
 		43B12F572806E9CB0049BE9C /* Hi5API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B12F562806E9CB0049BE9C /* Hi5API.swift */; };
@@ -106,6 +108,8 @@
 		439215A3280C62CB00E53631 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		439215A5280C630700E53631 /* MarkerFactoryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarkerFactoryViewController.swift; sourceTree = "<group>"; };
 		439215A7280C650D00E53631 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		43A018E32858812D00E2983E /* AchievementsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementsViewController.swift; sourceTree = "<group>"; };
+		43A018E52858849600E2983E /* AchievementsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementsView.swift; sourceTree = "<group>"; };
 		43A68F9D284F3C9B0006A38C /* UserDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailViewController.swift; sourceTree = "<group>"; };
 		43B12F532806E19F0049BE9C /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		43B12F562806E9CB0049BE9C /* Hi5API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hi5API.swift; sourceTree = "<group>"; };
@@ -189,6 +193,7 @@
 				431CDBEF27D8E807000F1F10 /* View Controllers */,
 				4320387027D8ED1D00DB2DBC /* ObjectsToDraw */,
 				431CDBEE27D8E7E4000F1F10 /* Data Parser */,
+				43A018E22858811200E2983E /* Achievements */,
 				4320388127D8EDA400DB2DBC /* Utilities */,
 				433B1F3F27DD81AF00F44604 /* Shaders.metal */,
 			);
@@ -257,6 +262,15 @@
 				676FFB64282CE76000E4F362 /* CacheHelper.swift */,
 			);
 			path = Utilities;
+			sourceTree = "<group>";
+		};
+		43A018E22858811200E2983E /* Achievements */ = {
+			isa = PBXGroup;
+			children = (
+				43A018E32858812D00E2983E /* AchievementsViewController.swift */,
+				43A018E52858849600E2983E /* AchievementsView.swift */,
+			);
+			path = Achievements;
 			sourceTree = "<group>";
 		};
 		43A35EFB27EC58010078E25B /* Home Screen */ = {
@@ -441,6 +455,7 @@
 				4369E3282822CDAD0016A455 /* SettingTableViewCell.swift in Sources */,
 				4369E3242822C6560016A455 /* SettingTableViewController.swift in Sources */,
 				439215A0280C623400E53631 /* HomeViewController.swift in Sources */,
+				43A018E42858812D00E2983E /* AchievementsViewController.swift in Sources */,
 				43C54BD127EA04990067F559 /* FunctionCollectionViewCell.swift in Sources */,
 				43F72BE8282E794D0088BB9E /* CheckModeViewController.swift in Sources */,
 				43B12F5B2806F9EE0049BE9C /* HTTPRequest.swift in Sources */,
@@ -466,6 +481,7 @@
 				4320388027D8ED9200DB2DBC /* BufferProvider.swift in Sources */,
 				43108E4327C7314400F3287D /* AppDelegate.swift in Sources */,
 				43FA187127E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift in Sources */,
+				43A018E62858849600E2983E /* AchievementsView.swift in Sources */,
 				43B12F572806E9CB0049BE9C /* Hi5API.swift in Sources */,
 				437DA8C227DEF7790080A74C /* Quad.swift in Sources */,
 				43108E4527C7314400F3287D /* SceneDelegate.swift in Sources */,
@@ -656,7 +672,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2.1;
+				MARKETING_VERSION = 0.2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.seupenglab.hi5;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -685,7 +701,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2.1;
+				MARKETING_VERSION = 0.2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.seupenglab.hi5;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
