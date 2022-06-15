@@ -67,6 +67,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     
     var achievementVC:UIViewController!
     var dismissButton:UIButton!
+    var blurEffectView:UIVisualEffectView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -193,8 +194,15 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
         return imageName
     }
     
+    // MARK: - Achievements system
     @objc func showAchievements(){
         let type = AchievementType.dailySomaGoal
+        
+        let blurEffect = UIBlurEffect(style: UIBlurEffect.Style.light)
+        blurEffectView = UIVisualEffectView(effect: blurEffect)
+        blurEffectView.frame = view.bounds
+        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        view.addSubview(blurEffectView)
         
         achievementVC = AchievementsViewController()
         self.addChild(achievementVC)
@@ -202,7 +210,6 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
         
         achievementVC.view.translatesAutoresizingMaskIntoConstraints = false
         achievementVC.view.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
-        achievementVC.view.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
         achievementVC.view.widthAnchor.constraint(equalToConstant: 264).isActive = true
         achievementVC.view.heightAnchor.constraint(equalToConstant: 364).isActive = true
         
@@ -221,11 +228,17 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
         dismissButton.bottomAnchor.constraint(equalTo: achievementVC.view.bottomAnchor,constant: -15).isActive = true
         dismissButton.addTarget(self, action: #selector(dismissAchievementView), for: .touchUpInside)
         
-        achievementVC.didMove(toParent: self)
-        
+        UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseIn) {
+            self.achievementVC.view.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+            self.achievementVC.view.layoutIfNeeded()
+        } completion: { (finished) in
+            self.achievementVC.didMove(toParent: self)
+        }
+
     }
     
     @objc func dismissAchievementView(){
+        blurEffectView?.removeFromSuperview()
         achievementVC.willMove(toParent: nil)
         // deactivate constraints
         achievementVC.view.removeFromSuperview()
