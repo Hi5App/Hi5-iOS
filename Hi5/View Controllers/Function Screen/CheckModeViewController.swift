@@ -101,52 +101,48 @@ class CheckModeViewController:Image3dViewController{
     @IBOutlet var NormalButton: UIBarButtonItem!
     @IBOutlet var ImageBadButton: UIBarButtonItem!
     
-    var userPref:UserPreferences!
+    // track daily soma
+    var userPref:UserPreferences!{
+        didSet{
+//            print(userPref)
+//            userPref.dailyCheckGoal = 1
+            achievementChecker = AchievementChecker(dailySomaGoal: userPref.dailySomaGoal, dailyCheckGoal: userPref.dailyCheckGoal, pastAchievement: userPref.achievements)
+        }
+    }
+    var achievementChecker:AchievementChecker?
+    
     
     @IBAction func GoodTypeTapped(_ sender: Any) {
-        HTTPRequest.QualityInspectionPart.updateSingleArborResult(arborId: currentArbor.id, result: 4, name: self.user.userName, passwd: self.user.password) {
-            //TODO: add label showing result
-            print("image marked as Good")
-        } errorHandler: { error in
-            print("error")
-        }
+        uploadImageResults(resultNumber: 4, resultType: "Good")
         forwardButtonTapped()
     }
     
     @IBAction func swcBadTapped(_ sender: Any) {
-        HTTPRequest.QualityInspectionPart.updateSingleArborResult(arborId: currentArbor.id, result: 3, name: self.user.userName, passwd: self.user.password) {
-            //TODO: add label showing result
-            print("image marked as swc Bad")
-        } errorHandler: { error in
-            print("error")
-        }
+        uploadImageResults(resultNumber: 3, resultType: "swc Bad")
         forwardButtonTapped()
     }
     
     @IBAction func normalTypeTapped(_ sender: Any) {
-        HTTPRequest.QualityInspectionPart.updateSingleArborResult(arborId: currentArbor.id, result: 2, name: self.user.userName, passwd: self.user.password) {
-            //TODO: add label showing result
-            print("image marked as normal")
-        } errorHandler: { error in
-            print("error")
-        }
+        uploadImageResults(resultNumber: 2, resultType: "Normal")
         forwardButtonTapped()
     }
     
     @IBAction func ImageBadTapped(_ sender: Any) {
-        HTTPRequest.QualityInspectionPart.updateSingleArborResult(arborId: currentArbor.id, result: -1, name: self.user.userName, passwd: self.user.password) {
-            //TODO: add label showing result
-            print("image marked as Bad")
-        } errorHandler: { error in
-            print("error")
-        }
+        uploadImageResults(resultNumber: -1, resultType: "Bad")
         forwardButtonTapped()
     }
     
-    func updateReconstractionType(type:ReconstructionType){
-        // organize marker array
-        
-        // upload status with/without marker array
+    func uploadImageResults(resultNumber:Int,resultType:String){
+        HTTPRequest.QualityInspectionPart.updateSingleArborResult(arborId: currentArbor.id, result: resultNumber, name: self.user.userName, passwd: self.user.password) { [self] in
+            print("image marked as \(resultType)")
+            userPref.dailyCheck += 1
+            userPref.totalCheck += 1
+            if let type = achievementChecker?.check(dailySoma: userPref.dailySoma, dailyCheck: userPref.dailyCheck, totalSoma: userPref.totalSoma, totalCheck: userPref.totalCheck){
+                showAchievements(for: type, with: userPref.dailyCheckGoal)
+            }
+        } errorHandler: { error in
+            print("error")
+        }
     }
     
     
@@ -255,6 +251,9 @@ class CheckModeViewController:Image3dViewController{
         let fbottomConstraint = formerArborResult.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,constant: -(markToolbar.frame.height+swcTypeToolbar.frame.height+CGFloat(20)))
         NSLayoutConstraint.activate([fbottomConstraint])
         formerArborResult.addTarget(self, action: #selector(showFormerResults), for: .touchUpInside)
+        
+        //debug show achievment
+//        showAchievements(for: .total1000Soma, with: 100)
     }
     
     

@@ -31,11 +31,21 @@ class HomeViewController: UIViewController,checkLoginStatus,passUserPrefChange{
     let functionDataSource = functionCollectionViewDataSource()
     var loginUser:User!{
         didSet{
-            userPref = UserPreferences(username: loginUser.userName, password: loginUser.password, autoLogin: false, ImageShapening: false,genderPicture: true,dailyGoals: 0)
+            if userPref == nil{
+                let achievements = AchievementRecord(dailyGoalReached: false,
+                                                     somaBronzeMedal: false,
+                                                     checkBronzeMedal: false,
+                                                     somaSliverMedal: false,
+                                                     checkSlivereMedal: false,
+                                                     somaGoldMedal: false,
+                                                     checkGoldMedal: false)
+                userPref = UserPreferences(username: loginUser.userName, password: loginUser.password, autoLogin: false, ImageShapening: false,genderPicture: true,achievements: achievements)
+            }
         }
     }
     var userPref:UserPreferences!{
         didSet{
+//            print(userPref)
             saveUserPref()
         }
     }
@@ -49,11 +59,6 @@ class HomeViewController: UIViewController,checkLoginStatus,passUserPrefChange{
         functionCollectionView.delegate = self
         configureCollectionViewLayout()
         saveUserPref()
-//        showAchievements()
-    }
-    
-    func showAchievements(){
-        drawAchievementsView(for: .dailySomaGoal)
     }
     
     func saveUserPref(){

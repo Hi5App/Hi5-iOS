@@ -67,7 +67,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     
     var achievementVC:UIViewController!
     var dismissButton:UIButton!
-    var blurEffectView:UIVisualEffectView!
+    var maskView:UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -195,14 +195,12 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     }
     
     // MARK: - Achievements system
-    @objc func showAchievements(){
-        let type = AchievementType.dailySomaGoal
+    func showAchievements(for type:AchievementType,with goal:Int){
         
-        let blurEffect = UIBlurEffect(style: UIBlurEffect.Style.light)
-        blurEffectView = UIVisualEffectView(effect: blurEffect)
-        blurEffectView.frame = view.bounds
-        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        view.addSubview(blurEffectView)
+        maskView = UIView(frame: self.view.bounds)
+        maskView.backgroundColor = .black
+        maskView.alpha = 0.6
+        view.addSubview(maskView)
         
         achievementVC = AchievementsViewController()
         self.addChild(achievementVC)
@@ -213,13 +211,18 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
         achievementVC.view.widthAnchor.constraint(equalToConstant: 264).isActive = true
         achievementVC.view.heightAnchor.constraint(equalToConstant: 364).isActive = true
         
-        achievementVC.drawAchievementsView(for: type)
+        achievementVC.drawAchievementsView(for: type, with: goal)
         
         var buttonConfig = UIButton.Configuration.filled()
         buttonConfig.background.cornerRadius = 10
         buttonConfig.buttonSize = .medium
         buttonConfig.baseBackgroundColor = UIColor.systemOrange
-        buttonConfig.title = "Got it!"
+        switch type {
+        case .dailySomaGoal,.dailyCheckGoal:
+            buttonConfig.title = "Got it!"
+        default:
+            buttonConfig.title = "Great!"
+        }
         dismissButton = UIButton(configuration: buttonConfig)
         
         achievementVC.view.addSubview(dismissButton)
@@ -238,7 +241,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     }
     
     @objc func dismissAchievementView(){
-        blurEffectView?.removeFromSuperview()
+        maskView?.removeFromSuperview()
         achievementVC.willMove(toParent: nil)
         // deactivate constraints
         achievementVC.view.removeFromSuperview()

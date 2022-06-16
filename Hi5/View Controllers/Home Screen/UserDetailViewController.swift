@@ -52,7 +52,7 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
         
         //use userPref
         setupProfileImage()
-        updateDailySomaGoal(goal: userPref.dailyGoals)
+        updateDailySomaGoal(goal: userPref.dailySomaGoal)
         profileImageView.layer.cornerRadius = 40
     }
     
@@ -68,7 +68,7 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
         HTTPRequest.UserPart.queryPerformance(name: loginUser.userName, passwd: loginUser.password) { [self] feedback in
             if let feed = feedback{
                 fillCounts(checkNumber: feed.totalCheck, DCheckNumber: feed.dailyCheck, somaNumber: feed.totalsoma, DSomaNumber: feed.dailysoma)
-                updateDailySomaGoal(goal: userPref.dailyGoals)
+                updateDailySomaGoal(goal: userPref.dailySomaGoal)
             }
         } errorHandler: { error in
             print(error)
@@ -117,7 +117,7 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
             return
         }else{
             dailySomaCheck.text = "0/\(goal)"
-            userPref.dailyGoals = goal
+            userPref.dailySomaGoal = goal
         }
     }
     
