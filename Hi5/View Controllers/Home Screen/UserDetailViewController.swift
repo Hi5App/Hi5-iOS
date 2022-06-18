@@ -23,8 +23,8 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
     
     @IBOutlet var totalCheckLabel: UILabel!
     @IBOutlet var dailyCheckLabel: UILabel!
-    @IBOutlet var totalSomaCheck: UILabel!
-    @IBOutlet var dailySomaCheck: UILabel!
+    @IBOutlet var totalSomaLabel: UILabel!
+    @IBOutlet var dailySomaLabel: UILabel!
     
     @IBOutlet var actionTableView: UITableView!
     
@@ -49,10 +49,12 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
         fillLabels()
         requestForNumberCounts()
         tapImageGesture()
+        tapDailyGoalsLabel()
         
         //use userPref
         setupProfileImage()
-        updateDailySomaGoal(goal: userPref.dailySomaGoal)
+        updateDailySomaGoal(type:"soma", goal: userPref.dailySomaGoal)
+        updateDailySomaGoal(type:"check", goal: userPref.dailyCheckGoal)
         profileImageView.layer.cornerRadius = 40
     }
     
@@ -68,7 +70,8 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
         HTTPRequest.UserPart.queryPerformance(name: loginUser.userName, passwd: loginUser.password) { [self] feedback in
             if let feed = feedback{
                 fillCounts(checkNumber: feed.totalCheck, DCheckNumber: feed.dailyCheck, somaNumber: feed.totalsoma, DSomaNumber: feed.dailysoma)
-                updateDailySomaGoal(goal: userPref.dailySomaGoal)
+                updateDailySomaGoal(type: "soma", goal: userPref.dailySomaGoal)
+                updateDailySomaGoal(type: "check", goal: userPref.dailyCheckGoal)
             }
         } errorHandler: { error in
             print(error)
@@ -85,8 +88,8 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
     func fillCounts(checkNumber:Int,DCheckNumber:Int,somaNumber:Int,DSomaNumber:Int){
         totalCheckLabel.text = String(checkNumber)
         dailyCheckLabel.text = String(DCheckNumber)
-        totalSomaCheck.text = String(somaNumber)
-        dailySomaCheck.text = String(DSomaNumber)
+        totalSomaLabel.text = String(somaNumber)
+        dailySomaLabel.text = String(DSomaNumber)
     }
     
     func tapImageGesture(){
@@ -94,6 +97,52 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
         profileImageView.isUserInteractionEnabled = true
         profileImageView.addGestureRecognizer(tapGestureRecognizer)
     }
+    
+    func tapDailyGoalsLabel(){
+        let somaTapGesture = UITapGestureRecognizer(target: self, action: #selector(updateSomaGoals))
+        let checkTapGesture = UITapGestureRecognizer(target: self, action: #selector(updateCheckGoals))
+        dailyCheckLabel.addGestureRecognizer(checkTapGesture)
+        dailyCheckLabel.isUserInteractionEnabled = true
+        dailySomaLabel.isUserInteractionEnabled = true
+        dailySomaLabel.addGestureRecognizer(somaTapGesture)
+    }
+    
+    @objc func updateCheckGoals(){
+        let inputView = UIAlertController(title: "Set your daily check goal", message: nil, preferredStyle: .alert)
+        
+        inputView.addTextField { textfield in
+            textfield.placeholder = "Your daily check Goal"
+            textfield.keyboardType = .numberPad
+        }
+        
+        inputView.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+            let text = inputView.textFields![0].text!
+            print("goal is \(text)")
+            if let goal = Int(text){
+                self.updateDailySomaGoal(type: "check", goal: goal)
+            }
+        }))
+        self.present(inputView, animated: true)
+    }
+                                                     
+    @objc func updateSomaGoals(){
+        let inputView = UIAlertController(title: "Set your daily soma goal", message: nil, preferredStyle: .alert)
+        
+        inputView.addTextField { textfield in
+            textfield.placeholder = "Your daily soma Goal"
+            textfield.keyboardType = .numberPad
+        }
+        
+        inputView.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+            let text = inputView.textFields![0].text!
+            print("goal is \(text)")
+            if let goal = Int(text){
+                self.updateDailySomaGoal(type: "soma", goal: goal)
+            }
+        }))
+        self.present(inputView, animated: true)
+    }
+                                                    
     
     @objc func changeGender(){
         let actionsheet = UIAlertController(title: "Choose your gender", message: nil, preferredStyle: .actionSheet)
@@ -112,12 +161,18 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
         self.present(actionsheet, animated: true)
     }
     
-    func updateDailySomaGoal(goal:Int){
+    func updateDailySomaGoal(type:String,goal:Int){
         if goal <= 0{
             return
         }else{
-            dailySomaCheck.text = "0/\(goal)"
-            userPref.dailySomaGoal = goal
+            if type == "soma"{
+                dailySomaLabel.text = "0/\(goal)"
+                userPref.dailySomaGoal = goal
+            }else if type == "check"{
+                dailyCheckLabel.text = "0/\(goal)"
+                userPref.dailyCheckGoal = goal
+            }
+            
         }
     }
     
@@ -152,21 +207,53 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
         let title = options[indexPath.row].title
         switch title{
         case "Daily Goals":
-            let inputView = UIAlertController(title: "Set your daily Goals", message: nil, preferredStyle: .alert)
-            
-            inputView.addTextField { textfield in
-                textfield.placeholder = "Your daily soma Goal"
-                textfield.keyboardType = .numberPad
-            }
-            
-            inputView.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
-                let text = inputView.textFields![0].text!
-                print("goal is \(text)")
-                if let goal = Int(text){
-                    self.updateDailySomaGoal(goal: goal)
+            let actionsheet = UIAlertController(title: "Choose which daily goal?", message: nil, preferredStyle: .actionSheet)
+            let manChoice = UIAlertAction(title: "Soma", style: .default) { _ in
+                let inputView = UIAlertController(title: "Set your daily soma goal", message: nil, preferredStyle: .alert)
+                
+                inputView.addTextField { textfield in
+                    textfield.placeholder = "Your daily soma Goal"
+                    textfield.keyboardType = .numberPad
                 }
-            }))
-            self.present(inputView, animated: true)
+                
+                inputView.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+                    let text = inputView.textFields![0].text!
+                    print("goal is \(text)")
+                    if let goal = Int(text){
+                        self.updateDailySomaGoal(type: "soma", goal: goal)
+                        let cell = tableView.cellForRow(at: indexPath)
+                        cell?.selectionStyle = .none
+                    }
+                }))
+                self.present(inputView, animated: true)
+            }
+            let womanChoice = UIAlertAction(title: "Check", style: .default) { _ in
+                let inputView = UIAlertController(title: "Set your daily check goal", message: nil, preferredStyle: .alert)
+                
+                inputView.addTextField { textfield in
+                    textfield.placeholder = "Your daily check Goal"
+                    textfield.keyboardType = .numberPad
+                }
+                
+                inputView.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+                    let text = inputView.textFields![0].text!
+                    print("goal is \(text)")
+                    if let goal = Int(text){
+                        self.updateDailySomaGoal(type: "check", goal: goal)
+                        let cell = tableView.cellForRow(at: indexPath)
+                        cell?.selectionStyle = .none
+                    }
+                }))
+                self.present(inputView, animated: true)
+            }
+            let cancel = UIAlertAction(title: "Cancel", style: .cancel) { _ in
+                let cell = tableView.cellForRow(at: indexPath)
+                cell?.selectionStyle = .none
+            }
+            actionsheet.addAction(manChoice)
+            actionsheet.addAction(womanChoice)
+            actionsheet.addAction(cancel)
+            self.present(actionsheet, animated: true)
         default:
             let alertView = UIAlertController(title: "Sorry", message: "This options is under Development", preferredStyle: .alert)
             alertView.addAction(UIAlertAction(title: "OK", style: .cancel))

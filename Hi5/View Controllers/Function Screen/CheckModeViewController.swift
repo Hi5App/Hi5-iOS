@@ -104,8 +104,8 @@ class CheckModeViewController:Image3dViewController,passUserPrefChange{
     // track daily soma
     var userPref:UserPreferences!{
         didSet{
-            print(userPref)
-            userPref.dailyCheckGoal = 1
+//            print(userPref)
+//            userPref.dailyCheckGoal = 1
             achievementChecker = AchievementChecker(dailySomaGoal: userPref.dailySomaGoal, dailyCheckGoal: userPref.dailyCheckGoal, pastAchievement: userPref.achievements)
         }
     }

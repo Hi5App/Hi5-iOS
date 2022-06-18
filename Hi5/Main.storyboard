@@ -275,12 +275,12 @@
                     <connections>
                         <outlet property="actionTableView" destination="5bm-ez-Nnu" id="rtU-qv-3Xn"/>
                         <outlet property="dailyCheckLabel" destination="WPu-ry-9Cb" id="0jh-ws-TKD"/>
-                        <outlet property="dailySomaCheck" destination="Fex-sx-kik" id="V5J-5e-ygy"/>
+                        <outlet property="dailySomaLabel" destination="Fex-sx-kik" id="V5J-5e-ygy"/>
                         <outlet property="emailLabel" destination="1AF-zB-ucq" id="lR3-3M-oC5"/>
                         <outlet property="profileImageView" destination="Rus-PS-WDn" id="Xic-sf-B67"/>
                         <outlet property="signOutButton" destination="2wi-do-fmo" id="wCQ-5e-TYE"/>
                         <outlet property="totalCheckLabel" destination="aGa-b4-qCD" id="GYf-Dl-xCf"/>
-                        <outlet property="totalSomaCheck" destination="hXu-eA-yYi" id="6cG-qH-Tdh"/>
+                        <outlet property="totalSomaLabel" destination="hXu-eA-yYi" id="6cG-qH-Tdh"/>
                         <outlet property="userNameLabel" destination="Yoj-Os-559" id="qnd-bg-CRc"/>
                     </connections>
                 </viewController>
@@ -300,11 +300,11 @@
                                 <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
                             </mtkView>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="O5b-tt-Ofk">
-                                <rect key="frame" x="0.0" y="761" width="390" height="49"/>
+                                <rect key="frame" x="0.0" y="766" width="390" height="44"/>
                                 <items>
                                     <barButtonItem style="plain" id="7am-NX-faw">
                                         <segmentedControl key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="SaX-90-gG2">
-                                            <rect key="frame" x="16" y="10.666666666666664" width="358" height="33"/>
+                                            <rect key="frame" x="16" y="5.6666666666666679" width="358" height="33"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <segments>
                                                 <segment title="View"/>
@@ -353,7 +353,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
                             </mtkView>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="crf-LI-9nR">
-                                <rect key="frame" x="0.0" y="761" width="390" height="49"/>
+                                <rect key="frame" x="0.0" y="766" width="390" height="44"/>
                                 <items>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="LPq-px-gkH"/>
                                     <barButtonItem title="Finshed" id="9J7-be-Jek">
@@ -366,7 +366,7 @@
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="qIc-4m-P4l"/>
                                     <barButtonItem style="plain" id="HeP-4y-dDE">
                                         <segmentedControl key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="52K-9T-FI3">
-                                            <rect key="frame" x="87" y="10.666666666666664" width="179" height="33"/>
+                                            <rect key="frame" x="87" y="5.6666666666666679" width="179" height="33"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <segments>
                                                 <segment title="View"/>
