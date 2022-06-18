@@ -8,7 +8,8 @@
 import Foundation
 
 struct AchievementRecord:Codable{
-    var dailyGoalReached:Bool
+    var dailySomaReached:Bool
+    var dailyCheckReached:Bool
     
     var somaBronzeMedal:Bool
     var checkBronzeMedal:Bool
@@ -32,16 +33,16 @@ struct AchievementChecker{
   
     mutating func check(dailySoma:Int,dailyCheck:Int,totalSoma:Int,totalCheck:Int)->AchievementType?{
         // check daily goal
-        if pastAchievement.dailyGoalReached == false && dailySomaGoal != 0{
+        if pastAchievement.dailySomaReached == false && dailySomaGoal != 0{
             if dailySoma >= dailySomaGoal{
-                pastAchievement.dailyGoalReached = true
+                pastAchievement.dailySomaReached = true
                 return .dailySomaGoal
             }
         }
         
-        if pastAchievement.dailyGoalReached == false &&  dailyCheckGoal != 0{
+        if pastAchievement.dailyCheckReached == false &&  dailyCheckGoal != 0{
             if dailyCheck >= dailyCheckGoal{
-                pastAchievement.dailyGoalReached = true
+                pastAchievement.dailyCheckReached = true
                 return .dailyCheckGoal
             }
         }

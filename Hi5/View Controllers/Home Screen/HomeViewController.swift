@@ -32,7 +32,7 @@ class HomeViewController: UIViewController,checkLoginStatus,passUserPrefChange{
     var loginUser:User!{
         didSet{
             if userPref == nil{
-                let achievements = AchievementRecord(dailyGoalReached: false,
+                let achievements = AchievementRecord(dailySomaReached: false, dailyCheckReached: false,
                                                      somaBronzeMedal: false,
                                                      checkBronzeMedal: false,
                                                      somaSliverMedal: false,
@@ -212,6 +212,7 @@ extension HomeViewController:UICollectionViewDelegate{
         nextViewController.user = self.loginUser
         nextViewController.imageSharpen = self.userPref.ImageShapening
         nextViewController.userPref = self.userPref
+        nextViewController.delegate = self
         self.navigationController?.pushViewController(nextViewController, animated: true)
     }
 }

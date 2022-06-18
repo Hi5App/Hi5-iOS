@@ -12,7 +12,7 @@ class MarkerFactoryViewController:Image3dViewController{
     
     var timeoutNumber:Int = 0{
         didSet{
-            if timeoutNumber > 6{
+            if timeoutNumber > 5{
                 OperationQueue.main.addOperation {
                     self.alertForNetworkError()
                 }
@@ -87,7 +87,6 @@ class MarkerFactoryViewController:Image3dViewController{
         imageCache = image4DSimpleCache()
 //        request potential location and brainList for later use
         self.preDownloadMethod()
-        
         checkFreshTimer = Timer.scheduledTimer(timeInterval: 30, target: self, selector: #selector(checkFresh), userInfo: nil, repeats: true)
      
     }

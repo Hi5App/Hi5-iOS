@@ -36,7 +36,7 @@ struct arborFeedbackManagement{
     }
 }
 
-class CheckModeViewController:Image3dViewController{
+class CheckModeViewController:Image3dViewController,passUserPrefChange{
  
     //Buttons
     var backwardButton:UIButton!
@@ -104,8 +104,8 @@ class CheckModeViewController:Image3dViewController{
     // track daily soma
     var userPref:UserPreferences!{
         didSet{
-//            print(userPref)
-//            userPref.dailyCheckGoal = 1
+            print(userPref)
+            userPref.dailyCheckGoal = 1
             achievementChecker = AchievementChecker(dailySomaGoal: userPref.dailySomaGoal, dailyCheckGoal: userPref.dailyCheckGoal, pastAchievement: userPref.achievements)
         }
     }
@@ -138,6 +138,7 @@ class CheckModeViewController:Image3dViewController{
             userPref.dailyCheck += 1
             userPref.totalCheck += 1
             if let type = achievementChecker?.check(dailySoma: userPref.dailySoma, dailyCheck: userPref.dailyCheck, totalSoma: userPref.totalSoma, totalCheck: userPref.totalCheck){
+                userPref.achievements = achievementChecker!.pastAchievement
                 showAchievements(for: type, with: userPref.dailyCheckGoal)
             }
         } errorHandler: { error in
@@ -187,6 +188,8 @@ class CheckModeViewController:Image3dViewController{
     
     var t1:Date!
     var t2:Date!
+    
+    var delegate:passUserPrefChange!
     //MARK: - Lifecycle
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -194,6 +197,7 @@ class CheckModeViewController:Image3dViewController{
         imageCache.imageCache.removeAll()
         uploadMarkerArray()
         uploadDeleteMarkerArray()
+        delegate.userPref = userPref
     }
     
     override func viewDidLoad() {
@@ -514,7 +518,7 @@ class CheckModeViewController:Image3dViewController{
             print("image download")
             self.currentImageURL = url
             checkTimer.invalidate()
-            showMessage(message: "Decompressing swc...", showProcess: true)
+            showMessage(message: "Decompressing image...", showProcess: true)
             self.decompressImage{
                 if let image = imageToDisplay{
                     drawWithImage(image: image)
