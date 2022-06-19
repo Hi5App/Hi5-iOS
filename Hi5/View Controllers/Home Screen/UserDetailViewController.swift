@@ -14,7 +14,7 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
     var options:[option]!
     
     var delegate:passUserPrefChange!
-    
+    var performanceFeedback:performanceFeedback?
     var loginDelagate:checkLoginStatus?
     
     @IBOutlet var profileImageView: UIImageView!
@@ -69,6 +69,7 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
     func requestForNumberCounts(){
         HTTPRequest.UserPart.queryPerformance(name: loginUser.userName, passwd: loginUser.password) { [self] feedback in
             if let feed = feedback{
+                performanceFeedback = feed
                 fillCounts(checkNumber: feed.totalCheck, DCheckNumber: feed.dailyCheck, somaNumber: feed.totalsoma, DSomaNumber: feed.dailysoma)
                 updateDailySomaGoal(type: "soma", goal: userPref.dailySomaGoal)
                 updateDailySomaGoal(type: "check", goal: userPref.dailyCheckGoal)
@@ -254,10 +255,19 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
             actionsheet.addAction(womanChoice)
             actionsheet.addAction(cancel)
             self.present(actionsheet, animated: true)
+        case "Achievements":
+            if let performanceFeedback = performanceFeedback {
+                let AchievementsTV = AchievementsTableView(record: userPref.achievements,performance: performanceFeedback)
+                self.navigationController?.pushViewController(AchievementsTV, animated: true)
+                let cell = tableView.cellForRow(at: indexPath)
+                cell?.selectionStyle = .none
+            }
         default:
             let alertView = UIAlertController(title: "Sorry", message: "This options is under Development", preferredStyle: .alert)
             alertView.addAction(UIAlertAction(title: "OK", style: .cancel))
             self.present(alertView, animated: true)
+            let cell = tableView.cellForRow(at: indexPath)
+            cell?.selectionStyle = .none
         }
     }
 

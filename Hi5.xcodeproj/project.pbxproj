@@ -21,6 +21,7 @@
 		4320386927D8EC8000DB2DBC /* MetalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4320386827D8EC8000DB2DBC /* MetalViewController.swift */; };
 		4320387E27D8ED8F00DB2DBC /* MetalTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4320387D27D8ED8F00DB2DBC /* MetalTexture.swift */; };
 		4320388027D8ED9200DB2DBC /* BufferProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4320387F27D8ED9200DB2DBC /* BufferProvider.swift */; };
+		432986D2285ED09400194E80 /* AchievementsTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432986D1285ED09400194E80 /* AchievementsTableView.swift */; };
 		433B1F3C27DD815B00F44604 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 433B1F3927DD815B00F44604 /* Node.swift */; };
 		433B1F3D27DD815B00F44604 /* Cube.swift in Sources */ = {isa = PBXBuildFile; fileRef = 433B1F3A27DD815B00F44604 /* Cube.swift */; };
 		433B1F3E27DD815B00F44604 /* Vertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 433B1F3B27DD815B00F44604 /* Vertex.swift */; };
@@ -92,6 +93,7 @@
 		4320386827D8EC8000DB2DBC /* MetalViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalViewController.swift; sourceTree = "<group>"; };
 		4320387D27D8ED8F00DB2DBC /* MetalTexture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalTexture.swift; sourceTree = "<group>"; };
 		4320387F27D8ED9200DB2DBC /* BufferProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BufferProvider.swift; sourceTree = "<group>"; };
+		432986D1285ED09400194E80 /* AchievementsTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementsTableView.swift; sourceTree = "<group>"; };
 		433B1F3927DD815B00F44604 /* Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
 		433B1F3A27DD815B00F44604 /* Cube.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cube.swift; sourceTree = "<group>"; };
 		433B1F3B27DD815B00F44604 /* Vertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vertex.swift; sourceTree = "<group>"; };
@@ -285,6 +287,7 @@
 				4369E3232822C6560016A455 /* SettingTableViewController.swift */,
 				4369E3272822CDAD0016A455 /* SettingTableViewCell.swift */,
 				43A68F9D284F3C9B0006A38C /* UserDetailViewController.swift */,
+				432986D1285ED09400194E80 /* AchievementsTableView.swift */,
 			);
 			path = "Home Screen";
 			sourceTree = "<group>";
@@ -459,6 +462,7 @@
 				4369E3282822CDAD0016A455 /* SettingTableViewCell.swift in Sources */,
 				4369E3242822C6560016A455 /* SettingTableViewController.swift in Sources */,
 				439215A0280C623400E53631 /* HomeViewController.swift in Sources */,
+				432986D2285ED09400194E80 /* AchievementsTableView.swift in Sources */,
 				43A018E42858812D00E2983E /* AchievementsViewController.swift in Sources */,
 				43C54BD127EA04990067F559 /* FunctionCollectionViewCell.swift in Sources */,
 				43F72BE8282E794D0088BB9E /* CheckModeViewController.swift in Sources */,
