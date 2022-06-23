@@ -166,11 +166,15 @@ class UserDetailViewController: UIViewController,UITableViewDataSource,UITableVi
         if goal <= 0{
             return
         }else{
+            guard let feed = performanceFeedback else {
+                return
+            }
+
             if type == "soma"{
-                dailySomaLabel.text = "0/\(goal)"
+                dailySomaLabel.text = "\(feed.dailysoma)/\(goal)"
                 userPref.dailySomaGoal = goal
             }else if type == "check"{
-                dailyCheckLabel.text = "0/\(goal)"
+                dailyCheckLabel.text = "\(feed.dailyCheck)/\(goal)"
                 userPref.dailyCheckGoal = goal
             }
             

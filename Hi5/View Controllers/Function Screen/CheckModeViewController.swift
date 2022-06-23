@@ -105,8 +105,8 @@ class CheckModeViewController:Image3dViewController,passUserPrefChange{
     var userPref:UserPreferences!{
         didSet{
 //            print(userPref)
-//            userPref.dailyCheckGoal = 1
             achievementChecker = AchievementChecker(dailySomaGoal: userPref.dailySomaGoal, dailyCheckGoal: userPref.dailyCheckGoal, pastAchievement: userPref.achievements)
+//            print(achievementChecker)
         }
     }
     var achievementChecker:AchievementChecker?
@@ -136,6 +136,7 @@ class CheckModeViewController:Image3dViewController,passUserPrefChange{
         HTTPRequest.QualityInspectionPart.updateSingleArborResult(arborId: currentArbor.id, result: resultNumber, name: self.user.userName, passwd: self.user.password) { [self] in
             print("image marked as \(resultType)")
             userPref.dailyCheck += 1
+            print(userPref.dailyCheck)
             userPref.totalCheck += 1
             if let type = achievementChecker?.check(dailySoma: userPref.dailySoma, dailyCheck: userPref.dailyCheck, totalSoma: userPref.totalSoma, totalCheck: userPref.totalCheck){
                 userPref.achievements = achievementChecker!.pastAchievement

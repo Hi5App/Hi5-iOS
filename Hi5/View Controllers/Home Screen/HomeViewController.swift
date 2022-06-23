@@ -38,7 +38,7 @@ class HomeViewController: UIViewController,checkLoginStatus,passUserPrefChange{
                                                      somaSliverMedal: false,
                                                      checkSlivereMedal: false,
                                                      somaGoldMedal: false,
-                                                     checkGoldMedal: false)
+                                                     checkGoldMedal: false, dailyGoalTimeStamp: Date())
                 userPref = UserPreferences(username: loginUser.userName, password: loginUser.password, autoLogin: false, ImageShapening: false,genderPicture: true,achievements: achievements)
             }
         }
@@ -54,6 +54,7 @@ class HomeViewController: UIViewController,checkLoginStatus,passUserPrefChange{
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         self.view.backgroundColor = UIColor(named: "homeBackground")
+        userPref.achievements.refreshDailyGoal()
         configureNavBar()
         functionCollectionView.dataSource = functionDataSource
         functionCollectionView.delegate = self

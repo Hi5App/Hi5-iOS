@@ -19,6 +19,16 @@ struct AchievementRecord:Codable{
     
     var somaGoldMedal:Bool
     var checkGoldMedal:Bool
+    
+    var dailyGoalTimeStamp:Date
+    
+    mutating func refreshDailyGoal(){
+        let currentDate = Date()
+        if Calendar.current.isDate(dailyGoalTimeStamp, inSameDayAs: currentDate){
+            dailySomaReached = false
+            dailyCheckReached = false
+        }
+    }
 }
 
 struct AchievementChecker{

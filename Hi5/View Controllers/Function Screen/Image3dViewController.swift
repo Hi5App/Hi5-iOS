@@ -26,6 +26,8 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
         }
     }
     
+    var currentMarkerColor:UIColor = .systemOrange
+    
     var editStatus:editMode = .View
     var scaleLabel:UIButton!
     var indicator:UIButton!
@@ -420,7 +422,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
     
     func mapToMarkerArray(){
         self.markerArray = self.somaArray.map({ loc in
-            return Marker(type: .MarkerFactory, displayPosition: loc, color: .systemOrange)
+            return Marker(type: .MarkerFactory, displayPosition: loc, color: currentMarkerColor)
         })
     }
 }

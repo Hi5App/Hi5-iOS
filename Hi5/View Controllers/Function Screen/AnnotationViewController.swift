@@ -9,7 +9,7 @@ import UIKit
 import UniformTypeIdentifiers
 import simd
 
-class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate{
+class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UIColorPickerViewControllerDelegate{
     
     //Controls
     @IBOutlet var modeSwitcher: UISegmentedControl!
@@ -25,6 +25,31 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate{
             print("unrecognized index")
         }
     }
+    
+    
+    @IBOutlet var colorPickerItem: UIBarButtonItem!
+    @IBAction func colorPicker(_ sender: Any) {
+        let colorPickerVC = UIColorPickerViewController()
+        colorPickerVC.delegate = self
+        present(colorPickerVC, animated: true)
+    }
+    
+    func colorPickerViewControllerDidFinish(_ viewController: UIColorPickerViewController) {
+        let color = viewController.selectedColor
+        colorPickerItem.tintColor = color
+        currentMarkerColor = color
+        mapToMarkerArray()
+    }
+    
+    @IBAction func lineMarkMode(_ sender: Any) {
+    }
+    
+    @IBAction func Tracing(_ sender: Any) {
+    }
+    
+    @IBAction func moreOptions(_ sender: Any) {
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         worldModelMatrix = float4x4()
