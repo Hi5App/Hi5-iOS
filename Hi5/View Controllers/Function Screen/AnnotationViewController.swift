@@ -9,6 +9,37 @@ import UIKit
 import UniformTypeIdentifiers
 import simd
 
+struct intersectionSpace{
+    var x0:Float
+    var x1:Float
+    var y0:Float
+    var y1:Float
+    var z0:Float
+    var z1:Float
+    
+    init(twoPoints:[simd_float4]){
+        x0 = Float(twoPoints[0].x)
+        x1 = Float(twoPoints[1].x)
+        y0 = Float(twoPoints[0].y)
+        y1 = Float(twoPoints[1].y)
+        z0 = Float(twoPoints[0].z)
+        z1 = Float(twoPoints[1].z)
+    }
+    
+    mutating func update(twoPoints:[simd_float4]){
+        x1 = max(x1, Float(max(twoPoints[0].x, twoPoints[1].x)))
+        x0 = min(x0, Float(min(twoPoints[0].x, twoPoints[1].x)))
+        y1 = max(y1, Float(max(twoPoints[0].y, twoPoints[1].y)))
+        y0 = min(y0, Float(min(twoPoints[0].y, twoPoints[1].y)))
+        z1 = max(z1, Float(max(twoPoints[0].z, twoPoints[1].z)))
+        z0 = min(z0, Float(min(twoPoints[0].z, twoPoints[1].z)))
+    }
+    
+    func isInSpace(point:simd_float4)->Bool{
+        return point.x >= x0 && point.x <= x1 && point.y >= y0 && point.y <= y1 && point.z >= z0 && point.z <= z1
+    }
+}
+
 class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UIColorPickerViewControllerDelegate{
     
     //Controls
@@ -41,7 +72,19 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
         mapToMarkerArray()
     }
     
+    var lineMarkMode:Bool = false
+    @IBOutlet var lineMarkSwitch: UIBarButtonItem!
+    var touchPoints:[simd_float4] = []
     @IBAction func lineMarkMode(_ sender: Any) {
+        if lineMarkMode{
+            lineMarkMode = false
+            lineMarkSwitch.tintColor = UIColor.systemOrange
+            lineMarkSwitch.image = UIImage(systemName: "scribble")
+        }else{
+            lineMarkMode = true
+            lineMarkSwitch.tintColor = UIColor.systemBlue
+            lineMarkSwitch.image = UIImage(systemName: "scribble.variable")
+        }
     }
     
     @IBAction func Tracing(_ sender: Any) {
@@ -55,10 +98,10 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
         worldModelMatrix = float4x4()
         worldModelMatrix.translate(0.0, y: 0.0, z: -4)
         worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
-        
     }
     
     var userPref:UserPreferences!
+    var space:intersectionSpace!
     
     // MARK: - Congfigue UI
     override func configureNavBar(){
@@ -84,9 +127,6 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
             mapToMarkerArray()
         }
     }
-    
-    
-    
     
    // MARK: - Image Reader
     func readLocalImage(){
@@ -190,5 +230,105 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
             modeSwitcher.selectedSegmentIndex = 2
             modeSwitcher.sendActions(for: UIControl.Event.valueChanged)
         }
+    }
+    
+    //MARK: - override pan interaction
+    override func pan(panGesture: UIPanGestureRecognizer) {
+        if lineMarkMode{
+            if panGesture.state == UIGestureRecognizer.State.changed{
+                let PanLocation = panGesture.location(in: self.view)
+                guard let coord = findIntersectionEnd(PanLocation) else {return}
+                touchPoints.append(contentsOf: coord)
+                if space == nil{
+                    space = intersectionSpace(twoPoints: coord)
+                }else{
+                    space.update(twoPoints: coord)
+//                    print(space)
+                }
+            }else if panGesture.state == UIGestureRecognizer.State.ended{
+                print(touchPoints)
+                print(space)
+                // calculate curve
+                let startRay = touchPoints.prefix(2)
+                let endRay = touchPoints.suffix(2)
+                print(space.isInSpace(point: startRay[0]))
+                // reset space
+                space = nil
+                touchPoints = []
+            }
+            
+        }else{
+            if panGesture.state == UIGestureRecognizer.State.changed{
+                let pointInView = panGesture.location(in: self.view)
+                
+                let xDelta = Float((lastPanLocation.x - pointInView.x)/self.view.bounds.width) * panSensivity
+                let yDelta = Float((lastPanLocation.y - pointInView.y)/self.view.bounds.height) * panSensivity
+                objectToDraw.rotationY -= xDelta
+                objectToDraw.rotationX -= yDelta
+                lastPanLocation = pointInView
+            }else if panGesture.state == UIGestureRecognizer.State.began{
+                if editStatus == .Mark{
+                    editStatus = .View
+                    respondEditStatusChange()
+                }
+                lastPanLocation = panGesture.location(in: self.view)
+            }
+        }
+    }
+    
+    func findIntersectionEnd(_ tapPosition:CGPoint)->[simd_float4]?{ //find a start and end point for a given point
+        // calculate coordinate in NDC
+        let viewWidth = self.view.bounds.width
+        let viewHeight = self.view.bounds.height
+        let centerX = viewWidth/2
+        let centerY = viewHeight/2
+        let clipX = Float((tapPosition.x-centerX)/centerX)
+        let clipY = Float((-tapPosition.y+centerY)/centerY)
+        let clipZstart = Float(0)
+        let clipZend = Float(1)
+        let clipW = Float(1)
+        let tapCastStart = simd_float4(clipX, clipY, clipZstart, clipW)
+        let tapCastEnd = simd_float4(clipX, clipY, clipZend, clipW)
+        // calculate inverse of finalMatrix
+        var finalMatrix = objectToDraw.modelMatrix()
+        finalMatrix.multiplyLeft(worldModelMatrix)
+        finalMatrix.multiplyLeft(projectionMatrix)
+        let inverseFinalMatrix = finalMatrix.inverse
+        // calculate tapCast in model space, ms stands for model space
+        var msTapCastStart = matrix_multiply(inverseFinalMatrix, tapCastStart)
+        var msTapCastEnd = matrix_multiply(inverseFinalMatrix, tapCastEnd)
+        msTapCastStart = msTapCastStart/msTapCastStart.w
+        msTapCastEnd = msTapCastEnd/msTapCastEnd.w
+        // decide whether intersects, same as raycasting method
+        let TapCast = msTapCastEnd - msTapCastStart
+        let Step = TapCast/512
+        var currentPosi = msTapCastStart
+        // variable holding start and end
+        var intersectionStart:simd_float4? = nil
+        var intersectionEnd:simd_float4? = nil
+        var intersectionFlag:Bool = false
+        for _ in 1...512{
+            if currentPosi[0]<1.0 && currentPosi[0]>(-1.0) && currentPosi[1]<1.0 && currentPosi[1]>(-1.0) && currentPosi[2]<1.0 && currentPosi[2]>(-1.0){
+                //when intersect
+                if intersectionFlag == false{
+                    intersectionStart = currentPosi
+                }
+                intersectionFlag = true
+                currentPosi += Step
+            }else{
+                if intersectionFlag == false{
+                    currentPosi += Step
+                }else{
+                    intersectionEnd = currentPosi
+                    break
+                }
+            }
+        }
+        if intersectionStart != nil && intersectionEnd != nil{
+            return [intersectionStart!,intersectionEnd!]
+        }else{
+            return nil
+        }
+        
     }
 }

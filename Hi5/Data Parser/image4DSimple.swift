@@ -92,7 +92,7 @@ class image4DSimple{
     }
     
     func access3DfromCenter(x:Float,y:Float,z:Float)->(Float,Float,Float){
-        // input model space coordinates, output 3d array index
+        //  model space coordinates -> 3d array index
         // 62.5 = 127/2,center index of the array
         // rotate 90 degree and invert y axis
         let temp = x

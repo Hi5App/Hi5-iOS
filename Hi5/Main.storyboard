@@ -338,7 +338,7 @@
                                         </connections>
                                     </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="cun-3n-qyy"/>
-                                    <barButtonItem title="Line Mark" image="scribble.variable" catalog="system" id="7Fd-yo-mv6">
+                                    <barButtonItem title="Line Mark" image="scribble" catalog="system" id="7Fd-yo-mv6">
                                         <connections>
                                             <action selector="lineMarkMode:" destination="pRn-hD-zFs" id="x8g-Jq-Xgg"/>
                                         </connections>
@@ -377,6 +377,7 @@
                     </view>
                     <connections>
                         <outlet property="colorPickerItem" destination="yo6-c9-Pyt" id="hyh-NO-Ly4"/>
+                        <outlet property="lineMarkSwitch" destination="7Fd-yo-mv6" id="qPE-1P-K6D"/>
                         <outlet property="modeSwitcher" destination="SaX-90-gG2" id="4sC-4c-hwx"/>
                         <outlet property="mtkView" destination="7nr-Q4-se1" id="r5m-DI-wTh"/>
                     </connections>
@@ -894,7 +895,7 @@
         <image name="man" width="512" height="512"/>
         <image name="pencil.circle" catalog="system" width="128" height="121"/>
         <image name="pencil.tip" catalog="system" width="99" height="128"/>
-        <image name="scribble.variable" catalog="system" width="128" height="118"/>
+        <image name="scribble" catalog="system" width="128" height="118"/>
         <image name="slider.horizontal.3" catalog="system" width="128" height="100"/>
         <image name="trash" catalog="system" width="121" height="128"/>
         <namedColor name="AccentColor">
