@@ -18,7 +18,10 @@ class image4DSimple{
     var imageData:[[[UInt8]]]
     let imageArray:[UInt8]
     
-    init(name:String,endiannessType e:Character,dataType dt:UInt8,_ sX:Int,_ sY:Int,_ sZ:Int,_ channel:Int,_ data:[[[UInt8]]],array:[UInt8]){
+    var maxIntensity:UInt8
+    var minIntensity:UInt8
+    
+    init(name:String,endiannessType e:Character,dataType dt:UInt8,_ sX:Int,_ sY:Int,_ sZ:Int,_ channel:Int,_ data:[[[UInt8]]],array:[UInt8],maxIntensity:UInt8,minIntensity:UInt8){
         self.name = name
         endianness = e
         dataType = dt
@@ -28,27 +31,31 @@ class image4DSimple{
         channelNumber = channel
         imageData = data
         imageArray = array
+        self.maxIntensity = maxIntensity
+        self.minIntensity = minIntensity
     }
     
     func make3DArrayFrom1DArray(){
         var start = 0
-        var array128x128x128 = Array(repeating: Array(repeating: Array(repeating: UInt8(0), count: 128), count: 128), count: 128)
-        for i in 0...127{
-            for j in 0...127{
-                for k in 0...127{
-                    array128x128x128[i][j][k] = imageArray[start]
+        var array3D = Array(repeating: Array(repeating: Array(repeating: UInt8(0), count: sizeZ), count: sizeY), count: sizeX)
+        for i in 0...sizeX-1{
+            for j in 0...sizeY-1{
+                for k in 0...sizeZ-1{
+                    let element = imageArray[start]
+                    array3D[i][j][k] = imageArray[start]
+                    maxIntensity = max(maxIntensity, element)
+                    minIntensity = min(minIntensity, element)
                     start += 1
                 }
             }
         }
-        imageData = array128x128x128
+        imageData = array3D
     }
     
     func sample3Ddata(x:Float,y:Float,z:Float)->Float{
-        let positionIn3dArray = access3DfromCenter(x: x, y: y, z: z )
-        let lowX = Int(positionIn3dArray.0)
-        let lowY = Int(positionIn3dArray.1)
-        let lowZ = Int(positionIn3dArray.2)
+        let lowX = Int(x)
+        let lowY = Int(y)
+        let lowZ = Int(z)
         let highX = lowX+1
         let highY = lowY+1
         let highZ = lowZ+1
@@ -65,9 +72,9 @@ class image4DSimple{
 //        print(Intensities)
         
         // fraction
-        let xf = positionIn3dArray.0 - Float(lowX)
-        let yf = positionIn3dArray.1 - Float(lowY)
-        let zf = positionIn3dArray.2 - Float(lowZ)
+        let xf = x - Float(lowX)
+        let yf = y - Float(lowY)
+        let zf = z - Float(lowZ)
         var fractions = Array(repeating: Array(repeating: Array(repeating: Float(0), count: 2), count: 2), count: 2)
         fractions[0][0][0] = (1.0-xf)*(1.0-yf)*(1.0-zf)
         fractions[0][0][1] = (1.0-xf)*(1.0-yf)*(    zf)
@@ -105,4 +112,17 @@ class image4DSimple{
         let arrayZ = -(z*62.5-62.5)
         return (arrayX,arrayY,arrayZ)
     }
+    
+    func from3DToDisplay(position:(Int,Int,Int))->(Float,Float,Float){
+        var x = (Float(position.0) - 62.5)/62.5
+        var y = -(Float(position.1) - 62.5)/62.5
+        var z = (-Float(position.2) + 62.5)/62.5
+        
+        (x,z) = (-z,x)
+        y = -y
+        
+        return (x,y,z)
+    }
+    
+    
 }

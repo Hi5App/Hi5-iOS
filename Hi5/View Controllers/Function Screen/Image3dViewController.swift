@@ -393,7 +393,8 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
                 //when intersect
                 flag = true
                 if !deleteMode {
-                    currentIntensity = imageToDisplay.sample3Ddata(x: currentPosi.x, y: currentPosi.y, z: currentPosi.z)
+                    let position = imageToDisplay.access3DfromCenter(x: currentPosi.x, y: currentPosi.y, z: currentPosi.z)
+                    currentIntensity = imageToDisplay.sample3Ddata(x: position.0, y: position.1, z: position.2)
                     if currentIntensity > maxIntensity{
                         maxIntensity = currentIntensity
     //                    print("maxIntensity changed to \(currentIntensity)")

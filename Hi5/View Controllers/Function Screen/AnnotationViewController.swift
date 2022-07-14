@@ -8,6 +8,20 @@
 import UIKit
 import UniformTypeIdentifiers
 import simd
+import Foundation
+
+enum spacePointsStatus{
+    case ALIVE
+    case FAR
+    case TRIAL
+}
+
+struct heapElement:Equatable{
+    var index:Int
+    var parentIndex:Int
+    var distance:Float
+}
+
 
 struct intersectionSpace{
     var x0:Float
@@ -16,6 +30,9 @@ struct intersectionSpace{
     var y1:Float
     var z0:Float
     var z1:Float
+    
+    var minPoint:(Float,Float,Float) = (0,0,0)
+    var maxPoint:(Float,Float,Float) = (0,0,0)
     
     init(twoPoints:[simd_float4]){
         x0 = Float(twoPoints[0].x)
@@ -35,8 +52,27 @@ struct intersectionSpace{
         z0 = min(z0, Float(min(twoPoints[0].z, twoPoints[1].z)))
     }
     
-    func isInSpace(point:simd_float4)->Bool{
-        return point.x >= x0 && point.x <= x1 && point.y >= y0 && point.y <= y1 && point.z >= z0 && point.z <= z1
+    mutating func extendArea(extent:Float){
+        x0 = max(x0-extent,-1)
+        x1 = min(x1+extent,1)
+        y0 = max(y0-extent,-1)
+        y1 = min(y1+extent,1)
+        z0 = max(z0-extent,-1)
+        z1 = min(z1+extent,1)
+    }
+    
+    mutating func setEdge(point1:(Float,Float,Float),point2:(Float,Float,Float)){
+        minPoint = point1
+        maxPoint = point2
+    }
+    
+    func isInSpace(point:(Int,Int,Int))->Bool{
+        return Float(point.0) >= minPoint.0 &&
+        Float(point.0) <= maxPoint.0 &&
+        Float(point.1) >= minPoint.1 &&
+        Float(point.1) <= maxPoint.1 &&
+        Float(point.2) >= minPoint.2 &&
+        Float(point.2) <= maxPoint.2
     }
 }
 
@@ -98,10 +134,12 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
         worldModelMatrix = float4x4()
         worldModelMatrix.translate(0.0, y: 0.0, z: -4)
         worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
+//        test()
     }
     
     var userPref:UserPreferences!
     var space:intersectionSpace!
+    var globalIDCounter:Int = 0
     
     // MARK: - Congfigue UI
     override func configureNavBar(){
@@ -140,6 +178,9 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
     }
     
     func readImageFromDocumentsFolder(filename:String){
+        self.userArray.removeAll()
+        self.somaArray = self.userArray + self.originalSomaArray
+        mapToMarkerArray()
         let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(filename)
         print(URL(string: filename)!.pathExtension)
         switch URL(string: filename)?.pathExtension {
@@ -243,18 +284,118 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
                     space = intersectionSpace(twoPoints: coord)
                 }else{
                     space.update(twoPoints: coord)
-//                    print(space)
                 }
             }else if panGesture.state == UIGestureRecognizer.State.ended{
-                print(touchPoints)
-                print(space)
                 // calculate curve
-                let startRay = touchPoints.prefix(2)
-                let endRay = touchPoints.suffix(2)
-                print(space.isInSpace(point: startRay[0]))
+                let timer1 = Date()
+                space.extendArea(extent: 0.1) //extend space for correcting error
+                space.setEdge(point1: (imageToDisplay.access3DfromCenter(x: space.x0, y: space.y0, z: space.z0)), point2: (imageToDisplay.access3DfromCenter(x: space.x1, y: space.y1, z: space.z1)))
+                // data type transform: simd_float4 -> [simd_float4] -> 3d array coord float -> 3d array coord int -> spacePoints struct
+                let startEnds = Array(touchPoints.prefix(2))
+                print(startEnds)
+                // check for bound
+                let startRay = interpolateVector(points: startEnds, numberOfPoints: 40)
+                let IntStartRay = startRay.map({imageToDisplay.access3DfromCenter(x: $0.x, y: $0.y, z: $0.z)}).map { point in
+                    (Int(point.0),Int(point.1),Int(point.2))
+                }
+                
+                let endEnds = Array(touchPoints.suffix(2))
+                let endRay = interpolateVector(points: endEnds, numberOfPoints: 40)
+                let IntEndRay = endRay.map({imageToDisplay.access3DfromCenter(x: $0.x, y: $0.y, z: $0.z)}).map { point in
+                    (Int(point.0),Int(point.1),Int(point.2))
+                }
+                
+                let arraysize = imageToDisplay.sizeX*imageToDisplay.sizeY*imageToDisplay.sizeZ
+                let imageSize = (imageToDisplay.sizeX,imageToDisplay.sizeY,imageToDisplay.sizeZ)
+                
+                // array stores distance parent status
+                var distance = Array(repeating: Float.greatestFiniteMagnitude, count: arraysize)
+                var parent = Array(repeating: -1, count: arraysize)
+                var status = Array(repeating: spacePointsStatus.FAR, count: arraysize)
+                
+                // dictionary stores start points and end points
+                let startIndex = Set<Int>(IntStartRay.map({ point in
+                    return coord2Index(coord: point, size: imageSize)
+                }))
+                let endIndex = Set<Int>(IntEndRay.map({ point in
+                    return coord2Index(coord: point, size: imageSize)
+                }))
+                
+                // initialize for start point
+                for point in IntStartRay{
+                    let index = coord2Index(coord: point, size: imageSize)
+                    status[index] = .ALIVE
+                    parent[index] = index
+                    distance[index] = 0
+                }
+                
+                // fast marching search
+                var pathEndIndex = -1
+                var path = Array<Int>()
+                var minHeap = heap(sort: compareHeapElement)
+                for point in IntStartRay{
+                    let index = coord2Index(coord: point, size: imageSize)
+                    let element = heapElement(index: index, parentIndex: index, distance: 0)
+                    minHeap.insert(element)
+                }
+                while(!minHeap.isEmpty){
+                    let minElement = minHeap.remove()! // take out min value of heap
+                    // see if it's in end array
+                    if endIndex.contains(minElement.index){
+                        pathEndIndex = minElement.index
+                        break
+                    }
+                    for point in nearPoints(around: index2Coord(index: minElement.index, size: imageSize)){
+                        let nearIndex = coord2Index(coord: point, size: imageSize)
+                        if status[nearIndex] != .ALIVE{
+                            let startPosition = index2Coord(index: minElement.index, size: imageSize)
+                            let newDistance = minElement.distance + graphDistance(from: startPosition, to: point)
+                            let newElement = heapElement(index: nearIndex, parentIndex: minElement.index, distance: newDistance)
+                            if status[nearIndex] == .FAR{
+                                //update info
+                                parent[nearIndex] = minElement.index
+                                distance[nearIndex] = newDistance
+                                status[nearIndex] = .TRIAL
+                                // insert to heap
+                                minHeap.insert(newElement)
+                            }else if status[nearIndex] == .TRIAL{
+                               // update info when newDistance is shorter
+                                if newDistance < distance[nearIndex]{
+                                    // update info
+                                    distance[nearIndex] = newDistance
+                                    parent[nearIndex] = minElement.index
+                                    // update element in heap (remove and reinsert)
+                                    guard let index = minHeap.nodes.firstIndex(where: {$0.index == nearIndex}) else {
+                                        print("TRIAL objects can't be found in heap")
+                                        break
+                                    }
+                                    minHeap.remove(at: index)
+                                    minHeap.insert(newElement)
+                                }
+                            }
+                        }
+                    }
+                }
+                // collect path
+                while(!startIndex.contains(pathEndIndex)){
+                    path.append(pathEndIndex)
+                    pathEndIndex = parent[pathEndIndex]
+                }
+                path.append(pathEndIndex)
+                let timer2 = Date()
+                print("Curve calculation used \(timer2.timeIntervalSince(timer1)) seconds")
+                
+                let positions =
+                path.map({index2Coord(index: $0, size: imageSize)})
+                    .map({imageToDisplay.from3DToDisplay(position: $0)})
+                    .map({simd_float3($0.0,$0.1,$0.2)})
+                userArray.append(contentsOf: positions)
+                self.somaArray =  self.originalSomaArray + self.userArray
+                mapToMarkerArray()
                 // reset space
                 space = nil
                 touchPoints = []
+                minHeap.nodes.removeAll()
             }
             
         }else{
@@ -274,6 +415,22 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
                 lastPanLocation = panGesture.location(in: self.view)
             }
         }
+    }
+    
+    func compareHeapElement(_ point1:heapElement,_ point2:heapElement)->Bool{
+        return point1.distance < point2.distance
+    }
+    
+    func interpolateVector(points:[simd_float4],numberOfPoints:Int)->[simd_float4]{
+        var start = points[0]
+        let end = points[1]
+        let step = (end - start)/Float(numberOfPoints)
+        var steps = [simd_float4]()
+        for _ in 1...numberOfPoints{
+            steps.append(start)
+            start += step
+        }
+        return steps
     }
     
     func findIntersectionEnd(_ tapPosition:CGPoint)->[simd_float4]?{ //find a start and end point for a given point
@@ -301,25 +458,29 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
         msTapCastEnd = msTapCastEnd/msTapCastEnd.w
         // decide whether intersects, same as raycasting method
         let TapCast = msTapCastEnd - msTapCastStart
-        let Step = TapCast/512
+        let Step = TapCast/2000
         var currentPosi = msTapCastStart
         // variable holding start and end
         var intersectionStart:simd_float4? = nil
+        var lastIntersectionPosition:simd_float4? = nil
         var intersectionEnd:simd_float4? = nil
         var intersectionFlag:Bool = false
-        for _ in 1...512{
+        for _ in 1...2000{
             if currentPosi[0]<1.0 && currentPosi[0]>(-1.0) && currentPosi[1]<1.0 && currentPosi[1]>(-1.0) && currentPosi[2]<1.0 && currentPosi[2]>(-1.0){
                 //when intersect
                 if intersectionFlag == false{
                     intersectionStart = currentPosi
                 }
                 intersectionFlag = true
+                lastIntersectionPosition = currentPosi
                 currentPosi += Step
+                intersectionEnd = lastIntersectionPosition
             }else{
                 if intersectionFlag == false{
+                    lastIntersectionPosition = currentPosi
                     currentPosi += Step
                 }else{
-                    intersectionEnd = currentPosi
+//                    intersectionEnd = currentPosi
                     break
                 }
             }
@@ -331,4 +492,35 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
         }
         
     }
+    
+    func graphDistance(from A:(Int,Int,Int),to B:(Int,Int,Int))->Float{
+        let euclideanDistance = sqrt(pow(Double(abs(A.0-B.0)), 2) + pow(Double(abs(A.1-B.1)), 2) + pow(Double(abs(A.2-B.2)), 2))
+        let intensityParameter = (intensity(for: A, lambda: 10) + intensity(for: B, lambda: 10))/2.0
+        return Float(euclideanDistance) * intensityParameter
+    }
+    
+    func intensity(for point:(Int,Int,Int), lambda:Float)->Float{
+        let intensity = imageToDisplay.sample3Ddata(x: Float(point.0), y: Float(point.1), z: Float(point.2))
+        let ratio = pow((1-(intensity - Float(imageToDisplay.minIntensity))/(Float(imageToDisplay.maxIntensity) - Float(imageToDisplay.minIntensity))),2)
+        return Float(exp(ratio*lambda))
+    }
+    
+    func nearPoints(around point:(Int,Int,Int))->[(Int,Int,Int)]{ // six points around a start point
+        let array = [(-1,0,0),(0,-1,0),(0,0,-1),(1,0,0),(0,1,0),(0,0,1)]
+        let pointArray = array.map({($0.0+point.0,$0.1+point.1,$0.2+point.2)})
+        return pointArray.filter {space.isInSpace(point: $0)}
+    }
+    
+    func coord2Index(coord:(Int,Int,Int),size:(Int,Int,Int))->Int{
+        return coord.0*size.0*size.1 + coord.1*size.2 + coord.2
+    }
+    
+    func index2Coord(index:Int,size:(Int,Int,Int))->(Int,Int,Int){
+        let x = index/(size.0*size.1)
+        let y = (index - (size.0*size.1*x))/128
+        let z = index - (size.0*size.1*x) - (size.2*y)
+        return (x,y,z)
+    }
+    
+    
 }

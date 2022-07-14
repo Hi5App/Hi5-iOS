@@ -102,7 +102,7 @@ struct PBDImage{
 //        }
         print("Image \(PBDimageURL.lastPathComponent) read finished")
         // init a image4DSimple
-        let image4DSimple = image4DSimple(name: PBDimageURL.lastPathComponent, endiannessType: endianness, dataType: datatype, Int(size[0]), Int(size[1]), Int(size[2]), Int(size[3]), array128x128x128 ,array: decompressionByteBuffer)
+        let image4DSimple = image4DSimple(name: PBDimageURL.lastPathComponent, endiannessType: endianness, dataType: datatype, Int(size[0]), Int(size[1]), Int(size[2]), Int(size[3]), array128x128x128 ,array: decompressionByteBuffer,maxIntensity: 255,minIntensity: 0)
 //        print("initialized a image4DSimple obejct from pbd file")
         return image4DSimple
     }

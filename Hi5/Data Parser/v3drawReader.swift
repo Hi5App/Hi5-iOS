@@ -85,12 +85,17 @@ struct v3drawReader{
             return nil
         }
         var imageDataStart = 43
+        var maxIntensity = UInt8(0)
+        var minIntensity = UInt8(255)
         var array128x128x128 = Array(repeating: Array(repeating: Array(repeating: UInt8(0), count: 128), count: 128), count: 128)
         let oneDemenArray = Array(bytes[43...])
         for i in 0...127{
             for j in 0...127{
                 for k in 0...127{
-                    array128x128x128[i][j][k] = bytes[imageDataStart]
+                    let intensity = bytes[imageDataStart]
+                    array128x128x128[i][j][k] = intensity
+                    maxIntensity = max(maxIntensity, intensity)
+                    minIntensity = min(minIntensity, intensity)
                     imageDataStart += 1
                 }
             }
@@ -100,7 +105,7 @@ struct v3drawReader{
         }
         
         
-        let image4DSimple = image4DSimple(name: path.lastPathComponent, endiannessType: endianness, dataType: datatype, Int(size[0]), Int(size[1]), Int(size[2]), Int(size[3]), array128x128x128,array: oneDemenArray)
+        let image4DSimple = image4DSimple(name: path.lastPathComponent, endiannessType: endianness, dataType: datatype, Int(size[0]), Int(size[1]), Int(size[2]), Int(size[3]), array128x128x128,array: oneDemenArray,maxIntensity: maxIntensity,minIntensity: minIntensity)
         print("initialized a image4DSimple obejct")
         return image4DSimple
     }
