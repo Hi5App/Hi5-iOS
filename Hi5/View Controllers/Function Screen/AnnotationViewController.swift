@@ -22,6 +22,10 @@ struct heapElement:Equatable{
     var distance:Float
 }
 
+struct userLines{
+    var lines:[[simd_float3]]
+    var lineColor:UIColor
+}
 
 struct intersectionSpace{
     var x0:Float
@@ -135,22 +139,31 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
         worldModelMatrix.translate(0.0, y: 0.0, z: -4)
         worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
 //        test()
+        // init
+        
     }
     
     var userPref:UserPreferences!
     var space:intersectionSpace!
     var globalIDCounter:Int = 0
+    var drawingLines:userLines?
+    
+    override func renderObjects(drawable: CAMetalDrawable) {
+        objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil, markerArray: markerArray, Tree: Tree,userLines: drawingLines)
+    }
     
     // MARK: - Congfigue UI
     override func configureNavBar(){
         super.configureNavBar()
         // buttons
-        let readLocalFile = UIAction(title:"Local Image",image: UIImage(systemName: "folder.fill")){ (action) in
-            self.readLocalImage()
-        }
-        let menu = UIMenu(title: "", options: .displayInline, children: [readLocalFile])
+//        let readLocalFile = UIAction(title:"Local Image",image: UIImage(systemName: "folder.fill")){ (action) in
+//            self.readLocalImage()
+//        }
+//        let menu = UIMenu(title: "", options: .displayInline, children: [readLocalFile])
         let openImageButton = UIBarButtonItem(systemItem: .add)
-        openImageButton.menu = menu
+        openImageButton.target = self
+        openImageButton.action = #selector(readLocalImage)
+//        openImageButton.menu = menu
         let UndoButton = UIBarButtonItem()
         UndoButton.image = UIImage(systemName: "arrow.counterclockwise")
         UndoButton.target = self
@@ -163,11 +176,13 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
             userArray.remove(at: userArray.count-1)
             somaArray = originalSomaArray + userArray
             mapToMarkerArray()
+        }else if let userLines = drawingLines,userLines.lines.count != 0{
+            drawingLines?.lines.remove(at: userLines.lines.count-1)
         }
     }
     
    // MARK: - Image Reader
-    func readLocalImage(){
+    @objc func readLocalImage(){
         let v3drawUTType = UTType("com.penglab.Hi5-imageType.v3draw.v3draw")!
         let swcUTType = UTType("com.penglab.Hi5-annotationType.swc")!
         let pbdUTType = UTType("com.penglab.Hi5-imageType.pbd")!
@@ -221,8 +236,7 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
         default:
             fatalError("Unknown File Type")
         }
-        
-        
+        drawingLines = nil
     }
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentAt url: URL) {
@@ -385,13 +399,15 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
                 let timer2 = Date()
                 print("Curve calculation used \(timer2.timeIntervalSince(timer1)) seconds")
                 
-                let positions =
-                path.map({index2Coord(index: $0, size: imageSize)})
+                let positions = path.map({index2Coord(index: $0, size: imageSize)})
                     .map({imageToDisplay.from3DToDisplay(position: $0)})
                     .map({simd_float3($0.0,$0.1,$0.2)})
-                userArray.append(contentsOf: positions)
-                self.somaArray =  self.originalSomaArray + self.userArray
-                mapToMarkerArray()
+                if drawingLines == nil{ // first line
+                    let a2 = [positions]
+                    drawingLines = userLines(lines:a2, lineColor: .systemRed)
+                }else{ // later line
+                    drawingLines?.lines.append(positions)
+                }
                 // reset space
                 space = nil
                 touchPoints = []

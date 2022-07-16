@@ -107,7 +107,7 @@ class MarkerFactoryViewController:Image3dViewController{
         markerArray = somaArray.map({ somaLoc in
             return Marker(type: .MarkerFactory, displayPosition: somaLoc, color: .systemOrange)
         })
-        objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil, markerArray: markerArray, Tree: Tree)
+        objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil, markerArray: markerArray, Tree: Tree,userLines: nil)
     }
 
     override func viewDidDisappear(_ animated: Bool) {

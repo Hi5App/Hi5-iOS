@@ -129,7 +129,7 @@ class Node{
     }
     
     // call 60 times a second
-    func render(commandQueue:MTLCommandQueue,pipelineState:MTLRenderPipelineState,drawable:CAMetalDrawable,parentModelViewMatrix:float4x4, projectionMatrix:float4x4,clearColor:MTLClearColor?,markerArray:[Marker],Tree:neuronTree?){
+    func render(commandQueue:MTLCommandQueue,pipelineState:MTLRenderPipelineState,drawable:CAMetalDrawable,parentModelViewMatrix:float4x4, projectionMatrix:float4x4,clearColor:MTLClearColor?,markerArray:[Marker],Tree:neuronTree?,userLines:userLines?){
         _ = bufferProvider.availableResourcesSemaphore.wait(timeout: DispatchTime.distantFuture)
         
         // set up for cube texture
@@ -306,6 +306,34 @@ class Node{
                 renderEncoder.setVertexBuffer(uniformBuffer, offset: 0, index: 1)
                 renderEncoder.drawPrimitives(type: .lineStrip, vertexStart: 0, vertexCount: vertexArray.count)
 
+            }
+        }
+        
+        //draw user lines in annotation mode
+        if let userLines = userLines {
+            for branch in userLines.lines{
+                let vertexArray = branch.map { position in
+                    return Vertex(x: position.x, y: position.y, z: position.z, r: Float(userLines.lineColor.redValue), g: Float(userLines.lineColor.greenValue), b: Float(userLines.lineColor.blueValue), a: 1.0, s: 1.0, t: 1.0)
+                }
+                let dataSize = vertexArray.count * MemoryLayout.size(ofValue: vertexArray[0])
+                let pointBuffer = device.makeBuffer(bytes: vertexArray, length: dataSize, options: [])
+
+                let defaultLibrary = device.makeDefaultLibrary()!
+                let fragmentProgram = defaultLibrary.makeFunction(name: "texture_fragment")
+                let vertexProgram = defaultLibrary.makeFunction(name: "texture_vertex")
+
+                let trianglePipelineStateDescriptor = MTLRenderPipelineDescriptor()
+                trianglePipelineStateDescriptor.label = "draw user lines"
+                trianglePipelineStateDescriptor.vertexFunction = vertexProgram
+                trianglePipelineStateDescriptor.fragmentFunction = fragmentProgram
+                trianglePipelineStateDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+
+                let trianglePipelineState = try! device.makeRenderPipelineState(descriptor: trianglePipelineStateDescriptor)
+
+                renderEncoder.setRenderPipelineState(trianglePipelineState)
+                renderEncoder.setVertexBuffer(pointBuffer, offset: 0, index: 0)
+                renderEncoder.setVertexBuffer(uniformBuffer, offset: 0, index: 1)
+                renderEncoder.drawPrimitives(type: .lineStrip, vertexStart: 0, vertexCount: vertexArray.count)
             }
         }
         

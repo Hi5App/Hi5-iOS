@@ -295,7 +295,7 @@ class CheckModeViewController:Image3dViewController,passUserPrefChange{
     }
     
     override func renderObjects(drawable: CAMetalDrawable) {
-        objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil, markerArray: markerArray, Tree: Tree)
+        objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil, markerArray: markerArray, Tree: Tree,userLines: nil)
     }
     
     // MARK: - Congfigue UI

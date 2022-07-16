@@ -257,7 +257,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
   //MARK: - MetalViewControllerDelegate
     func renderObjects(drawable:CAMetalDrawable) {
     // draw the view
-        objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil, markerArray: markerArray, Tree: Tree)
+        objectToDraw.render(commandQueue: commandQueue, pipelineState: pipelineState, drawable: drawable, parentModelViewMatrix: worldModelMatrix, projectionMatrix: projectionMatrix, clearColor: nil, markerArray: markerArray, Tree: Tree,userLines: nil)
     }
 
     func updateLogic(timeSinceLastUpdate: CFTimeInterval) {
