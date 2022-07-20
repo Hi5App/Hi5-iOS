@@ -301,6 +301,7 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
                 }
             }else if panGesture.state == UIGestureRecognizer.State.ended{
                 // calculate curve
+                guard space != nil else {return}
                 let timer1 = Date()
                 space.extendArea(extent: 0.1) //extend space for correcting error
                 space.setEdge(point1: (imageToDisplay.access3DfromCenter(x: space.x0, y: space.y0, z: space.z0)), point2: (imageToDisplay.access3DfromCenter(x: space.x1, y: space.y1, z: space.z1)))
@@ -399,9 +400,12 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
                 let timer2 = Date()
                 print("Curve calculation used \(timer2.timeIntervalSince(timer1)) seconds")
                 
-                let positions = path.map({index2Coord(index: $0, size: imageSize)})
+                var positions = path.map({index2Coord(index: $0, size: imageSize)})
                     .map({imageToDisplay.from3DToDisplay(position: $0)})
                     .map({simd_float3($0.0,$0.1,$0.2)})
+//                print(positions)
+                positions = smoothLine(line: positions,windowSize: 4)
+//                print(positions)
                 if drawingLines == nil{ // first line
                     let a2 = [positions]
                     drawingLines = userLines(lines:a2, lineColor: .systemRed)
@@ -538,5 +542,43 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
         return (x,y,z)
     }
     
-    
+    func smoothLine(line:[simd_float3],windowSize:Int)->[simd_float3]{
+        if (windowSize < 2){return line}
+        let length = line.count
+        let halfWindowSize = Float(windowSize/2)
+        let lineCopy = line
+        var smoothedLine = lineCopy
+        
+        for i in 1..<line.count-1{
+            var winC = [simd_float3]()
+            var winW = [Float]()
+            
+            winC.append(lineCopy[i])
+            winW.append(1.0 + halfWindowSize)
+            
+            for j in 1...Int(halfWindowSize){
+                let k1 = max(0,min((i+j),length-1))
+                let k2 = max(0,min((i-j),length-1))
+                winC.append(contentsOf: [lineCopy[k1],lineCopy[k2]])
+                winW.append(contentsOf: [1.0+halfWindowSize-Float(j),1.0+halfWindowSize-Float(j)])
+            }
+            
+            var x:Float = 0.0,y:Float = 0.0,z:Float = 0.0,s:Float = 0.0
+            for j in 0...winW.count-1{
+                x += winW[j] * winC[j].x
+                y += winW[j] * winC[j].y
+                z += winW[j] * winC[j].z
+                s += winW[j]
+            }
+            if s>0 {
+                x /= s
+                y /= s
+                z /= s
+            }
+            
+            smoothedLine[i] = simd_float3(x,y,z)
+        }
+        
+        return smoothedLine
+    }
 }
