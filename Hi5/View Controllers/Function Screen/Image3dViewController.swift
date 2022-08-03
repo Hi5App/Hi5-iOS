@@ -413,7 +413,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
                 currentPosi += Step
             }
         }
-        if flag && !deleteMode{
+        if flag && !deleteMode && maxIntensity != 0.0{
             print("soma intensity is \(maxIntensity)")
             return simd_float3(maxPosition.x,maxPosition.y,maxPosition.z)
         }else{

@@ -56,9 +56,9 @@ class image4DSimple{
         let lowX = Int(x)
         let lowY = Int(y)
         let lowZ = Int(z)
-        let highX = lowX+1
-        let highY = lowY+1
-        let highZ = lowZ+1
+        let highX = min(lowX+1,127)
+        let highY = min(lowY+1,127)
+        let highZ = min(lowZ+1,127)
         var Intensities = Array(repeating: Array(repeating: Array(repeating: 0, count: 2), count: 2), count: 2)
         // fill Intensities
         Intensities[0][0][0] = Int(imageData[lowX][lowY][lowZ])
@@ -100,23 +100,23 @@ class image4DSimple{
     
     func access3DfromCenter(x:Float,y:Float,z:Float)->(Float,Float,Float){
         //  model space coordinates -> 3d array index
-        // 62.5 = 127/2,center index of the array
         // rotate 90 degree and invert y axis
         let temp = x
         let x = z
         let y = -y
         let z = -temp
         // position in 3dArray
-        let arrayX = x*62.5+62.5
-        let arrayY = -y*62.5+62.5
-        let arrayZ = -(z*62.5-62.5)
+        let arrayX = x*Float(sizeX-1)/2+Float(sizeX-1)/2
+        let arrayY = -y*Float(sizeY-1)/2+Float(sizeY-1)/2
+        let arrayZ = -(z*Float(sizeZ-1)/2-Float(sizeZ-1)/2)
         return (arrayX,arrayY,arrayZ)
     }
     
     func from3DToDisplay(position:(Int,Int,Int))->(Float,Float,Float){
-        var x = (Float(position.0) - 62.5)/62.5
-        var y = -(Float(position.1) - 62.5)/62.5
-        var z = (-Float(position.2) + 62.5)/62.5
+        var x = (Float(position.0) - Float(sizeX-1)/2)/(Float(sizeX-1)/2)
+        print(Float(sizeX-1)/2)
+        var y = -(Float(position.1) - Float(sizeY-1)/2)/(Float(sizeY-1)/2)
+        var z = (-Float(position.2) + Float(sizeZ-1)/2)/(Float(sizeZ-1)/2)
         
         (x,z) = (-z,x)
         y = -y

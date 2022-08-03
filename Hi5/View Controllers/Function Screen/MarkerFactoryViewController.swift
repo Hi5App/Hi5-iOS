@@ -67,7 +67,7 @@ class MarkerFactoryViewController:Image3dViewController{
 //    let threadQueue = DispatchQueue.global()
 
     var preDownloadThread = Thread()
-    var checkFreshTimer = Timer()
+//    var checkFreshTimer = Timer()
     var checkDownloadTimer:Timer!
 
     // MARK: - Life Cycle
@@ -75,6 +75,7 @@ class MarkerFactoryViewController:Image3dViewController{
         super.viewWillDisappear(animated)
         imageCache.imageCache.removeAll()
         checkDownloadTimer.invalidate()
+//        checkFreshTimer.invalidate()
     }
     
     override func viewDidLoad() {
@@ -87,7 +88,7 @@ class MarkerFactoryViewController:Image3dViewController{
         imageCache = image4DSimpleCache()
 //        request potential location and brainList for later use
         self.preDownloadMethod()
-        checkFreshTimer = Timer.scheduledTimer(timeInterval: 30, target: self, selector: #selector(checkFresh), userInfo: nil, repeats: true)
+//        checkFreshTimer = Timer.scheduledTimer(timeInterval: 30, target: self, selector: #selector(checkFresh), userInfo: nil, repeats: true)
      
     }
     
