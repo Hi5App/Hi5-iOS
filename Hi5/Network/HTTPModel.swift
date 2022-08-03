@@ -117,6 +117,11 @@ struct QueryPotentialLoactionStruct:Codable{
     let user:UserInfo
 }
 
+struct getArborStruct:Codable{
+    let MaxId:Int
+    let user:UserInfo
+}
+
 struct PotentialLocationFeedBack:Codable{
     let id:Int
     let image:String

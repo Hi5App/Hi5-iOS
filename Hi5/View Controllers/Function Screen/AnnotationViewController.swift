@@ -305,7 +305,7 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
                 let timer1 = Date()
                 space.extendArea(extent: 0.1) //extend space for correcting error
                 space.setEdge(point1: (imageToDisplay.access3DfromCenter(x: space.x0, y: space.y0, z: space.z0)), point2: (imageToDisplay.access3DfromCenter(x: space.x1, y: space.y1, z: space.z1)))
-                print(space)
+//                print(space)
                 // data type transform: simd_float4 -> [simd_float4] -> 3d array coord float -> 3d array coord int -> spacePoints struct
                 let startEnds = Array(touchPoints.prefix(2))
                 print(startEnds)

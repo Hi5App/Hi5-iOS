@@ -208,8 +208,8 @@ struct HTTPRequest{
     }
     
     struct QualityInspectionPart {
-        static func getArbor(name:String, passwd:String, completionHandler:@escaping(QueryArborFeedBack?)->Void, errorHandler:@escaping(String)->Void) {
-            let queryPotentialLocationStruct = QueryPotentialLoactionStruct(user: UserInfo(name: name, passwd: passwd))
+        static func getArbor(name:String, passwd:String,maxID:Int, completionHandler:@escaping(QueryArborFeedBack?)->Void, errorHandler:@escaping(String)->Void) {
+            let queryPotentialLocationStruct = getArborStruct(MaxId:maxID,user: UserInfo(name: name, passwd: passwd))
             let jsonData = Hi5API.generateJSON(queryPotentialLocationStruct)
             guard jsonData != nil else {return}
             

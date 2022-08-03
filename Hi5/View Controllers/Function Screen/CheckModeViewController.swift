@@ -19,7 +19,14 @@ enum ReconstructionType:Int {
 }
 
 struct arborFeedbackManagement{
-    var currentFeedback:QueryArborFeedBack
+    var currentFeedback:QueryArborFeedBack{
+        didSet{
+            let idArray = currentFeedback.arbors.map{($0.id)}
+            maxId = idArray.max() ?? 0
+            print("maxid is \(maxId)")
+        }
+    }
+    var maxId:Int = 0
     var downloadStatus:[URL?]{
         didSet{
             let indicatorArray = downloadStatus.map { item in
@@ -213,11 +220,11 @@ class CheckModeViewController:Image3dViewController,passUserPrefChange{
             if let feedback = feedback {
                 self.brainListfeed = feedback
                 // download arbor
-                HTTPRequest.QualityInspectionPart.getArbor(name: self.user.userName, passwd: self.user.password) { feedback in
+                HTTPRequest.QualityInspectionPart.getArbor(name: self.user.userName, passwd: self.user.password, maxID: 0) { feedback in
                     if let feed = feedback{
 //                        print(feed)
                         
-                        self.getArborFeedBack = arborFeedbackManagement(currentFeedback: feed,downloadStatus: Array(repeating: nil, count: feed.arbors.count))
+                        self.getArborFeedBack = arborFeedbackManagement(currentFeedback: feed, downloadStatus: Array(repeating: nil, count: feed.arbors.count))
                         self.currentArbor = feed.arbors[0]
                         // debug
                         self.readCloudImage()
@@ -411,7 +418,7 @@ class CheckModeViewController:Image3dViewController,passUserPrefChange{
         }
         if currentFeedbackIndex >= 5 && getArborFeedBack.nextFeedback == nil{
             print("reach threshold")
-            HTTPRequest.QualityInspectionPart.getArbor(name: self.user.userName, passwd: self.user.password) { feedback in
+            HTTPRequest.QualityInspectionPart.getArbor(name: self.user.userName, passwd: self.user.password, maxID: self.getArborFeedBack.maxId) { feedback in
                 if let feed = feedback{
                     self.getArborFeedBack.nextFeedback = feed
                     print("next feedback download success")
