@@ -18,7 +18,7 @@ enum spacePointsStatus{
 
 struct heapElement:Equatable{
     var index:Int
-    var parentIndex:Int
+//    var parentIndex:Int
     var distance:Float
 }
 
@@ -331,15 +331,15 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
                 
                 // dictionary stores start points and end points
                 let startIndex = Set<Int>(IntStartRay.map({ point in
-                    return coord2Index(coord: point, size: imageSize)
+                    return CoordHelper.coord2Index(coord: point, size: imageSize)
                 }))
                 let endIndex = Set<Int>(IntEndRay.map({ point in
-                    return coord2Index(coord: point, size: imageSize)
+                    return CoordHelper.coord2Index(coord: point, size: imageSize)
                 }))
                 
                 // initialize for start point
                 for point in IntStartRay{
-                    let index = coord2Index(coord: point, size: imageSize)
+                    let index = CoordHelper.coord2Index(coord: point, size: imageSize)
                     status[index] = .ALIVE
                     parent[index] = index
                     distance[index] = 0
@@ -350,8 +350,8 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
                 var path = Array<Int>()
                 var minHeap = heap(sort: compareHeapElement)
                 for point in IntStartRay{
-                    let index = coord2Index(coord: point, size: imageSize)
-                    let element = heapElement(index: index, parentIndex: index, distance: 0)
+                    let index = CoordHelper.coord2Index(coord: point, size: imageSize)
+                    let element = heapElement(index: index, distance: 0)
                     minHeap.insert(element)
                 }
                 while(!minHeap.isEmpty){
@@ -361,12 +361,12 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
                         pathEndIndex = minElement.index
                         break
                     }
-                    for point in nearPoints(around: index2Coord(index: minElement.index, size: imageSize)){
-                        let nearIndex = coord2Index(coord: point, size: imageSize)
+                    for point in nearPoints(around: CoordHelper.index2Coord(index: minElement.index, size: imageSize)){
+                        let nearIndex = CoordHelper.coord2Index(coord: point, size: imageSize)
                         if status[nearIndex] != .ALIVE{
-                            let startPosition = index2Coord(index: minElement.index, size: imageSize)
+                            let startPosition:(Int,Int,Int) = CoordHelper.index2Coord(index: minElement.index, size: imageSize)
                             let newDistance = minElement.distance + graphDistance(from: startPosition, to: point)
-                            let newElement = heapElement(index: nearIndex, parentIndex: minElement.index, distance: newDistance)
+                            let newElement = heapElement(index: nearIndex, distance: newDistance)
                             if status[nearIndex] == .FAR{
                                 //update info
                                 parent[nearIndex] = minElement.index
@@ -401,7 +401,7 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
                 let timer2 = Date()
                 print("Curve calculation used \(timer2.timeIntervalSince(timer1)) seconds")
                 
-                var positions = path.map({index2Coord(index: $0, size: imageSize)})
+                var positions = path.map({CoordHelper.index2Coord(index: $0, size: imageSize)})
                     .map({imageToDisplay.from3DToDisplay(position: $0)})
                     .map({simd_float3($0.0,$0.1,$0.2)})
 //                print(positions)
@@ -532,16 +532,7 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
         return pointArray.filter {space.isInSpace(point: $0)}
     }
     
-    func coord2Index(coord:(Int,Int,Int),size:(Int,Int,Int))->Int{
-        return coord.0*size.0*size.1 + coord.1*size.2 + coord.2
-    }
     
-    func index2Coord(index:Int,size:(Int,Int,Int))->(Int,Int,Int){
-        let x = index/(size.0*size.1)
-        let y = (index - (size.0*size.1*x))/128
-        let z = index - (size.0*size.1*x) - (size.2*y)
-        return (x,y,z)
-    }
     
     func smoothLine(line:[simd_float3],windowSize:Int)->[simd_float3]{
         if (windowSize < 2){return line}

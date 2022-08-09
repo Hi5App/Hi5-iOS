@@ -51,6 +51,7 @@
 		43C145CF28479AE300A9BCC0 /* FormerResultsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C145CE28479AE300A9BCC0 /* FormerResultsController.swift */; };
 		43C54BD127EA04990067F559 /* FunctionCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C54BD027EA04990067F559 /* FunctionCollectionViewCell.swift */; };
 		43CFDB242810FDA000AF33FB /* image4DSimpleCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43CFDB232810FDA000AF33FB /* image4DSimpleCache.swift */; };
+		43D4D49D28A240B60077A298 /* AnnotationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D4D49C28A240B60077A298 /* AnnotationHelper.swift */; };
 		43EEA48C27FFDF8D00B0E8B7 /* float4x4+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EEA48B27FFDF8D00B0E8B7 /* float4x4+Extensions.swift */; };
 		43F72BE8282E794D0088BB9E /* CheckModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43F72BE7282E794D0088BB9E /* CheckModeViewController.swift */; };
 		43FA187127E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FA187027E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift */; };
@@ -124,6 +125,7 @@
 		43C145CE28479AE300A9BCC0 /* FormerResultsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormerResultsController.swift; sourceTree = "<group>"; };
 		43C54BD027EA04990067F559 /* FunctionCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionCollectionViewCell.swift; sourceTree = "<group>"; };
 		43CFDB232810FDA000AF33FB /* image4DSimpleCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = image4DSimpleCache.swift; sourceTree = "<group>"; };
+		43D4D49C28A240B60077A298 /* AnnotationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationHelper.swift; sourceTree = "<group>"; };
 		43EEA48B27FFDF8D00B0E8B7 /* float4x4+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "float4x4+Extensions.swift"; sourceTree = "<group>"; };
 		43F72BE7282E794D0088BB9E /* CheckModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckModeViewController.swift; sourceTree = "<group>"; };
 		43FA187027E5C17000CBE5EF /* FunctionCollectionViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionCollectionViewDataSource.swift; sourceTree = "<group>"; };
@@ -320,6 +322,7 @@
 				4320386827D8EC8000DB2DBC /* MetalViewController.swift */,
 				439215A5280C630700E53631 /* MarkerFactoryViewController.swift */,
 				437BA778281C13E6001C0A44 /* AnnotationViewController.swift */,
+				43D4D49C28A240B60077A298 /* AnnotationHelper.swift */,
 				43B2255A281BD4DE00808B09 /* Image3dViewController.swift */,
 				43F72BE7282E794D0088BB9E /* CheckModeViewController.swift */,
 				43C145CE28479AE300A9BCC0 /* FormerResultsController.swift */,
@@ -470,6 +473,7 @@
 				43A018E42858812D00E2983E /* AchievementsViewController.swift in Sources */,
 				43C54BD127EA04990067F559 /* FunctionCollectionViewCell.swift in Sources */,
 				43F72BE8282E794D0088BB9E /* CheckModeViewController.swift in Sources */,
+				43D4D49D28A240B60077A298 /* AnnotationHelper.swift in Sources */,
 				43B12F5B2806F9EE0049BE9C /* HTTPRequest.swift in Sources */,
 				433C55C32813F8D900BC223F /* CoordHelper.swift in Sources */,
 				43EEA48C27FFDF8D00B0E8B7 /* float4x4+Extensions.swift in Sources */,

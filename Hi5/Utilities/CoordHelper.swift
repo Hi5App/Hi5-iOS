@@ -42,4 +42,26 @@ struct CoordHelper{
                              y: Float(displayLoc.y)*128+center.y,
                              z: Float(displayLoc.z)*128+center.z)
     }
+    
+    static func coord2Index(coord:(Int,Int,Int),size:(Int,Int,Int))->Int{
+        return coord.0*size.0*size.1 + coord.1*size.2 + coord.2
+    }
+    
+    static func coord2Index(coord:IntPoint3D,size:(Int,Int,Int))->Int{
+        return coord.x*size.0*size.1 + coord.y*size.2 + coord.z
+    }
+    
+    static func index2Coord(index:Int,size:(Int,Int,Int))->(Int,Int,Int){
+        let x = index/(size.0*size.1)
+        let y = (index - (size.0*size.1*x))/128
+        let z = index - (size.0*size.1*x) - (size.2*y)
+        return (x,y,z)
+    }
+    
+    static func index2Coord(index:Int,size:(Int,Int,Int))->IntPoint3D{
+        let x = index/(size.0*size.1)
+        let y = (index - (size.0*size.1*x))/128
+        let z = index - (size.0*size.1*x) - (size.2*y)
+        return IntPoint3D(x: x, y: y, z: z)
+    }
 }
