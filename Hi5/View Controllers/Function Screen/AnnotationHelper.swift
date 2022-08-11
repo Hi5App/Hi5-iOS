@@ -25,6 +25,11 @@ struct IntPoint3D{
 }
 
 struct neuronTracing{
+    
+    // useful constants
+    let sqrt2 = 1.41421356237
+    let sqrt3 = 1.73205080757
+    
     func app2(seed:simd_float3,image:image4DSimple)
 //    -> neuronTree
     {
@@ -37,7 +42,10 @@ struct neuronTracing{
         let imageSize = (image.sizeX,image.sizeY,image.sizeZ)
         // array stores distance parent status
         var distance = Array(repeating: Float.greatestFiniteMagnitude, count: arraysize)
-        var parent = Array(repeating: -1, count: arraysize)
+        var parent = Array(repeating: -2, count: arraysize)
+        for i in 0...parent.count-1{
+            parent[i] = image.imageArray[i] > image.avgIntensity ? 0 : -1
+        }
         var status = Array(repeating: spacePointsStatus.FAR, count: arraysize)
         // init for seed position
         let index = CoordHelper.coord2Index(coord: seedIntPosition, size: imageSize)
@@ -54,6 +62,7 @@ struct neuronTracing{
             let nearPoints = nearElements(seed:minPosition , numberOfElements: 6, minBound: IntPoint3D(x: 0, y: 0, z: 0), maxBound: IntPoint3D(x: 127, y: 127, z: 127))
             for point in nearPoints{
                 let nearIndex = CoordHelper.coord2Index(coord: point, size: imageSize)
+                if parent[nearIndex] == -1 {continue}
                 if status[nearIndex] != .ALIVE{
                     let startPosition:(Int,Int,Int) = CoordHelper.index2Coord(index: minElement.index, size: imageSize)
                     let newDistance = minElement.distance + graphDistance(from: startPosition, to: point.tupleValue,image: image)
@@ -89,14 +98,27 @@ struct neuronTracing{
     }
     
     func graphDistance(from A:(Int,Int,Int),to B:(Int,Int,Int),image:image4DSimple)->Float{
-        let euclideanDistance = sqrt(pow(Double(abs(A.0-B.0)), 2) + pow(Double(abs(A.1-B.1)), 2) + pow(Double(abs(A.2-B.2)), 2))
+//        let euclideanDistance = sqrt(pow(Double(abs(A.0-B.0)), 2) + pow(Double(abs(A.1-B.1)), 2) + pow(Double(abs(A.2-B.2)), 2))
+        let gap = abs(A.0 - B.0) + abs(A.1 - B.1) + abs(A.2 - B.2)
+        var euclideanDistance:Double = 0.0
+        switch gap{
+        case 1:
+            euclideanDistance = 1.0
+        case 2:
+            euclideanDistance = sqrt2
+        case 3:
+            euclideanDistance = sqrt3
+        default:
+            fatalError("error when calculating enclideanDistance in app2 graphDistanceFunction")
+        }
         let intensityParameter = (intensity(for: A, lambda: 10,image: image) + intensity(for: B, lambda: 10,image: image))/2.0
         return Float(euclideanDistance) * intensityParameter
     }
     
     func intensity(for point:(Int,Int,Int), lambda:Float,image:image4DSimple)->Float{
-        let intensity = image.sample3Ddata(x: Float(point.0), y: Float(point.1), z: Float(point.2))
-        let ratio = pow((1-(intensity - Float(image.minIntensity))/(Float(image.maxIntensity) - Float(image.minIntensity))),2)
+//        let intensity = image.sample3Ddata(x: Float(point.0), y: Float(point.1), z: Float(point.2))
+        let intensity = image.imageArray[CoordHelper.coord2Index(coord: point, size: (image.sizeX,image.sizeY,image.sizeZ))]
+        let ratio = pow((1-(Float(intensity) - Float(image.minIntensity))/(Float(image.maxIntensity) - Float(image.minIntensity))),2)
         return Float(exp(ratio*lambda))
     }
     

@@ -127,10 +127,16 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
         }
     }
     
+    
+    let tracingFunctions = neuronTracing()
     @IBAction func Tracing(_ sender: Any) {
+//        if self.markerArray.count == 1{
+//            tracingFunctions.app2(seed: markerArray[0].displayPosition, image: self.imageToDisplay)
+//        }
     }
     
     @IBAction func moreOptions(_ sender: Any) {
+        
     }
     
     override func viewDidLoad() {
@@ -215,6 +221,7 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
         case "v3dpbd":
             var pbdimage = PBDImage(imageLocation: fileURL)
             imageToDisplay = pbdimage.decompressToV3draw()
+            imageToDisplay.make3DArrayFrom1DArray()
             if let image = imageToDisplay{
                 drawWithImage(image: image)
                 hideMessageLabel()
@@ -365,7 +372,7 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
                         let nearIndex = CoordHelper.coord2Index(coord: point, size: imageSize)
                         if status[nearIndex] != .ALIVE{
                             let startPosition:(Int,Int,Int) = CoordHelper.index2Coord(index: minElement.index, size: imageSize)
-                            let newDistance = minElement.distance + graphDistance(from: startPosition, to: point)
+                            let newDistance = minElement.distance + tracingFunctions.graphDistance(from: startPosition, to: point, image: self.imageToDisplay)
                             let newElement = heapElement(index: nearIndex, distance: newDistance)
                             if status[nearIndex] == .FAR{
                                 //update info

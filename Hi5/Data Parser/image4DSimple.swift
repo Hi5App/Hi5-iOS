@@ -20,8 +20,9 @@ class image4DSimple{
     
     var maxIntensity:UInt8
     var minIntensity:UInt8
+    var avgIntensity:UInt8
     
-    init(name:String,endiannessType e:Character,dataType dt:UInt8,_ sX:Int,_ sY:Int,_ sZ:Int,_ channel:Int,_ data:[[[UInt8]]],array:[UInt8],maxIntensity:UInt8,minIntensity:UInt8){
+    init(name:String,endiannessType e:Character,dataType dt:UInt8,_ sX:Int,_ sY:Int,_ sZ:Int,_ channel:Int,_ data:[[[UInt8]]],array:[UInt8],maxIntensity:UInt8,minIntensity:UInt8,avgIntensity:UInt8){
         self.name = name
         endianness = e
         dataType = dt
@@ -33,22 +34,26 @@ class image4DSimple{
         imageArray = array
         self.maxIntensity = maxIntensity
         self.minIntensity = minIntensity
+        self.avgIntensity = avgIntensity
     }
     
     func make3DArrayFrom1DArray(){
         var start = 0
         var array3D = Array(repeating: Array(repeating: Array(repeating: UInt8(0), count: sizeZ), count: sizeY), count: sizeX)
+        var totalIntensity = 0
         for i in 0...sizeX-1{
             for j in 0...sizeY-1{
                 for k in 0...sizeZ-1{
                     let element = imageArray[start]
                     array3D[i][j][k] = imageArray[start]
+                    totalIntensity += Int(element)
                     maxIntensity = max(maxIntensity, element)
                     minIntensity = min(minIntensity, element)
                     start += 1
                 }
             }
         }
+        avgIntensity = UInt8(totalIntensity/(sizeX*sizeY*sizeZ))
         imageData = array3D
     }
     
