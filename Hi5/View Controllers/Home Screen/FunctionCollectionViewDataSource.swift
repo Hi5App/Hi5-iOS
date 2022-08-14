@@ -40,6 +40,12 @@ class functionCollectionViewDataSource:NSObject,UICollectionViewDataSource{
         cell.contentView.layer.masksToBounds = true
         
         cell.setup(with: softwareFunctions[indexPath.row])
+        for name in ["Smart Imaging","Chat","Help"] {
+            if cell.functionName.text == name{
+                cell.functionImage.tintColor = UIColor.systemGray
+                cell.isUserInteractionEnabled = false
+            }
+        }
         return cell
     }
     

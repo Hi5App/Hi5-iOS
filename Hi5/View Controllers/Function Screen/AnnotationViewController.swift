@@ -129,12 +129,14 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
     
     
     let tracingFunctions = neuronTracing()
+    @IBOutlet var neuronTracingButton: UIBarButtonItem!
     @IBAction func Tracing(_ sender: Any) {
 //        if self.markerArray.count == 1{
 //            tracingFunctions.app2(seed: markerArray[0].displayPosition, image: self.imageToDisplay)
 //        }
     }
     
+    @IBOutlet var moreOptionsButton: UIBarButtonItem!
     @IBAction func moreOptions(_ sender: Any) {
         
     }
@@ -144,9 +146,9 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
         worldModelMatrix = float4x4()
         worldModelMatrix.translate(0.0, y: 0.0, z: -4)
         worldModelMatrix.rotateAroundX(0.0, y: 0.0, z: 0.0)
-//        test()
-        // init
-        
+        // disable buttons
+        neuronTracingButton.isEnabled = false
+        moreOptionsButton.isEnabled = false
     }
     
     var userPref:UserPreferences!
@@ -162,10 +164,6 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
     override func configureNavBar(){
         super.configureNavBar()
         // buttons
-//        let readLocalFile = UIAction(title:"Local Image",image: UIImage(systemName: "folder.fill")){ (action) in
-//            self.readLocalImage()
-//        }
-//        let menu = UIMenu(title: "", options: .displayInline, children: [readLocalFile])
         let openImageButton = UIBarButtonItem(systemItem: .add)
         openImageButton.target = self
         openImageButton.action = #selector(readLocalImage)

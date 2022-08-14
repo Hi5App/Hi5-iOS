@@ -379,7 +379,9 @@
                         <outlet property="colorPickerItem" destination="yo6-c9-Pyt" id="hyh-NO-Ly4"/>
                         <outlet property="lineMarkSwitch" destination="7Fd-yo-mv6" id="qPE-1P-K6D"/>
                         <outlet property="modeSwitcher" destination="SaX-90-gG2" id="4sC-4c-hwx"/>
+                        <outlet property="moreOptionsButton" destination="Vyv-Uw-jB2" id="JGQ-FU-4uE"/>
                         <outlet property="mtkView" destination="7nr-Q4-se1" id="r5m-DI-wTh"/>
+                        <outlet property="neuronTracingButton" destination="DGz-Ix-t1I" id="Epz-AZ-aFm"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Q5X-uY-DfB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

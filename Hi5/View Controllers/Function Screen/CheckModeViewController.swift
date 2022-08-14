@@ -356,10 +356,12 @@ class CheckModeViewController:Image3dViewController,passUserPrefChange{
     }
     
     func enableButtons(){
+        if currentFeedbackIndex != 0 {
+            backwardButton.isEnabled = true
+            backwardButton.alpha = 1
+        }
         forwardButton.isEnabled = true
-        backwardButton.isEnabled = true
         forwardButton.alpha = 1
-        backwardButton.alpha = 1
         GoodTypeButton.isEnabled = true
         SWCBadButton.isEnabled = true
         NormalButton.isEnabled = true
