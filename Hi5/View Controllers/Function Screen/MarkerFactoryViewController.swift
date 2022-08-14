@@ -206,15 +206,17 @@ class MarkerFactoryViewController:Image3dViewController{
                 print(error)
             }
         }
-        // retrive soma locaiton from cache
-//        if let location = imageCache.previousLocation(){
-//            self.somaPotentialLocation = location
-//            readCloudImage()
-//        }
         disableButtons()
         if imageCache.previousOne() {
             self.somaPotentialLocation = self.imageCache.somaPoLocations[self.imageCache.index].potentialLocationFeedBack
             self.currentImageURL = self.imageCache.urls[self.imageCache.index]
+            self.readLocalImage()
+        }else{ //alert for no more files
+            let alert = UIAlertController(title: "Sorry", message: "No more valid previous images", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self] (action) in
+                self?.enableButtons()
+            }))
+            self.present(alert, animated: true)
         }
     }
     
@@ -251,6 +253,10 @@ class MarkerFactoryViewController:Image3dViewController{
     }
     
     @objc func requestForNextImage(){
+        userArray.removeAll()
+        originalSomaArray.removeAll()
+        somaArray = userArray + originalSomaArray
+        mapToMarkerArray()
         if imageCache.nextOne() {
             self.somaPotentialLocation = imageCache.somaPoLocations[imageCache.index].potentialLocationFeedBack
             self.currentImageURL = imageCache.urls[imageCache.index]
@@ -393,13 +399,8 @@ class MarkerFactoryViewController:Image3dViewController{
             self.decompressImage {
                 if let image = self.imageToDisplay{
                     self.drawWithImage(image: image)
-                    
                 }else{
                     print("No 4d image")
-                }
-                let queue = DispatchQueue.global()
-                queue.async {
-                    self.imageToDisplay.make3DArrayFrom1DArray()
                 }
                 // request somaList
                 HTTPRequest.SomaPart.getSomaList(centerX: self.somaPotentialLocation.loc.x, centerY: self.somaPotentialLocation.loc.y, centerZ: self.somaPotentialLocation.loc.z, size: self.somaperferredSize, res:"", brainId: self.somaPotentialLocation.image, name: self.user.userName, passwd: self.user.password) { feedback in
@@ -431,6 +432,7 @@ class MarkerFactoryViewController:Image3dViewController{
     func decompressImage(completion:()->()){
         var PBDImage = PBDImage(imageLocation: self.currentImageURL!) // decompress image
         self.imageToDisplay = PBDImage.decompressToV3draw()
+        self.imageToDisplay.make3DArrayFrom1DArray()
         completion()
     }
     
@@ -474,10 +476,12 @@ class MarkerFactoryViewController:Image3dViewController{
                         print(removeIndex)
                         userArray.remove(at: removeIndex)
                         somaArray = originalSomaArray + userArray
+                        mapToMarkerArray()
                     }else if let removeIndex = originalSomaArray.firstIndex(of: somaPostion){
                         print(removeIndex)
                         originalSomaArray.remove(at: removeIndex)
                         somaArray = originalSomaArray + userArray
+                        mapToMarkerArray()
                     }
                     // add to remove list
                     let soma = CoordHelper.DisplaySomaLocation2UploadSomaLocation(displayLoc: somaPostion, center: self.somaPotentialSecondaryResLocation)
@@ -500,7 +504,7 @@ class MarkerFactoryViewController:Image3dViewController{
     }
     
     @objc func preLoad(){
-        print("download checked")
+//        print("download checked")
         if (preDownloadThread.isCancelled) {
             Thread.exit()
         }
