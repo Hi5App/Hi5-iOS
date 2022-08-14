@@ -40,11 +40,13 @@ class RegisterViewController: UIViewController {
         
         HTTPRequest.UserPart.register(email: emailTextField.text!, name: usernameTextField.text!, passwd: passwordTextField.text!, nickname: nicknameTextField.text!) { [self] in
             print("user:\(usernameTextField.text!) with nickname:\(nicknameTextField.text!) with email:\(emailTextField.text!) registered successfully")
-            errorTextField.alpha = 1
-            errorTextField.text = "Registered Successfully"
-            errorTextField.textColor = UIColor.systemGreen
+            let alert = UIAlertController(title: "Success!", message: "You have successfully registered as Hi5 user", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel,handler: { (action) in
+                self.navigationController?.popViewController(animated: true)
+            }))
+            self.present(alert, animated: true)
         } errorHandler: { error in
-            let alert = UIAlertController(title: "Register Failed", message: "Please check all text Fields and try again", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Register Failed", message: "Please check your username and email", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel,handler: { (action) in
                 self.navigationController?.popViewController(animated: true)
             }))
