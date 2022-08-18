@@ -13,8 +13,6 @@ struct softwareFunction{
     let image:UIImage?
 }
 
-
-
 class functionCollectionViewDataSource:NSObject,UICollectionViewDataSource{
     
     let softwareFunctions: [softwareFunction] = [

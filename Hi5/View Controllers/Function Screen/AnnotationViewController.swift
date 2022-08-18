@@ -8,7 +8,6 @@
 import UIKit
 import UniformTypeIdentifiers
 import simd
-import Foundation
 
 enum spacePointsStatus{
     case ALIVE
@@ -190,7 +189,8 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
         let v3drawUTType = UTType("com.penglab.Hi5-imageType.v3draw.v3draw")!
         let swcUTType = UTType("com.penglab.Hi5-annotationType.swc")!
         let pbdUTType = UTType("com.penglab.Hi5-imageType.pbd")!
-        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [v3drawUTType,swcUTType,pbdUTType])
+        let tiffUTType = UTType.tiff
+        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [v3drawUTType,swcUTType,pbdUTType,tiffUTType])
 //        let documentPicker = UIDocumentPickerViewController()
         documentPicker.delegate = self
         present(documentPicker, animated: true, completion: nil)
@@ -201,7 +201,6 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
         self.somaArray = self.userArray + self.originalSomaArray
         mapToMarkerArray()
         let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(filename)
-        print(URL(string: filename)!.pathExtension)
         switch URL(string: filename)?.pathExtension {
         case "v3draw":
             let reader = v3drawReader()
@@ -238,8 +237,21 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
             }else{
                 print("No 4d image")
             }
+        case "tif":
+            if let image = tiffReader.read(from: fileURL){
+                imageToDisplay = image
+                imageToDisplay.make3DArrayFrom1DArray()
+                drawWithImage(image: image)
+                hideMessageLabel()
+            }else{
+                print("read tiff image failed")
+            }
         default:
-            fatalError("Unknown File Type")
+            // alert user for not supported format
+            let alert = UIAlertController(title: nil, message:"This image format is not supported", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "OK", style: .default)
+            alert.addAction(okAction)
+            self.present(alert, animated: true)
         }
         drawingLines = nil
     }
@@ -410,7 +422,9 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
                     .map({imageToDisplay.from3DToDisplay(position: $0)})
                     .map({simd_float3($0.0,$0.1,$0.2)})
 //                print(positions)
-                positions = smoothLine(line: positions,windowSize: 4)
+                if positions.count >= 2{
+                    positions = smoothLine(line: positions,windowSize: 4)
+                }
 //                print(positions)
                 if drawingLines == nil{ // first line
                     let a2 = [positions]
