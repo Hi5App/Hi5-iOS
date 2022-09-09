@@ -61,9 +61,9 @@ class image4DSimple{
         let lowX = Int(x)
         let lowY = Int(y)
         let lowZ = Int(z)
-        let highX = min(lowX+1,127)
-        let highY = min(lowY+1,127)
-        let highZ = min(lowZ+1,127)
+        let highX = min(lowX+1,sizeX-1)
+        let highY = min(lowY+1,sizeY-1)
+        let highZ = min(lowZ+1,sizeZ-1)
         var Intensities = Array(repeating: Array(repeating: Array(repeating: 0, count: 2), count: 2), count: 2)
         // fill Intensities
         Intensities[0][0][0] = Int(imageData[lowX][lowY][lowZ])

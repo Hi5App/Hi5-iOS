@@ -464,7 +464,7 @@ class MarkerFactoryViewController:Image3dViewController{
                     print("find soma at \(somaPosition)")
                     userArray.append(somaPosition)
                     self.somaArray =  self.originalSomaArray + self.userArray
-                    print(somaArray)
+//                    print(somaArray)
                 }
                 
             }else if editStatus == .Delete{ // delete mode

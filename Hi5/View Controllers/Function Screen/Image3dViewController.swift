@@ -338,7 +338,7 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
                     userArray.append(somaPosition)
                     self.somaArray =  self.originalSomaArray + self.userArray
                     mapToMarkerArray()
-                    print(somaArray)
+//                    print(somaArray)
                 }
                 
             }else if editStatus == .Delete{ // delete mode
@@ -388,12 +388,13 @@ class Image3dViewController: MetalViewController,MetalViewControllerDelegate{
         var maxIntensity:Float = 0
         var maxPosition = currentPosi
         var flag = false
-        for _ in 1...512{
+        for _ in 1...256{
             if currentPosi[0]<1.0 && currentPosi[0]>(-1.0) && currentPosi[1]<1.0 && currentPosi[1]>(-1.0) && currentPosi[2]<1.0 && currentPosi[2]>(-1.0){
                 //when intersect
                 flag = true
                 if !deleteMode {
                     let position = imageToDisplay.access3DfromCenter(x: currentPosi.x, y: currentPosi.y, z: currentPosi.z)
+                    print(position)
                     currentIntensity = imageToDisplay.sample3Ddata(x: position.0, y: position.1, z: position.2)
                     if currentIntensity > maxIntensity{
                         maxIntensity = currentIntensity

@@ -204,7 +204,6 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
         switch URL(string: filename)?.pathExtension {
         case "v3draw":
             let reader = v3drawReader()
-            
             imageToDisplay = reader.read(from: fileURL)
             localImageURL = fileURL
             self.title = imageToDisplay.name
@@ -226,6 +225,16 @@ class AnnotationViewController:Image3dViewController,UIDocumentPickerDelegate,UI
                 print("No 4d image")
             }
         case "swc":
+            // check for swc file name format
+            let swcFileName = fileURL.lastPathComponent
+            let swcFileNameArray = swcFileName.components(separatedBy: "_")
+            guard swcFileNameArray.count == 16 else {
+                let alert = UIAlertController(title: "Sorry", message: "This name of swc file is not supported", preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "OK", style: .default)
+                alert.addAction(okAction)
+                self.present(alert, animated: true)
+                return
+            }
             Tree = neuronTree(from: fileURL)
             if let branches = Tree?.organizeBranch(){
                 Tree?.branchIndexes = branches

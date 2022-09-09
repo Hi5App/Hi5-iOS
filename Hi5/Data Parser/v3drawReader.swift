@@ -89,13 +89,17 @@ struct v3drawReader{
         var minIntensity = UInt8(255)
         var avgIntensity = UInt8(0)
         var totalIntensity = 0
-        var array128x128x128 = Array(repeating: Array(repeating: Array(repeating: UInt8(0), count: 128), count: 128), count: 128)
+        let IntSize = size.map {Int($0)}
+        var array3D = Array(repeating: Array(repeating: Array(repeating: UInt8(0), count: IntSize[2]), count: IntSize[1]), count: IntSize[0])
         let oneDemenArray = Array(bytes[43...])
-        for i in 0...127{
-            for j in 0...127{
-                for k in 0...127{
+        for i in 0...IntSize[0]-1{
+            for j in 0...IntSize[1]-1{
+                for k in 0...IntSize[2]-1{
                     let intensity = bytes[imageDataStart]
-                    array128x128x128[i][j][k] = intensity
+                    if intensity>170 {
+                        print("position is \(i),\(j),\(k) with \(intensity)")
+                    }
+                    array3D[i][j][k] = intensity
                     totalIntensity += Int(intensity)
                     maxIntensity = max(maxIntensity, intensity)
                     minIntensity = min(minIntensity, intensity)
@@ -108,7 +112,7 @@ struct v3drawReader{
         }
         avgIntensity = UInt8(totalIntensity/(Int(size[0])*Int(size[1])*Int(size[2])))
         
-        let image4DSimple = image4DSimple(name: path.lastPathComponent, endiannessType: endianness, dataType: datatype, Int(size[0]), Int(size[1]), Int(size[2]), Int(size[3]), array128x128x128,array: oneDemenArray,maxIntensity: maxIntensity,minIntensity: minIntensity,avgIntensity: avgIntensity)
+        let image4DSimple = image4DSimple(name: path.lastPathComponent, endiannessType: endianness, dataType: datatype, Int(size[0]), Int(size[1]), Int(size[2]), Int(size[3]), array3D,array: oneDemenArray,maxIntensity: maxIntensity,minIntensity: minIntensity,avgIntensity: avgIntensity)
         print("initialized a image4DSimple obejct")
         return image4DSimple
     }
